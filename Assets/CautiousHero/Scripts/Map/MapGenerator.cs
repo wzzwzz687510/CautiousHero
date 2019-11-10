@@ -20,7 +20,7 @@ namespace Wing.TileUtils
 
         public string seed;
         public bool useRandomSeed = true;
-        [Range(40, 50)]
+        [Range(30, 60)]
         public int randomFillPercent = 45;
 
         public int[,] map { get; private set; }
@@ -40,9 +40,9 @@ namespace Wing.TileUtils
             if (hasEmptyTile) {
                 ProcessMap();
                 RandomTerrainMap();
-                for (int i = 0; i < 1; i++) {
-                    SmoothMap(true);
-                }
+                //for (int i = 0; i < 1; i++) {
+                //    SmoothMap(true);
+                //}
             }
 
         }
@@ -83,9 +83,14 @@ namespace Wing.TileUtils
                     survivingLandBlock.Add(new LandBlock(landRegion, map));
                 }
             }
+
             survivingLandBlock.Sort();
             survivingLandBlock[0].isMainBlock = true;
             survivingLandBlock[0].isAccessibleFromMainBlock = true;
+
+            //foreach (var block in survivingLandBlock) {
+            //    Debug.Log("block cnt: " + block.blockSize);
+            //}
 
             if (connectIsland)
                 ConnectClosestBlocks(survivingLandBlock);
@@ -167,7 +172,7 @@ namespace Wing.TileUtils
         {
             LandBlock.ConnectBlocks(blockA, blockB);
 
-            Debug.DrawLine (CoordToWorldPoint (tileA), CoordToWorldPoint (tileB), Color.green, 3);
+            //Debug.DrawLine (CoordToWorldPoint (tileA), CoordToWorldPoint (tileB), Color.green, 3);
 
             List<Coord> line = GetLine(tileA, tileB);
             foreach (Coord c in line) {
@@ -352,7 +357,7 @@ namespace Wing.TileUtils
                 }
             }
 
-            for (int i = 0; i < terrainTypeCount + 1; i++) {
+            for (int i = 1; i < terrainTypeCount + 1; i++) {
                 surroundType = typeCnt[surroundType] >= typeCnt[i] ? surroundType : i;
             }
 
