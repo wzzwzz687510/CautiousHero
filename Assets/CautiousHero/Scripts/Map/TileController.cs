@@ -1,11 +1,14 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Wing.TileUtils;
 
 public class TileController : MonoBehaviour
 {
     public SpriteRenderer m_spriteRenderer;
     public Animator m_animator;
+
+    public Location Pos { get; private set; }
     // Start is called before the first frame update
     void Start()
     {
@@ -19,8 +22,9 @@ public class TileController : MonoBehaviour
     }
 
     // para sort order, sprite ID and animation delay time
-    public void Init_SpriteRenderer(int sortOrder, int spriteID,float AnimDelayTime)
+    public void Init_SpriteRenderer(Location location,int sortOrder, int spriteID,float AnimDelayTime)
     {
+        Pos = location;
         m_spriteRenderer.sortingOrder = sortOrder;
         m_spriteRenderer.sprite = GridManager.Instance.tileSprites[spriteID];
 

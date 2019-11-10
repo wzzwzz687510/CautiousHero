@@ -26,7 +26,7 @@ RenderSettings:
   m_AmbientIntensity: 1
   m_AmbientMode: 3
   m_SubtractiveShadowColor: {r: 0.42, g: 0.478, b: 0.627, a: 1}
-  m_SkyboxMaterial: {fileID: 0}
+  m_SkyboxMaterial: {fileID: 2100000, guid: 9b5bbce29c63f4ab5a5b63354c67d6ca, type: 2}
   m_HaloStrength: 0.5
   m_FlareStrength: 1
   m_FlareFadeSpeed: 3
@@ -234,11 +234,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   animationDuration: 0
+  tileLayer:
+    serializedVersion: 2
+    m_Bits: 256
   prefab: {fileID: 8944226066564207475, guid: 40ff4a4a7c9d98644be53c1449cd99ab, type: 3}
   tileSprites:
   - {fileID: 21300000, guid: 38f0f07655250c84c8d60e98f52ddd59, type: 3}
-  - {fileID: 21300000, guid: 73c381840b9e96945986aa9fac9dcaf5, type: 3}
-  - {fileID: 21300000, guid: 9ff3665d6c157c5428234650deac5faf, type: 3}
+  - {fileID: 21300000, guid: 351d188ac5383de43a0c2fe2129e7789, type: 3}
+  - {fileID: 21300000, guid: cdd25e8ee4271f047b3ecb7bdcd1df9b, type: 3}
+  - {fileID: 21300000, guid: 8ba6494715c915547b322c0c281b7b78, type: 3}
+  - {fileID: 21300000, guid: b3362a07a7667a64d8a17c12c19ff704, type: 3}
+  - {fileID: 21300000, guid: 4a40a5d6062d3994eb89546484780c26, type: 3}
+  - {fileID: 21300000, guid: ef14886e0a930b54ab5a29ec3d7b60b9, type: 3}
 --- !u!114 &1689295224
 MonoBehaviour:
   m_ObjectHideFlags: 0

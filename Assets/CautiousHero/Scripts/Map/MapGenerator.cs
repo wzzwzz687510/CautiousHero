@@ -60,23 +60,23 @@ namespace Wing.TileUtils
 
         private void ProcessMap()
         {
-            List<List<Coord>> airRegions = GetRegions(0);
+            List<List<Location>> airRegions = GetRegions(0);
 
-            foreach (List<Coord> landRegion in airRegions) {
+            foreach (List<Location> landRegion in airRegions) {
                 if (landRegion.Count < AirThresholdSize) {
-                    foreach (Coord tile in landRegion) {
-                        map[tile.tileX, tile.tileY] = 0;
+                    foreach (Location tile in landRegion) {
+                        map[tile.x, tile.y] = 0;
                     }
                 }
             }
 
-            List<List<Coord>> landRegions = GetRegions(1);
+            List<List<Location>> landRegions = GetRegions(1);
             List<LandBlock> survivingLandBlock = new List<LandBlock>();
 
-            foreach (List<Coord> landRegion in landRegions) {
+            foreach (List<Location> landRegion in landRegions) {
                 if (landRegion.Count < blockThresholdSize) {
-                    foreach (Coord tile in landRegion) {
-                        map[tile.tileX, tile.tileY] = 0;
+                    foreach (Location tile in landRegion) {
+                        map[tile.x, tile.y] = 0;
                     }
                 }
                 else {
@@ -117,8 +117,8 @@ namespace Wing.TileUtils
             }
 
             int bestDistance = 0;
-            Coord bestTileA = new Coord();
-            Coord bestTileB = new Coord();
+            Location bestTileA = new Location();
+            Location bestTileB = new Location();
             LandBlock bestBlockA = new LandBlock();
             LandBlock bestBlockB = new LandBlock();
             bool possibleConnectionFound = false;
@@ -138,9 +138,9 @@ namespace Wing.TileUtils
 
                     for (int tileIndexA = 0; tileIndexA < blockA.edgeTiles.Count; tileIndexA++) {
                         for (int tileIndexB = 0; tileIndexB < blockB.edgeTiles.Count; tileIndexB++) {
-                            Coord tileA = blockA.edgeTiles[tileIndexA];
-                            Coord tileB = blockB.edgeTiles[tileIndexB];
-                            int distanceBetweenBlocks = (int)(Mathf.Pow(tileA.tileX - tileB.tileX, 2) + Mathf.Pow(tileA.tileY - tileB.tileY, 2));
+                            Location tileA = blockA.edgeTiles[tileIndexA];
+                            Location tileB = blockB.edgeTiles[tileIndexB];
+                            int distanceBetweenBlocks = (int)(Mathf.Pow(tileA.x - tileB.x, 2) + Mathf.Pow(tileA.y - tileB.y, 2));
 
                             if (distanceBetweenBlocks < bestDistance || !possibleConnectionFound) {
                                 bestDistance = distanceBetweenBlocks;
@@ -168,30 +168,30 @@ namespace Wing.TileUtils
             }
         }
 
-        private void CreatePassage(LandBlock blockA, LandBlock blockB, Coord tileA, Coord tileB)
+        private void CreatePassage(LandBlock blockA, LandBlock blockB, Location tileA, Location tileB)
         {
             LandBlock.ConnectBlocks(blockA, blockB);
 
             //Debug.DrawLine (CoordToWorldPoint (tileA), CoordToWorldPoint (tileB), Color.green, 3);
 
-            List<Coord> line = GetLine(tileA, tileB);
-            foreach (Coord c in line) {
+            List<Location> line = GetLine(tileA, tileB);
+            foreach (Location c in line) {
                 DrawCircle(c, passageWidth);
             }
         }
 
-        private Vector3 CoordToWorldPoint(Coord tile)
+        private Vector3 CoordToWorldPoint(Location tile)
         {
-            return new Vector3((tile.tileX - tile.tileY) * 0.524f, (tile.tileX + tile.tileY) * -0.262f, 0);
+            return new Vector3((tile.x - tile.y) * 0.524f, (tile.x + tile.y) * -0.262f, 0);
         }
 
-        private void DrawCircle(Coord c, int r)
+        private void DrawCircle(Location c, int r)
         {
             for (int x = -r; x <= r; x++) {
                 for (int y = -r; y <= r; y++) {
                     if (x * x + y * y <= r * r) {
-                        int drawX = c.tileX + x;
-                        int drawY = c.tileY + y;
+                        int drawX = c.x + x;
+                        int drawY = c.y + y;
                         if (IsInMapRange(drawX, drawY)) {
                             map[drawX, drawY] = 1;
                         }
@@ -200,15 +200,15 @@ namespace Wing.TileUtils
             }
         }
 
-        private List<Coord> GetLine(Coord from, Coord to)
+        private List<Location> GetLine(Location from, Location to)
         {
-            List<Coord> line = new List<Coord>();
+            List<Location> line = new List<Location>();
 
-            int x = from.tileX;
-            int y = from.tileY;
+            int x = from.x;
+            int y = from.y;
 
-            int dx = to.tileX - from.tileX;
-            int dy = to.tileY - from.tileY;
+            int dx = to.x - from.x;
+            int dy = to.y - from.y;
 
             bool inverted = false;
             int step = Math.Sign(dx);
@@ -228,7 +228,7 @@ namespace Wing.TileUtils
 
             int gradientAccumulation = longest / 2;
             for (int i = 0; i < longest; i++) {
-                line.Add(new Coord(x, y));
+                line.Add(new Location(x, y));
 
                 if (inverted) {
                     y += step;
@@ -252,19 +252,19 @@ namespace Wing.TileUtils
             return line;
         }
 
-        private List<List<Coord>> GetRegions(int tileType)
+        private List<List<Location>> GetRegions(int tileType)
         {
-            List<List<Coord>> regions = new List<List<Coord>>();
+            List<List<Location>> regions = new List<List<Location>>();
             int[,] mapFlags = new int[width, height];
 
             for (int x = 0; x < width; x++) {
                 for (int y = 0; y < height; y++) {
                     if (mapFlags[x, y] == 0 && map[x, y] == tileType) {
-                        List<Coord> newRegion = GetRegionTiles(x, y);
+                        List<Location> newRegion = GetRegionTiles(x, y);
                         regions.Add(newRegion);
 
-                        foreach (Coord tile in newRegion) {
-                            mapFlags[tile.tileX, tile.tileY] = 1;
+                        foreach (Location tile in newRegion) {
+                            mapFlags[tile.x, tile.y] = 1;
                         }
                     }
                 }
@@ -273,26 +273,27 @@ namespace Wing.TileUtils
             return regions;
         }
 
-        List<Coord> GetRegionTiles(int startX, int startY)
+        List<Location> GetRegionTiles(int startX, int startY)
         {
-            List<Coord> tiles = new List<Coord>();
+            List<Location> tiles = new List<Location>();
             int[,] mapFlags = new int[width, height];
             int tileType = map[startX, startY];
 
-            Queue<Coord> queue = new Queue<Coord>();
-            queue.Enqueue(new Coord(startX, startY));
+            // I used system generic queue here. If need optimizaion, check the priority queue.
+            Queue<Location> queue = new Queue<Location>();
+            queue.Enqueue(new Location(startX, startY));
             mapFlags[startX, startY] = 1;
 
             while (queue.Count > 0) {
-                Coord tile = queue.Dequeue();
+                Location tile = queue.Dequeue();
                 tiles.Add(tile);
 
-                for (int x = tile.tileX - 1; x <= tile.tileX + 1; x++) {
-                    for (int y = tile.tileY - 1; y <= tile.tileY + 1; y++) {
-                        if (IsInMapRange(x, y) && (y == tile.tileY || x == tile.tileX)) {
+                for (int x = tile.x - 1; x <= tile.x + 1; x++) {
+                    for (int y = tile.y - 1; y <= tile.y + 1; y++) {
+                        if (IsInMapRange(x, y) && (y == tile.y || x == tile.x)) {
                             if (mapFlags[x, y] == 0 && map[x, y] == tileType) {
                                 mapFlags[x, y] = 1;
-                                queue.Enqueue(new Coord(x, y));
+                                queue.Enqueue(new Location(x, y));
                             }
                         }
                     }
@@ -375,7 +376,7 @@ namespace Wing.TileUtils
                 seed = System.DateTime.Now.Millisecond.ToString();
             }
 
-            pseudoRandom = new System.Random(seed.GetHashCode());
+            pseudoRandom = new System.Random(seed.GetStableHashCode());
 
             if (hasEmptyTile) {
                 for (int x = 0; x < width; x++) {
@@ -397,83 +398,100 @@ namespace Wing.TileUtils
                 }
             }
         }
+    }
 
-        struct Coord
+    public struct Location
+    {
+        public readonly int x, y;
+        public Location(int x, int y)
         {
-            public int tileX;
-            public int tileY;
+            this.x = x;
+            this.y = y;
+        }
 
-            public Coord(int x, int y)
-            {
-                tileX = x;
-                tileY = y;
+        public override bool Equals(object obj)
+        {
+            if (this.GetHashCode() != obj.GetHashCode())
+                return false;
+            return base.Equals(obj);
+        }
+
+        public override int GetHashCode()
+        {
+            unchecked {
+                return (x * 413) ^ y;
             }
         }
 
-        class LandBlock : IComparable<LandBlock>
+        public override string ToString()
         {
-            public List<Coord> tiles;
-            public List<Coord> edgeTiles;
-            public List<LandBlock> connectedBlocks;
-            public int blockSize;
-            public bool isAccessibleFromMainBlock;
-            public bool isMainBlock;
+            return "(" + x + ", " + y + ")";
+        }
+    }
 
-            public LandBlock()
-            {
-            }
+    class LandBlock : IComparable<LandBlock>
+    {
+        public List<Location> tiles;
+        public List<Location> edgeTiles;
+        public List<LandBlock> connectedBlocks;
+        public int blockSize;
+        public bool isAccessibleFromMainBlock;
+        public bool isMainBlock;
 
-            public LandBlock(List<Coord> blockTiles, int[,] map)
-            {
-                tiles = blockTiles;
-                blockSize = tiles.Count;
-                connectedBlocks = new List<LandBlock>();
+        public LandBlock()
+        {
+        }
 
-                edgeTiles = new List<Coord>();
-                foreach (Coord tile in tiles) {
-                    for (int x = tile.tileX - 1; x <= tile.tileX + 1; x++) {
-                        for (int y = tile.tileY - 1; y <= tile.tileY + 1; y++) {
-                            if (x == tile.tileX || y == tile.tileY) {
-                                if (map[x, y] == 0) {
-                                    edgeTiles.Add(tile);
-                                }
+        public LandBlock(List<Location> blockTiles, int[,] map)
+        {
+            tiles = blockTiles;
+            blockSize = tiles.Count;
+            connectedBlocks = new List<LandBlock>();
+
+            edgeTiles = new List<Location>();
+            foreach (Location tile in tiles) {
+                for (int x = tile.x - 1; x <= tile.x + 1; x++) {
+                    for (int y = tile.y - 1; y <= tile.y + 1; y++) {
+                        if (x == tile.x || y == tile.y) {
+                            if (map[x, y] == 0) {
+                                edgeTiles.Add(tile);
                             }
                         }
                     }
                 }
             }
+        }
 
-            public void SetAccessibleFromMainBlock()
-            {
-                if (!isAccessibleFromMainBlock) {
-                    isAccessibleFromMainBlock = true;
-                    foreach (LandBlock connectedBlock in connectedBlocks) {
-                        connectedBlock.SetAccessibleFromMainBlock();
-                    }
+        public void SetAccessibleFromMainBlock()
+        {
+            if (!isAccessibleFromMainBlock) {
+                isAccessibleFromMainBlock = true;
+                foreach (LandBlock connectedBlock in connectedBlocks) {
+                    connectedBlock.SetAccessibleFromMainBlock();
                 }
             }
+        }
 
-            public static void ConnectBlocks(LandBlock blockA, LandBlock blockB)
-            {
-                if (blockA.isAccessibleFromMainBlock) {
-                    blockB.SetAccessibleFromMainBlock();
-                }
-                else if (blockB.isAccessibleFromMainBlock) {
-                    blockA.SetAccessibleFromMainBlock();
-                }
-                blockA.connectedBlocks.Add(blockB);
-                blockB.connectedBlocks.Add(blockA);
+        public static void ConnectBlocks(LandBlock blockA, LandBlock blockB)
+        {
+            if (blockA.isAccessibleFromMainBlock) {
+                blockB.SetAccessibleFromMainBlock();
             }
+            else if (blockB.isAccessibleFromMainBlock) {
+                blockA.SetAccessibleFromMainBlock();
+            }
+            blockA.connectedBlocks.Add(blockB);
+            blockB.connectedBlocks.Add(blockA);
+        }
 
-            public bool IsConnected(LandBlock otherBlock)
-            {
-                return connectedBlocks.Contains(otherBlock);
-            }
+        public bool IsConnected(LandBlock otherBlock)
+        {
+            return connectedBlocks.Contains(otherBlock);
+        }
 
-            public int CompareTo(LandBlock otherBlock)
-            {
-                return otherBlock.blockSize.CompareTo(blockSize);
-            }
+        public int CompareTo(LandBlock otherBlock)
+        {
+            return otherBlock.blockSize.CompareTo(blockSize);
         }
     }
 }
