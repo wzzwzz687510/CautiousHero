@@ -234,9 +234,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   animationDuration: 0.01
-  tileLayer:
-    serializedVersion: 2
-    m_Bits: 256
   prefab: {fileID: 8944226066564207475, guid: 40ff4a4a7c9d98644be53c1449cd99ab, type: 3}
   tileSprites:
   - {fileID: 21300000, guid: 38f0f07655250c84c8d60e98f52ddd59, type: 3}
@@ -319,6 +316,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 439bf798a1bc3054aa8f686abaddf60f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  tileLayer:
+    serializedVersion: 2
+    m_Bits: 256
   player: {fileID: 1215449555}
 --- !u!4 &1333345800
 Transform:
@@ -411,6 +411,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Player
+      objectReference: {fileID: 0}
+    - target: {fileID: 3097053190565853647, guid: 5b38b498860707b43b98024e9ecc26d2,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3097053190565853644, guid: 5b38b498860707b43b98024e9ecc26d2,
         type: 3}

@@ -8,17 +8,24 @@ public class PlayerController : MonoBehaviour
 {
     public Location Loc { get; set; }
 
-    private int movementPoint;
+    public int MovementPoint { get; private set; }
     private List<Location[]> paths = new List<Location[]>();
+
+    protected SpriteRenderer m_sprite;
+    public SpriteRenderer Sprite { get { return m_sprite; } }
 
     private void Awake()
     {
+        MovementPoint = 3;
+        m_sprite = GetComponentInChildren<SpriteRenderer>();
     }
 
     public void MoveToTile(TileController tile, Stack<Location> path, bool anim = false)
     {
-        Loc = tile.Loc;
         if (anim) {
+            if (path.Count > MovementPoint)
+                return;
+
             Location[] sortedPath = new Location[path.Count];
             for (int i = 0; i < sortedPath.Length; i++) {
                 sortedPath[i] = path.Pop();
@@ -31,6 +38,8 @@ public class PlayerController : MonoBehaviour
             transform.GetChild(0).DOLocalMoveY(0.2f, 0.5f);
             transform.position = tile.transform.position;
         }
+
+        Loc = tile.Loc;
     }
 
     private void MoveAnimation()

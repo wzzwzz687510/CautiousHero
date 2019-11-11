@@ -2,8 +2,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 using Wing.TileUtils;
-using DG.Tweening;
 
 public class GridManager : MonoBehaviour
 {
@@ -11,16 +11,17 @@ public class GridManager : MonoBehaviour
 
     [Range(0,0.1f)]   public float animationDuration = 0.01f;
 
-    public LayerMask tileLayer;
     public GameObject prefab;
     public Sprite[] tileSprites;
 
-    protected MapGenerator m_mg;
-
+    private MapGenerator m_mg;
+    public Vector2 MapBoundingBox { get { return new Vector2(m_mg.width, m_mg.height); } }
     private GameObject tileHolder;
     private Dictionary<Location, TileController> tileDic 
         = new Dictionary<Location, TileController>();
-    private TileNavigation m_astar;
+
+    public delegate void OnCompleteMapRendering(MapGenerator generator);
+    public event OnCompleteMapRendering onCompleteMapRenderEvent;
 
     private void Awake()
     {
@@ -31,42 +32,15 @@ public class GridManager : MonoBehaviour
 
     private void Start()
     {
-       RenderMap();
-       m_astar = new TileNavigation(m_mg.width, m_mg.height, m_mg.map);
+        RenderMap();
+        onCompleteMapRenderEvent(m_mg);
     }
 
     private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.R)) {
-            RenderMap();
-        }
-
-        if (Input.GetMouseButtonDown(0)) {
-            var ray = Camera.main.ViewportPointToRay(new Vector3(Input.mousePosition.x / Screen.width,
-                Input.mousePosition.y / Screen.height, Input.mousePosition.z));
-            //Debug.DrawRay(ray.origin,10* ray.direction,Color.red,10);
-            var hit = Physics2D.Raycast(ray.origin, ray.direction, 20, tileLayer);
-            if (hit) {
-                var tile = hit.transform.parent.GetComponent<TileController>();
-                switch (BattleManager.Instance.State) {
-                    case BattleState.PlacePlayer:
-                        BattleManager.Instance.player.MoveToTile(tile, null);
-                        BattleManager.Instance.CompletePlacePlayer();
-                        break;
-                    case BattleState.Move:
-                        BattleManager.Instance.player.MoveToTile(tile, m_astar.GetPath(BattleManager.Instance.player.Loc, tile.Loc),true);
-                        break;
-                    case BattleState.CastSkill:
-                        break;
-                    case BattleState.Animate:
-                        break;
-                    case BattleState.NonInteractable:
-                        break;
-                    default:
-                        break;
-                }
-            }
-        }
+        //if (Input.GetKeyDown(KeyCode.R)) {
+        //    RenderMap();
+        //}
     }
 
     private void RenderMap()
@@ -83,12 +57,28 @@ public class GridManager : MonoBehaviour
             for (int y = 0; y < m_mg.height; y++) {
                 if (m_mg.map[x, y] != 0) {
                     var pos = new Location(x, y);
-                    TileController tc = Instantiate(prefab, new Vector3(0.524f * (x - y), -0.262f * (x + y), 0), Quaternion.identity, tileHolder.transform).GetComponent<TileController>();
-                    tc.Init_SpriteRenderer(pos, y * m_mg.width + x - m_mg.width * m_mg.height, m_mg.map[x, y] - 1, UnityEngine.Random.Range(0.01f, 1f));
+                    TileController tc = Instantiate(prefab, new Vector3(0.524f * (x - y), -0.262f * (x + y), 0), 
+                        Quaternion.identity, tileHolder.transform).GetComponent<TileController>();
+                    tc.Init_SpriteRenderer(pos, y * m_mg.width + x - m_mg.width * m_mg.height, 
+                        m_mg.map[x, y] - 1, UnityEngine.Random.Range(0.01f, 1f));
                     tileDic.Add(pos, tc);
                 }
             }
         }
         //Debug.Log("tile cnt:" + tileHolder.transform.childCount);
+    }
+
+    public void ResetTiles()
+    {
+        foreach (var tile in tileDic.Values) {
+            tile.ChangeTileState(TileState.Normal);
+        } 
+    }
+
+    public void ChangeTileState(Location id, TileState state)
+    {
+        TileController tc;
+        if (tileDic.TryGetValue(id, out tc))
+            tc.ChangeTileState(state);
     }
 }
