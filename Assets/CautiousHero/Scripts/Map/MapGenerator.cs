@@ -180,9 +180,16 @@ namespace Wing.TileUtils
             }
         }
 
-        private Vector3 CoordToWorldPoint(Location tile)
+        public static Vector3 LocationToWorldPoint(Location tile)
         {
             return new Vector3((tile.x - tile.y) * 0.524f, (tile.x + tile.y) * -0.262f, 0);
+        }
+
+        public static Location WorldPointToLocation(Vector3 point)
+        {
+            float a = point.x / 0.524f;
+            float b = point.y / -0.262f;
+            return new Location((int)(a + b) / 2, (int)(b - a) / 2);
         }
 
         private void DrawCircle(Location c, int r)
@@ -279,7 +286,6 @@ namespace Wing.TileUtils
             int[,] mapFlags = new int[width, height];
             int tileType = map[startX, startY];
 
-            // I used system generic queue here. If need optimizaion, check the priority queue.
             Queue<Location> queue = new Queue<Location>();
             queue.Enqueue(new Location(startX, startY));
             mapFlags[startX, startY] = 1;
@@ -427,6 +433,10 @@ namespace Wing.TileUtils
         {
             return "(" + x + ", " + y + ")";
         }
+
+        public static implicit operator Vector3(Location a) => MapGenerator.LocationToWorldPoint(a);
+        public static explicit operator Location(Vector3 a) => MapGenerator.WorldPointToLocation(a);
+
     }
 
     class LandBlock : IComparable<LandBlock>

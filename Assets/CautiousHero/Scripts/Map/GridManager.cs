@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Wing.TileUtils;
+using DG.Tweening;
 
 public class GridManager : MonoBehaviour
 {
@@ -46,7 +47,24 @@ public class GridManager : MonoBehaviour
             //Debug.DrawRay(ray.origin,10* ray.direction,Color.red,10);
             var hit = Physics2D.Raycast(ray.origin, ray.direction, 20, tileLayer);
             if (hit) {
-                Debug.Log(hit.transform.parent.GetComponent<TileController>().Pos.ToString());
+                var tile = hit.transform.parent.GetComponent<TileController>();
+                switch (BattleManager.Instance.State) {
+                    case BattleState.PlacePlayer:
+                        BattleManager.Instance.player.MoveToTile(tile, null);
+                        BattleManager.Instance.CompletePlacePlayer();
+                        break;
+                    case BattleState.Move:
+                        BattleManager.Instance.player.MoveToTile(tile, m_astar.GetPath(BattleManager.Instance.player.Loc, tile.Loc),true);
+                        break;
+                    case BattleState.CastSkill:
+                        break;
+                    case BattleState.Animate:
+                        break;
+                    case BattleState.NonInteractable:
+                        break;
+                    default:
+                        break;
+                }
             }
         }
     }
@@ -71,7 +89,6 @@ public class GridManager : MonoBehaviour
                 }
             }
         }
-
         //Debug.Log("tile cnt:" + tileHolder.transform.childCount);
     }
 }

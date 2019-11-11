@@ -1,10 +1,11 @@
 ﻿using System;
 using Priority_Queue;
 using System.Collections.Generic;
+using UnityEngine;
 
 namespace Wing.TileUtils
 {
-    public class TileNavigation
+    public class TileNavigation:MonoBehaviour
     {
         SquareGrid grid;
 
@@ -15,20 +16,20 @@ namespace Wing.TileUtils
             grid = new SquareGrid(width, height);
             for (int x = 0; x < width; x++) {
                 for (int y = 0; y < height; y++) {
-                    grid.SetWeight(new Location(x, y), map[x, y]);
+                    grid.SetWeight(new Location(x, y), 1);
                 }
             }
         }
 
-        public Location[] GetPath(Location from, Location to)
+        public Stack<Location> GetPath(Location from, Location to)
         {
             var astar = new AStarSearch(grid, from, to);
-            var path = new Location[astar.cameFrom.Count];
+            Stack<Location> path = new Stack<Location>();
 
             Location tmp = to;
-            for (int i = 0; i < astar.cameFrom.Count; i++) {               
-                tmp = astar.cameFrom[tmp];
-                path[astar.cameFrom.Count - i - 1] = tmp;
+            while (!tmp.Equals(from)) {
+                path.Push(tmp);
+                tmp = astar.cameFrom[tmp];                
             }
 
             return path;
@@ -41,7 +42,7 @@ namespace Wing.TileUtils
         IEnumerable<Location> Neighbors(Location id);
     }
 
-    public class SquareGrid : WeightedGraph<Location>
+    public class SquareGrid : MonoBehaviour, WeightedGraph<Location>
     {
         public int Width  { get; }
         public int Height { get; }
@@ -77,7 +78,7 @@ namespace Wing.TileUtils
         // Negative number or zero seen as block
         public bool Passable(Location id)
         {
-            return weights[id] <= 0;
+            return weights[id] > 0;
         }
 
         public int Cost(Location from, Location to)
