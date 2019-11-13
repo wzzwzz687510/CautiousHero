@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Wing.TileUtils;
 using DG.Tweening;
+using Wing.RPGSystem;
 
 public enum TileState
 {
@@ -21,9 +22,11 @@ public class TileController : MonoBehaviour
     public SpriteRenderer m_cover;
     public Animator m_animator;
     public Transform m_archor;    
-    public Vector3 Archor { get { return m_archor.position; } }
 
+    public Vector3 Archor { get { return m_archor.position; } }
     public Location Loc { get; private set; }
+    public Entity stayEntity { get; private set; }
+    public bool isEmpty { get { return stayEntity == null; } }
 
 
     // para sort order, sprite ID and animation delay time
@@ -69,6 +72,25 @@ public class TileController : MonoBehaviour
             default:
                 break;
         }
+    }
+
+    public void PassBy(Entity entity)
+    {
+        //Do something to entity;
+    }
+
+    public void OnEntityEntering(Entity entity)
+    {
+        // Do something to entity;
+
+        stayEntity = entity;
+    }
+
+    public void OnEntityLeaving()
+    {
+        // Do something to entity;
+
+        stayEntity = null;
     }
 
     private void SetCoverColor(Color c)

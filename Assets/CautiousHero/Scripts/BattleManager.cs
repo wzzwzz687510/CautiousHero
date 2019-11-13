@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using Wing.TileUtils;
+using Wing.RPGSystem;
 
 public enum BattleState
 {
@@ -18,11 +19,13 @@ public class BattleManager : MonoBehaviour
 
     [Header("Test")]
     public BaseSkill[] skills;
+    public BaseCreature[] creatures;
 
     [Header("Component References")]
     public LayerMask tileLayer;
-    public LayerMask defaultLayer;
+    public LayerMask entityLayer;
     public PlayerController player;
+    public CreatureController enemy;
     public BattleState State { get; private set; }
 
     private GameObject tmpPlayerVisual;
@@ -38,14 +41,14 @@ public class BattleManager : MonoBehaviour
             Instance = this;
         State = BattleState.PlacePlayer;
         GridManager.Instance.onCompleteMapRenderEvent += SetAstarNavigation;
-
-        player.Sprite.color = new Color(1, 1, 1, 0f);
     }
 
     public void SetAstarNavigation(MapGenerator generator)
     {
         m_astar = new TileNavigation(generator.width, generator.height, generator.map);
         PreparePlacePlayer();
+        enemy.InitCreature(creatures[0], GridManager.Instance.GetRandomTile());
+        enemy.Sprite.color = Color.white;
     }
 
     private void ChangeState(BattleState state)
@@ -117,7 +120,7 @@ public class BattleManager : MonoBehaviour
         }
 
         if (tileZone.Count == 0) {
-            hit = Physics2D.Raycast(ray.origin, ray.direction, 20, defaultLayer);
+            hit = Physics2D.Raycast(ray.origin, ray.direction, 20, entityLayer);
             if (hit && hit.transform.CompareTag("Player")) {
                 player.ChangeOutlineColor(Color.red);
                 switch (State) {
@@ -216,7 +219,7 @@ public class BattleManager : MonoBehaviour
                     int yDir = deltaLoc.y >= 0 ? 1 : -1;
                     bool exchange = deltaLoc.x != 0;
 
-                    foreach (var point in skills[selectedSkillID].affectPoints) {
+                    foreach (var point in skills[selectedSkillID].AffectPoints()) {
                         Location fixedPoint;
                         if (exchange) {
                             fixedPoint = new Location(xDir * point.y, point.x);

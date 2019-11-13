@@ -1,8 +1,6 @@
-﻿using System;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Events;
 using Wing.TileUtils;
 
 public class GridManager : MonoBehaviour
@@ -84,6 +82,44 @@ public class GridManager : MonoBehaviour
             return true;
         }
         return false;
+    }
+
+    public TileController GetRandomTile(bool isValid = true)
+    {
+        int cnt = 0;
+        if (isValid) {
+            var tilesEnumerator = ValidTiles().GetEnumerator();
+            int random = Random.Range(0, tileDic.Count);
+            for (int i = 0; i < random; i++) {
+                if (--random < 0)
+                    return tilesEnumerator.Current;
+                if (!tilesEnumerator.MoveNext()) {
+                    random = Random.Range(0, cnt);
+                    for (int j = 0; j < random; j++) {
+                        if (--random < 0)
+                            return tilesEnumerator.Current;
+                    }
+                }
+                cnt++;
+            }
+
+        }
+
+        cnt = Random.Range(0, tileDic.Count);
+        foreach (var tile in tileDic.Values) {
+            if (--cnt < 0)
+                return tile;
+        }
+
+        return null;
+    }
+
+    IEnumerable<TileController> ValidTiles()
+    {
+        foreach (var tile in tileDic.Values) {
+            if (tile.isEmpty)
+                yield return tile;
+        }
     }
 
 }

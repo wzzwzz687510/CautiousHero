@@ -14,11 +14,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   skillName: TriFlameBalls
   description: A mystical skill
+  sprite: {fileID: -6866506984239382969, guid: 95182df2e629f5c4c90c733881fc6d9c, type: 3}
   damageType: 1
   damageElement: 0
-  sprite: {fileID: -6866506984239382969, guid: 95182df2e629f5c4c90c733881fc6d9c, type: 3}
+  skillType: 0
   castCost: 40
-  affectValue: 40
+  baseValue: 0
+  levelCof: 0
+  attributeCof: 0
   castPoints:
   - x: 1
     y: 0
@@ -28,10 +31,8 @@ MonoBehaviour:
     y: 1
   - x: 0
     y: -1
-  affectPoints:
-  - x: 0
-    y: 1
+  affectPattern:
   - x: 1
-    y: 0
+    y: 1
   - x: -1
-    y: 0
+    y: 1
