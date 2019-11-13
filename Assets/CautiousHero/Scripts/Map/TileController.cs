@@ -11,8 +11,8 @@ public enum TileState
     PlaceSelected,
     MoveZone,
     MoveSelected,
-    AttackZone,    
-    AttackSelected
+    CastZone,    
+    CastSelected
 }
 
 public class TileController : MonoBehaviour
@@ -49,22 +49,22 @@ public class TileController : MonoBehaviour
                 SetCoverColor(new Color(0, 0, 0, 0));
                 break;
             case TileState.PlaceZone:
-                SetCoverColor(new Color(1.0f, 1.0f, 0.0f, 0.36f));
+                SetCoverColor(new Color(1.0f, 1.0f, 0.0f, 0.3f));
                 break;
             case TileState.MoveZone:
-                SetCoverColor(new Color(0.36f, 1.0f, 0.36f, 0.36f));
+                SetCoverColor(new Color(0.36f, 1.0f, 0.36f, 0.3f));
                 break;
-            case TileState.AttackZone:
-                SetCoverColor(new Color(1.0f, 0.3f, 0.0f, 0.36f));
+            case TileState.CastZone:
+                SetCoverColor(new Color(1.0f, 0.3f, 0.0f, 0.3f));
                 break;
             case TileState.MoveSelected:
-                SetCoverColor(new Color(0.36f, 1.0f, 0.36f, 0.5f));
+                SetCoverColor(new Color(0.36f, 1.0f, 0.36f, 0.7f));
                 break;
-            case TileState.AttackSelected:
-                SetCoverColor(new Color(1.0f, 0.3f, 0.0f, 0.5f));
+            case TileState.CastSelected:
+                SetCoverColor(new Color(1.0f, 0.1f, 0.1f, 0.7f));
                 break;
             case TileState.PlaceSelected:
-                SetCoverColor(new Color(1.0f, 1.0f, 0.0f, 0.5f));
+                SetCoverColor(new Color(1.0f, 1.0f, 0.0f, 0.7f));
                 break;
             default:
                 break;

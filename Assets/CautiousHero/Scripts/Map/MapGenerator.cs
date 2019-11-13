@@ -406,9 +406,10 @@ namespace Wing.TileUtils
         }
     }
 
+    [System.Serializable]
     public struct Location
     {
-        public readonly int x, y;
+        public int x, y;
         public Location(int x, int y)
         {
             this.x = x;
@@ -434,6 +435,9 @@ namespace Wing.TileUtils
             return "(" + x + ", " + y + ")";
         }
 
+        public static Location operator -(Location a) => new Location(-a.x, -a.y);
+        public static Location operator +(Location a, Location b) => new Location(a.x + b.x, a.y + b.y);
+        public static Location operator -(Location a, Location b) => a + (-b);
         public static implicit operator Vector3(Location a) => MapGenerator.LocationToWorldPoint(a);
         public static explicit operator Location(Vector3 a) => MapGenerator.WorldPointToLocation(a);
 

@@ -30,9 +30,10 @@ public class GridManager : MonoBehaviour
         m_mg = GetComponent<MapGenerator>();
     }
 
-    private void Start()
+    private IEnumerator Start()
     {
         RenderMap();
+        yield return new WaitForSeconds(2);
         onCompleteMapRenderEvent(m_mg);
     }
 
@@ -75,10 +76,14 @@ public class GridManager : MonoBehaviour
         } 
     }
 
-    public void ChangeTileState(Location id, TileState state)
+    public bool ChangeTileState(Location id, TileState state)
     {
         TileController tc;
-        if (tileDic.TryGetValue(id, out tc))
+        if (tileDic.TryGetValue(id, out tc)) {
             tc.ChangeTileState(state);
+            return true;
+        }
+        return false;
     }
+
 }

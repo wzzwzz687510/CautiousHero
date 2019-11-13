@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Wing.TileUtils;
 using DG.Tweening;
+using SpriteGlow;
 
 public class PlayerController : MonoBehaviour
 {
@@ -12,12 +13,16 @@ public class PlayerController : MonoBehaviour
     private List<Location[]> paths = new List<Location[]>();
 
     protected SpriteRenderer m_sprite;
+    protected SpriteGlowEffect m_playerOutline;
+    protected BoxCollider2D m_collider;
     public SpriteRenderer Sprite { get { return m_sprite; } }
 
     private void Awake()
     {
         MovementPoint = 3;
         m_sprite = GetComponentInChildren<SpriteRenderer>();
+        m_playerOutline = GetComponentInChildren<SpriteGlowEffect>();
+        m_collider = GetComponentInChildren<BoxCollider2D>();
     }
 
     public void MoveToTile(TileController tile, Stack<Location> path, bool anim = false)
@@ -40,6 +45,16 @@ public class PlayerController : MonoBehaviour
         }
 
         Loc = tile.Loc;
+    }
+
+    public void ChangeOutlineColor(Color c)
+    {
+        m_playerOutline.GlowColor = c;
+    }
+
+    public void SetActiveCollider(bool bl)
+    {
+        m_collider.enabled = bl;
     }
 
     private void MoveAnimation()
