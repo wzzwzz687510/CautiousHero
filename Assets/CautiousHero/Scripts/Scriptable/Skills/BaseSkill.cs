@@ -29,11 +29,18 @@ namespace Wing.RPGSystem
         Trajectory
     }
 
+    public enum AdditiveAttribute
+    {
+        Strength,
+        Intelligence,
+        Agility
+    }
+
     [System.Serializable]
     public struct SkillPattern
     {
-        Location loc;
-        float coefficient;
+        public Location loc;
+        public float coefficient;
     }
 
     [CreateAssetMenu(fileName = "Skill", menuName = "ScriptableSkills/BaseSkill", order = 1)]
@@ -44,6 +51,7 @@ namespace Wing.RPGSystem
         public Sprite sprite;
         public DamageType damageType;
         public DamageElement damageElement;
+        public AdditiveAttribute attribute;
         public SkillType skillType;     
 
         public int castCost;
@@ -53,16 +61,26 @@ namespace Wing.RPGSystem
         public float levelCof;
         public float attributeCof;
         public Location[] castPoints;
-        public Location[] affectPattern;
+        public SkillPattern[] affectPattern;
 
         public virtual IEnumerable<Location> AffectPoints()
         {
-            return affectPattern;
+            foreach (var point in affectPattern) {
+               yield return point.loc;
+            }
         }
 
-        public virtual void ApplyEffect(Entity castEntity, Entity[] targetEntity)
+        public virtual void ApplyEffect(Entity castEntity, Entity targetEntity,int patternID)
         {
+            int aa = 0;
+            if (attribute == AdditiveAttribute.Agility)
+                aa = castEntity.Agility;
+            else if (attribute == AdditiveAttribute.Intelligence)
+                aa = castEntity.Intelligence;
+            else if (attribute == AdditiveAttribute.Strength)
+                aa = castEntity.Strength;
 
+            targetEntity.DealDamage(Mathf.RoundToInt(baseValue * (1 + levelCof * levelCof + attributeCof * aa)));
         }
     }
 

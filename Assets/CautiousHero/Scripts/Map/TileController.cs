@@ -25,8 +25,12 @@ public class TileController : MonoBehaviour
 
     public Vector3 Archor { get { return m_archor.position; } }
     public Location Loc { get; private set; }
+    public TileController CastLoc { get; private set; }
     public Entity stayEntity { get; private set; }
     public bool isEmpty { get { return stayEntity == null; } }
+    public bool isBind { get; private set; }
+
+    public int SortOrder { get { return m_spriteRenderer.sortingOrder; } }
 
 
     // para sort order, sprite ID and animation delay time
@@ -50,6 +54,7 @@ public class TileController : MonoBehaviour
         switch (state) {
             case TileState.Normal:
                 SetCoverColor(new Color(0, 0, 0, 0));
+                SetStayEntityOutline(Color.black);
                 break;
             case TileState.PlaceZone:
                 SetCoverColor(new Color(1.0f, 1.0f, 0.0f, 0.3f));
@@ -59,12 +64,14 @@ public class TileController : MonoBehaviour
                 break;
             case TileState.CastZone:
                 SetCoverColor(new Color(1.0f, 0.3f, 0.0f, 0.3f));
+                SetStayEntityOutline(Color.black);
                 break;
             case TileState.MoveSelected:
                 SetCoverColor(new Color(0.36f, 1.0f, 0.36f, 0.7f));
                 break;
             case TileState.CastSelected:
                 SetCoverColor(new Color(1.0f, 0.1f, 0.1f, 0.7f));
+                SetStayEntityOutline(Color.red);
                 break;
             case TileState.PlaceSelected:
                 SetCoverColor(new Color(1.0f, 1.0f, 0.0f, 0.7f));
@@ -74,7 +81,15 @@ public class TileController : MonoBehaviour
         }
     }
 
-    public void PassBy(Entity entity)
+    public void SetStayEntityOutline(Color c)
+    {      
+        if (!isEmpty) {
+            stayEntity.ChangeOutlineColor(c);
+        }
+            
+    }
+
+    public void EntityPassBy(Entity entity)
     {
         //Do something to entity;
     }
@@ -93,8 +108,20 @@ public class TileController : MonoBehaviour
         stayEntity = null;
     }
 
+    public void BindCastLocation(TileController from)
+    {
+        CastLoc = from;
+        isBind = true;
+    }
+
+    public void DebindCastLocation()
+    {
+        isBind = false;
+    }
+
     private void SetCoverColor(Color c)
     {
         m_cover.DOColor(c, 0.2f);
     }
+
 }

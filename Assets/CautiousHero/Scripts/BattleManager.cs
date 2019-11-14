@@ -26,6 +26,7 @@ public class BattleManager : MonoBehaviour
     public LayerMask entityLayer;
     public PlayerController player;
     public CreatureController enemy;
+
     public BattleState State { get; private set; }
 
     private GameObject tmpPlayerVisual;
@@ -54,7 +55,7 @@ public class BattleManager : MonoBehaviour
     private void ChangeState(BattleState state)
     {
         State = state;
-        GridManager.Instance.ResetTiles();
+        GridManager.Instance.ResetAllTiles();
         currentSelected.Clear();
         tileZone.Clear();
         player.SetActiveCollider(true);
@@ -68,6 +69,20 @@ public class BattleManager : MonoBehaviour
     private void CompleteMovement()
     {
         ChangeState(BattleState.CastSkill);
+    }
+
+    private void CompleteCast()
+    {
+        var skill = skills[selectedSkillID];
+        if (!player.CostMana(skill.castCost))
+            return;
+
+        for (int i = 0; i < currentSelected.Count; i++) {
+            TileController tc = GridManager.Instance.GetTileController(currentSelected[i]);
+            if (!tc.isEmpty)
+                skill.ApplyEffect(player, tc.stayEntity, i);
+        }
+        ChangeState(BattleState.Animate);
     }
 
     private void Update()
@@ -98,7 +113,7 @@ public class BattleManager : MonoBehaviour
                     }
                     break;
                 case BattleState.Move:
-                    SelectVisual(tile,TileState.MoveZone);
+                    SelectVisual(tile, TileState.MoveZone);
 
                     if (Input.GetMouseButtonDown(0) && tileZone.Count != 0) {
                         tmpPlayerVisual.SetActive(false);
@@ -109,6 +124,11 @@ public class BattleManager : MonoBehaviour
                     break;
                 case BattleState.CastSkill:
                     SelectVisual(tile, TileState.CastZone);
+
+                    if (Input.GetMouseButtonDown(0) && currentSelected.Count != 0) {
+                        if (tileZone.Contains(tile.Loc) || (tile.isBind && currentSelected[0] == tile.CastLoc.Loc))
+                            CompleteCast();
+                    }
                     break;
                 case BattleState.Animate:
                     break;
@@ -143,6 +163,30 @@ public class BattleManager : MonoBehaviour
             }
             else if(State!= BattleState.CastSkill){
                 player.ChangeOutlineColor(Color.black);
+            }
+        }
+        else {
+            hit = Physics2D.Raycast(ray.origin, ray.direction, 20, entityLayer);
+            if(hit && hit.transform.CompareTag("Creature")) {
+                switch (State) {
+                    case BattleState.PlacePlayer:
+                        break;
+                    case BattleState.Move:
+                        break;
+                    case BattleState.CastSkill:
+                        SelectVisual(hit.transform.parent.GetComponent<CreatureController>().LocateTile, TileState.CastZone);
+
+                        if (Input.GetMouseButtonDown(0) && currentSelected.Count != 0) {
+                            CompleteCast();
+                        }
+                        break;
+                    case BattleState.Animate:
+                        break;
+                    case BattleState.NonInteractable:
+                        break;
+                    default:
+                        break;
+                }
             }
         }
 
@@ -181,68 +225,136 @@ public class BattleManager : MonoBehaviour
     {
         player.SetActiveCollider(false);
 
-        foreach (var point in skills[selectedSkillID].castPoints) {
-            var loc = player.Loc + point;
-            GridManager.Instance.ChangeTileState(loc, TileState.CastZone);
-            tileZone.Add(loc);
+        switch (skills[selectedSkillID].skillType) {
+            case SkillType.Instant:
+                foreach (var point in skills[selectedSkillID].castPoints) {
+                    var loc = player.Loc + point;
+                    GridManager.Instance.ChangeTileState(loc, TileState.CastZone);
+                    tileZone.Add(loc);
+                }
+                break;
+            case SkillType.Trajectory:
+                foreach (var castPoint in skills[selectedSkillID].castPoints) {
+                    var castLoc = player.Loc + castPoint;
+                    if (!GridManager.Instance.IsLocationValid(castLoc))
+                        continue;
+
+                    int xDir = castPoint.x >= 0 ? 1 : -1;
+                    int yDir = castPoint.y >= 0 ? 1 : -1;
+                    bool exchange = castPoint.x != 0;
+                    Location fixedPoint;
+                    foreach (var dir in skills[selectedSkillID].AffectPoints()) {
+                        if (exchange) {
+                            fixedPoint = new Location(xDir * dir.y, dir.x);
+                        }
+                        else {
+                            fixedPoint = new Location(dir.x, yDir * dir.y);
+                        }
+
+                        var hitPath = GridManager.Instance.GetTrajectoryHitTile(castLoc, fixedPoint, false);
+                        foreach (var passTile in hitPath) {
+                            passTile.BindCastLocation(GridManager.Instance.GetTileController(castLoc));
+                        }
+                    }
+                }
+                break;
+            default:
+                break;
         }
+
     }
 
     private void SelectVisual(TileController tile, TileState stateZone)
     {
-        if (currentSelected.Count != 0 && currentSelected[0].Equals(tile.Loc))
-            return;
+        if (currentSelected.Count != 0) {
+            if (currentSelected[0] == tile.Loc || (tile.isBind && currentSelected[0] == tile.CastLoc.Loc))
+                return;
+                
+            foreach (var selected in currentSelected) {
+                if (tileZone.Contains(selected)) {
+                    GridManager.Instance.ChangeTileState(selected, stateZone);
+                }
+                else {
+                    GridManager.Instance.ChangeTileState(selected, TileState.Normal);
+                }
+            }
+            currentSelected.Clear();
+        }
 
         if (tileZone.Contains(tile.Loc)) {
-            if (currentSelected.Count != 0) {
-                foreach (var selected in currentSelected) {
-                    if (tileZone.Contains(selected)) {
-                        GridManager.Instance.ChangeTileState(selected, stateZone);
-                    }
-                    else {
-                        GridManager.Instance.ChangeTileState(selected, TileState.Normal);
-                    }
-                }
-                currentSelected.Clear();
-            }
-
             if (stateZone == TileState.MoveZone) {
                 tmpPlayerVisual.transform.position = tile.Archor;
             }
 
-            tile.ChangeTileState(stateZone + 1);
             currentSelected.Add(tile.Loc);
             switch (stateZone) {
+                case TileState.PlaceZone:
+                case TileState.MoveZone:
+                    tile.ChangeTileState(stateZone + 1);
+                    break;
                 case TileState.CastZone:
-                    var deltaLoc = tile.Loc - player.Loc;
-                    int xDir = deltaLoc.x >= 0 ? 1 : -1;
-                    int yDir = deltaLoc.y >= 0 ? 1 : -1;
-                    bool exchange = deltaLoc.x != 0;
-
-                    foreach (var point in skills[selectedSkillID].AffectPoints()) {
-                        Location fixedPoint;
-                        if (exchange) {
-                            fixedPoint = new Location(xDir * point.y, point.x);
-                        }
-                        else {
-                            fixedPoint = new Location(point.x, yDir * point.y);
-                        }
-
-                        var tileLoc = tile.Loc + fixedPoint;
-                        if (GridManager.Instance.ChangeTileState(tileLoc, TileState.CastSelected)) {
-                            currentSelected.Add(tileLoc);
-                        }
-                    }
+                    HighlightAffectPoints(tile);
                     break;
                 default:
                     break;
             }
+        }
+        else {
+            if (tile.isBind && skills[selectedSkillID].skillType == SkillType.Trajectory)
+                HighlightAffectPoints(tile.CastLoc);
+            else
+                currentSelected.Add(tile.Loc);
+        }
+    }
 
+    public void HighlightAffectPoints(TileController tile)
+    {
+        var deltaLoc = tile.Loc - player.Loc;
+        int xDir = deltaLoc.x >= 0 ? 1 : -1;
+        int yDir = deltaLoc.y >= 0 ? 1 : -1;
+        bool exchange = deltaLoc.x != 0;
+        Location fixedPoint;
+
+        switch (skills[selectedSkillID].skillType) {
+            case SkillType.Instant:
+                foreach (var point in skills[selectedSkillID].AffectPoints()) {                    
+                    if (exchange) {
+                        fixedPoint = new Location(xDir * point.y, point.x);
+                    }
+                    else {
+                        fixedPoint = new Location(point.x, yDir * point.y);
+                    }
+
+                    var tileLoc = tile.Loc + fixedPoint;
+                    if (GridManager.Instance.ChangeTileState(tileLoc, TileState.CastSelected)) {
+                        currentSelected.Add(tileLoc);
+                    }
+                }
+                break;
+            case SkillType.Trajectory:
+                foreach (var point in skills[selectedSkillID].AffectPoints()) {
+                    if (exchange) {
+                        fixedPoint = new Location(xDir * point.y, point.x);
+                    }
+                    else {
+                        fixedPoint = new Location(point.x, yDir * point.y);
+                    }
+
+                    var hitPath = GridManager.Instance.GetTrajectoryHitTile(tile.Loc, fixedPoint, true);
+                    foreach (var passTile in hitPath) {
+                        currentSelected.Add(passTile.Loc);
+                    }
+                }
+                break;
+            default:
+                break;
         }
     }
 
     public void Button_CastSkill(int id)
     {
+        if (State != BattleState.Move && State != BattleState.CastSkill)
+            return;
         selectedSkillID = id;
         ChangeState(BattleState.CastSkill);
         PrepareSkill();

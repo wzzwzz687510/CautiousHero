@@ -10,16 +10,17 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 190110b8e498aec4f864af792ee231fc, type: 3}
-  m_Name: TriFireBalls
+  m_Name: FireBall
   m_EditorClassIdentifier: 
-  skillName: TriFlameBalls
+  skillName: FireBall
   description: A mystical skill
   sprite: {fileID: -6866506984239382969, guid: 95182df2e629f5c4c90c733881fc6d9c, type: 3}
   damageType: 1
   damageElement: 0
-  skillType: 0
+  attribute: 0
+  skillType: 1
   castCost: 40
-  baseValue: 0
+  baseValue: 80
   levelCof: 0
   attributeCof: 0
   castPoints:
@@ -32,7 +33,7 @@ MonoBehaviour:
   - x: 0
     y: -1
   affectPattern:
-  - x: 1
-    y: 1
-  - x: -1
-    y: 1
+  - loc:
+      x: 0
+      y: 1
+    coefficient: 0

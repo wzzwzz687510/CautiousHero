@@ -67,21 +67,35 @@ public class GridManager : MonoBehaviour
         //Debug.Log("tile cnt:" + tileHolder.transform.childCount);
     }
 
-    public void ResetTiles()
+    public void ResetAllTiles()
     {
         foreach (var tile in tileDic.Values) {
             tile.ChangeTileState(TileState.Normal);
+            tile.DebindCastLocation();
         } 
+    }
+
+    public bool IsLocationValid(Location id)
+    {
+        return tileDic.ContainsKey(id);
+    }
+
+    public TileController GetTileController(Location id)
+    {
+        TileController tc;
+        if (tileDic.TryGetValue(id, out tc)) {
+            return tc;
+        }
+        return null;
     }
 
     public bool ChangeTileState(Location id, TileState state)
     {
-        TileController tc;
-        if (tileDic.TryGetValue(id, out tc)) {
-            tc.ChangeTileState(state);
-            return true;
-        }
-        return false;
+        if(!IsLocationValid(id))
+            return false;
+
+        GetTileController(id).ChangeTileState(state);
+        return true;
     }
 
     public TileController GetRandomTile(bool isValid = true)
@@ -113,6 +127,31 @@ public class GridManager : MonoBehaviour
 
         return null;
     }
+
+    public IEnumerable<TileController> GetTrajectoryHitTile(Location id, Location dir, bool highlight = false)
+    {
+        TileController tc;
+        if (!tileDic.TryGetValue(id, out tc))
+            yield break;
+        Location tmp = id;
+
+        // Safe count for exit from while.
+        int cnt = 0;
+        while (tc.isEmpty) {
+            if (highlight)
+                tc.ChangeTileState(TileState.CastZone);
+            yield return tc;
+            tmp += dir;
+            if (!tileDic.TryGetValue(tmp, out tc) || cnt++ > 8)
+                yield break;
+        }
+
+        if (highlight)
+            tc.ChangeTileState(TileState.CastSelected);
+        yield return tc;
+    }
+
+
 
     IEnumerable<TileController> ValidTiles()
     {

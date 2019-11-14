@@ -438,6 +438,8 @@ namespace Wing.TileUtils
         public static Location operator -(Location a) => new Location(-a.x, -a.y);
         public static Location operator +(Location a, Location b) => new Location(a.x + b.x, a.y + b.y);
         public static Location operator -(Location a, Location b) => a + (-b);
+        public static bool operator ==(Location a, Location b) => a.Equals(b);
+        public static bool operator !=(Location a, Location b) => !a.Equals(b);
         public static implicit operator Vector3(Location a) => MapGenerator.LocationToWorldPoint(a);
         public static explicit operator Location(Vector3 a) => MapGenerator.WorldPointToLocation(a);
 

@@ -6,10 +6,11 @@ namespace Wing.RPGSystem
 {
     public enum BuffType
     {
-        AttributeAdjust,
-        HealthAdjust,
-        ManaAdjust,
-        ElementAdjust
+        Attribute,
+        Health,
+        Mana,
+        Defend,
+        Element
     }
 
     public class BaseBuff : ScriptableObject
@@ -17,11 +18,30 @@ namespace Wing.RPGSystem
         public BuffType buffType;
         public int lastTurn;
         public bool infinity;
+
+        public virtual void ApplyEffect(Entity castEntity, Entity targetEntity)
+        {
+
+        }
     }
 
     public class AttributeBuff : BaseBuff
     {
         public EntityAttribute adjustValue;
+    }
+
+    public class DicountBuff: BaseBuff
+    {
+        public float reduceCof;
+        public int reduceConst;
+    }
+
+    public class DamageBuff: DicountBuff
+    {
+    }
+
+    public class ManaBuff : DicountBuff
+    {
     }
 }
 

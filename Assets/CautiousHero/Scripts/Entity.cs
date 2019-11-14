@@ -10,16 +10,12 @@ namespace Wing.RPGSystem
     {
         protected int m_healthPoints;
         protected int m_manaPoints;
+        public int MovementPoint { get; protected set; }
 
         protected EntityAttribute m_attribute;
         public EntityAttribute Attribute {
             get {
-                var tmp = m_attribute;
-                foreach (var buff in buffs) {
-                    if (buff.ScriptableBuff.buffType == BuffType.AttributeAdjust)
-                        tmp += (buff.ScriptableBuff as AttributeBuff).adjustValue;
-                }
-                return tmp;
+                return m_attribute + buffManager.GetAttributeAdjustment();
             }
         }
         public int Level { get { return Attribute.level; } }
@@ -30,18 +26,21 @@ namespace Wing.RPGSystem
         public int Intelligence { get { return Attribute.intelligence; } }
         public int Agility { get { return Attribute.agility; } }
 
-        protected List<BuffHandler> buffs = new List<BuffHandler>();
+        protected BuffManager buffManager = new BuffManager();
 
         public Location Loc { get { return locateTile.Loc; } }
+        public TileController LocateTile { get { return locateTile; } }
         public SpriteRenderer Sprite { get { return m_sprite; } }
-
-        public int MovementPoint { get; protected set; }
 
         protected SpriteRenderer m_sprite;
         protected SpriteGlowEffect m_glowEffect;
         protected BoxCollider2D m_collider;
         protected TileController locateTile;
         protected List<Location[]> paths = new List<Location[]>();
+
+        public delegate void ValueChange(int value);
+        public event ValueChange OnHpChanged;
+        public event ValueChange OnMpChanged;
 
         protected virtual void Awake()
         {
@@ -66,7 +65,8 @@ namespace Wing.RPGSystem
             else {
                 transform.position = targetTile.transform.position;
             }
-
+            if (locateTile)
+                locateTile.OnEntityLeaving();
             locateTile = targetTile;
             targetTile.OnEntityEntering(this);
         }
@@ -90,6 +90,35 @@ namespace Wing.RPGSystem
             }
 
             transform.DOPath(points, 0.3f);
+        }
+
+        public virtual bool DealDamage(int value)
+        {
+            m_healthPoints -= Mathf.RoundToInt((value - buffManager.GetReduceConstant(BuffType.Defend)) * 
+                (1 - buffManager.GetReduceCof(BuffType.Defend)));
+            OnHpChanged?.Invoke(m_healthPoints);
+            if (m_healthPoints > 0)
+                return true;
+
+            Death();
+            return false;
+        }
+
+        public virtual void Death()
+        {
+
+        }
+
+        public virtual bool CostMana(int value)
+        {
+            int adjustedValue = Mathf.RoundToInt((value - buffManager.GetReduceConstant(BuffType.Mana)) *
+                (1 - buffManager.GetReduceCof(BuffType.Mana)));
+            if (m_manaPoints >= adjustedValue) {
+                m_manaPoints -= adjustedValue;
+                OnMpChanged?.Invoke(m_manaPoints);
+                return true;
+            }
+            return false;
         }
     }
 }
