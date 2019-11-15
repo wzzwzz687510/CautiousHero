@@ -23,8 +23,10 @@ public class BattleUIController : MonoBehaviour
 
     private void OnPlayerHpChanged(int value)
     {
-        DOTween.To(() => slider_playerHp.value, ratio => slider_playerHp.value = ratio, 1.0f * value / player.MaxHealthPoints, 1);
-        hpFill.color = slider_playerHp.value > 0.2f ? new Color(0.5f, 1, 0.4f) : Color.red;
+        float tmp = 1.0f * value / player.MaxHealthPoints;
+        DOTween.To(() => slider_playerHp.value, ratio => slider_playerHp.value = ratio, tmp, 1);
+        hpFill.fillAmount = tmp;
+        //hpFill.color = slider_playerHp.value > 0.2f ? new Color(0.5f, 1, 0.4f) : Color.red;
         text_playerHp.text = value.ToString() + "/" + player.MaxHealthPoints.ToString();
     }
 

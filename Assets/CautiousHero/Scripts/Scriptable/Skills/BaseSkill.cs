@@ -36,6 +36,15 @@ namespace Wing.RPGSystem
         Agility
     }
 
+    public enum Label
+    {
+        HardMoveControll,
+        SoftMoveControll,
+        Obstacle,
+        Debuff,
+        SuicideAttack
+    }
+
     [System.Serializable]
     public struct SkillPattern
     {
@@ -52,7 +61,8 @@ namespace Wing.RPGSystem
         public DamageType damageType;
         public DamageElement damageElement;
         public AdditiveAttribute attribute;
-        public SkillType skillType;     
+        public SkillType skillType;
+        public Label[] labels;
 
         public int castCost;
 

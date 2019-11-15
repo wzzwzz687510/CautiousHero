@@ -7,6 +7,7 @@ namespace Wing.RPGSystem {
     public class CreatureController : Entity
     {
         public SpriteMask mask_hp;
+        public SpriteMask mask_hpEffect;
 
         private BaseCreature scriptableCreature;
 
@@ -33,7 +34,9 @@ namespace Wing.RPGSystem {
 
         private void OnCreatureHpChanged(int value)
         {
-            DOTween.To(() => mask_hp.alphaCutoff, alpha => mask_hp.alphaCutoff = alpha, 1 - 1.0f * value / MaxHealthPoints, 1);
+            float tmp = 1 - 1.0f * value / MaxHealthPoints;
+            mask_hp.alphaCutoff = tmp;
+            DOTween.To(() => mask_hpEffect.alphaCutoff, alpha => mask_hpEffect.alphaCutoff = alpha, tmp, 1);
         }
     }
 }
