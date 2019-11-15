@@ -13,6 +13,7 @@ namespace Wing.RPGSystem
         {
             m_healthPoints = 100;
             m_attribute = new EntityAttribute(1, 100, 3, 1, 1, 1);
+            ActionPoints = 3;
             base.Awake();
         }
 
@@ -26,6 +27,11 @@ namespace Wing.RPGSystem
                 transform.GetChild(0).DOLocalMoveY(0.2f, 0.5f);
             }
             base.MoveToTile(targetTile, path, anim);
+        }
+
+        public void InitPlayer(BaseSkill[] skills)
+        {
+            this.skills = skills;
         }
     }
 }

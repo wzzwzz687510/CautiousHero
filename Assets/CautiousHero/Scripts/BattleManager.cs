@@ -42,12 +42,18 @@ public class BattleManager : MonoBehaviour
             Instance = this;
         State = BattleState.PlacePlayer;
         GridManager.Instance.onCompleteMapRenderEvent += SetAstarNavigation;
+
+        // For test
+        player.InitPlayer(skills);
+        GetComponent<BattleUIController>().UpdateUI();
     }
 
     public void SetAstarNavigation(MapGenerator generator)
     {
         m_astar = new TileNavigation(generator.width, generator.height, generator.map);
         PreparePlacePlayer();
+
+        // For test
         enemy.InitCreature(creatures[0], GridManager.Instance.GetRandomTile());
         enemy.Sprite.color = Color.white;
     }
@@ -78,11 +84,13 @@ public class BattleManager : MonoBehaviour
         /***************************************************************************
          * if not cooldown, return 
          ***************************************************************************/
-
+        HashSet<Location> dlpCheck = new HashSet<Location>();
         for (int i = 0; i < currentSelected.Count; i++) {
             TileController tc = GridManager.Instance.GetTileController(currentSelected[i]);
-            if (!tc.isEmpty)
+            if (!tc.isEmpty&& !dlpCheck.Contains(tc.Loc)) {
                 skill.ApplyEffect(player, tc.stayEntity, i);
+                dlpCheck.Add(tc.Loc);
+            }               
         }
         ChangeState(BattleState.Animate);
     }
@@ -229,31 +237,22 @@ public class BattleManager : MonoBehaviour
 
         switch (skills[selectedSkillID].skillType) {
             case SkillType.Instant:
-                foreach (var point in skills[selectedSkillID].castPoints) {
+                foreach (var point in skills[selectedSkillID].castPatterns) {
                     var loc = player.Loc + point;
-                    GridManager.Instance.ChangeTileState(loc, TileState.CastZone);
-                    tileZone.Add(loc);
+                    if (GridManager.Instance.ChangeTileState(loc, TileState.CastZone))
+                        tileZone.Add(loc);
                 }
                 break;
             case SkillType.Trajectory:
-                foreach (var castPoint in skills[selectedSkillID].castPoints) {
-                    var castLoc = player.Loc + castPoint;
-                    if (!GridManager.Instance.IsLocationValid(castLoc))
+                foreach (var castPattern in skills[selectedSkillID].castPatterns) {
+                    var castLoc = player.Loc + castPattern;
+                    if (!GridManager.Instance.ChangeTileState(castLoc, TileState.CastZone))
                         continue;
+                    tileZone.Add(castLoc);
 
-                    int xDir = castPoint.x >= 0 ? 1 : -1;
-                    int yDir = castPoint.y >= 0 ? 1 : -1;
-                    bool exchange = castPoint.x != 0;
-                    Location fixedPoint;
-                    foreach (var dir in skills[selectedSkillID].AffectPoints()) {
-                        if (exchange) {
-                            fixedPoint = new Location(xDir * dir.y, dir.x);
-                        }
-                        else {
-                            fixedPoint = new Location(dir.x, yDir * dir.y);
-                        }
+                    foreach (var pattern in skills[selectedSkillID].GetFixedEffectPattern(castPattern)) {
 
-                        var hitPath = GridManager.Instance.GetTrajectoryHitTile(castLoc, fixedPoint, false);
+                        var hitPath = GridManager.Instance.GetTrajectoryHitTile(castLoc, pattern, false);
                         foreach (var passTile in hitPath) {
                             passTile.BindCastLocation(GridManager.Instance.GetTileController(castLoc));
                         }
@@ -295,7 +294,7 @@ public class BattleManager : MonoBehaviour
                     tile.ChangeTileState(stateZone + 1);
                     break;
                 case TileState.CastZone:
-                    HighlightAffectPoints(tile);
+                    HighlightAffectPoints(tile.Loc);
                     break;
                 default:
                     break;
@@ -303,46 +302,26 @@ public class BattleManager : MonoBehaviour
         }
         else {
             if (tile.isBind && skills[selectedSkillID].skillType == SkillType.Trajectory)
-                HighlightAffectPoints(tile.CastLoc);
+                HighlightAffectPoints(tile.CastLoc.Loc);
             else
                 currentSelected.Add(tile.Loc);
         }
     }
 
-    public void HighlightAffectPoints(TileController tile)
+    public void HighlightAffectPoints(Location castLoc)
     {
-        var deltaLoc = tile.Loc - player.Loc;
-        int xDir = deltaLoc.x >= 0 ? 1 : -1;
-        int yDir = deltaLoc.y >= 0 ? 1 : -1;
-        bool exchange = deltaLoc.x != 0;
-        Location fixedPoint;
-
         switch (skills[selectedSkillID].skillType) {
             case SkillType.Instant:
-                foreach (var point in skills[selectedSkillID].AffectPoints()) {                    
-                    if (exchange) {
-                        fixedPoint = new Location(xDir * point.y, point.x);
-                    }
-                    else {
-                        fixedPoint = new Location(point.x, yDir * point.y);
-                    }
-
-                    var tileLoc = tile.Loc + fixedPoint;
-                    if (GridManager.Instance.ChangeTileState(tileLoc, TileState.CastSelected)) {
-                        currentSelected.Add(tileLoc);
+                foreach (var pattern in skills[selectedSkillID].GetFixedEffectPattern(castLoc-player.Loc)) {
+                    var targetLoc = castLoc + pattern;
+                    if (GridManager.Instance.ChangeTileState(targetLoc, TileState.CastSelected)) {
+                        currentSelected.Add(targetLoc);
                     }
                 }
                 break;
             case SkillType.Trajectory:
-                foreach (var point in skills[selectedSkillID].AffectPoints()) {
-                    if (exchange) {
-                        fixedPoint = new Location(xDir * point.y, point.x);
-                    }
-                    else {
-                        fixedPoint = new Location(point.x, yDir * point.y);
-                    }
-
-                    var hitPath = GridManager.Instance.GetTrajectoryHitTile(tile.Loc, fixedPoint, true);
+                foreach (var pattern in skills[selectedSkillID].GetFixedEffectPattern(castLoc - player.Loc)) {
+                    var hitPath = GridManager.Instance.GetTrajectoryHitTile(castLoc, pattern, true);
                     foreach (var passTile in hitPath) {
                         currentSelected.Add(passTile.Loc);
                     }

@@ -12,11 +12,20 @@ public class BattleUIController : MonoBehaviour
     public Text text_playerHp;
     public Text text_playerMp;
     public Image hpFill;
+    public Image[] skills;
     public PlayerController player;
 
     void Awake()
     {
-        player.OnHpChanged += OnPlayerHpChanged;
+        player.OnHpChanged += OnPlayerHpChanged;        
+    }
+
+    public void UpdateUI()
+    {
+        // For Test
+        for (int i = 0; i < 4; i++) {
+            skills[i].sprite = player.skills[i].sprite;
+        }
     }
 
     private void OnPlayerHpChanged(int value)

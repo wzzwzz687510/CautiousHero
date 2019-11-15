@@ -10,28 +10,36 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 0}
-  m_Name: Fireball
+  m_Name: Thunder
   m_EditorClassIdentifier: Assembly-CSharp:Wing.RPGSystem:BasicAttackSkill
-  skillName: Fire Ball
+  skillName: Thunder
   description: A mystical skill
-  sprite: {fileID: -542545160671792255, guid: 95182df2e629f5c4c90c733881fc6d9c, type: 3}
+  sprite: {fileID: -2400394132761560739, guid: 95182df2e629f5c4c90c733881fc6d9c, type: 3}
   damageType: 1
-  damageElement: 0
+  damageElement: 4
   attribute: 1
-  skillType: 1
+  skillType: 0
   labels: 
   cooldownTime: 1
   actionPointsCost: 1
   castPatterns:
-  - x: 0
+  - x: 1
     y: 1
   - x: 1
-    y: 0
-  - x: 0
     y: -1
   - x: -1
-    y: 0
-  effectPatterns: []
-  baseValue: 50
+    y: -1
+  - x: -1
+    y: 1
+  effectPatterns:
+  - loc:
+      x: 1
+      y: 1
+    coefficient: 0
+  - loc:
+      x: 2
+      y: 2
+    coefficient: 0
+  baseValue: 80
   levelCof: 0
   attributeCof: 0

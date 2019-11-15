@@ -10,6 +10,7 @@ namespace Wing.RPGSystem
     {
         public int m_healthPoints { get; protected set; }
         public int ActionPoints { get; protected set; }
+        public BaseSkill[] skills { get; protected set; }
 
         protected EntityAttribute m_attribute;
         public EntityAttribute Attribute {
