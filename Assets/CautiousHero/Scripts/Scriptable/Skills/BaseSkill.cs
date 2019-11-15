@@ -52,8 +52,8 @@ namespace Wing.RPGSystem
         public float coefficient;
     }
 
-    [CreateAssetMenu(fileName = "Skill", menuName = "ScriptableSkills/BaseSkill", order = 1)]
-    public class BaseSkill : ScriptableObject
+    //[CreateAssetMenu(fileName = "Skill", menuName = "ScriptableSkills/BaseSkill", order = 1)]
+    public abstract class BaseSkill : ScriptableObject
     {
         public string skillName = "New Skill";
         public string description = "A mystical skill";
@@ -64,23 +64,30 @@ namespace Wing.RPGSystem
         public SkillType skillType;
         public Label[] labels;
 
-        public int castCost;
+        public int cooldownTile;
+        public Location[] castPoints;
+        public SkillPattern[] affectPattern;
 
+        public abstract IEnumerable<Location> AffectPoints();
+        public abstract void ApplyEffect(Entity castEntity, Entity targetEntity, int patternID);
+    }
+
+    [CreateAssetMenu(fileName = "Skill", menuName = "ScriptableSkills/BasicAttackSkill", order = 1)]
+    public class BasicAttackSkill : BaseSkill
+    {
         // Final number = baseValue * (1 + levelCof * level + attributeCof * attribute)
         public int baseValue;
         public float levelCof;
         public float attributeCof;
-        public Location[] castPoints;
-        public SkillPattern[] affectPattern;
 
-        public virtual IEnumerable<Location> AffectPoints()
+        public override IEnumerable<Location> AffectPoints()
         {
             foreach (var point in affectPattern) {
-               yield return point.loc;
+                yield return point.loc;
             }
         }
 
-        public virtual void ApplyEffect(Entity castEntity, Entity targetEntity,int patternID)
+        public override void ApplyEffect(Entity castEntity, Entity targetEntity, int patternID)
         {
             int aa = 0;
             if (attribute == AdditiveAttribute.Agility)
@@ -92,11 +99,5 @@ namespace Wing.RPGSystem
 
             targetEntity.DealDamage(Mathf.RoundToInt(baseValue * (1 + levelCof * levelCof + attributeCof * aa)));
         }
-    }
-
-    [CreateAssetMenu(fileName = "Skill", menuName = "ScriptableSkills/TrajectorySkill", order = 2)]
-    public class TrajectorySkill : BaseSkill
-    {
-
     }
 }

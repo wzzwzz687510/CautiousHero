@@ -12,9 +12,7 @@ namespace Wing.RPGSystem
         protected override void Awake()
         {
             m_healthPoints = 100;
-            m_manaPoints = 100;
-            m_attribute = new EntityAttribute(1, 100, 100, 3, 1, 1, 1);
-            MovementPoint = 3;
+            m_attribute = new EntityAttribute(1, 100, 3, 1, 1, 1);
             base.Awake();
         }
 

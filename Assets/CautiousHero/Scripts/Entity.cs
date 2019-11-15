@@ -8,9 +8,8 @@ namespace Wing.RPGSystem
 {
     public class Entity : MonoBehaviour
     {
-        protected int m_healthPoints;
-        protected int m_manaPoints;
-        public int MovementPoint { get; protected set; }
+        public int m_healthPoints { get; protected set; }
+        public int ActionPoints { get; protected set; }
 
         protected EntityAttribute m_attribute;
         public EntityAttribute Attribute {
@@ -20,8 +19,7 @@ namespace Wing.RPGSystem
         }
         public int Level { get { return Attribute.level; } }
         public int MaxHealthPoints { get { return Attribute.maxHealth; } }
-        public int MaxManaPoints { get { return Attribute.maxMana; } }
-        public int MaxMovementPoints { get { return Attribute.maxMovement; } }
+        public int MaxActionPoints { get { return Attribute.maxAction; } }
         public int Strength { get { return Attribute.strength; } }
         public int Intelligence { get { return Attribute.intelligence; } }
         public int Agility { get { return Attribute.agility; } }
@@ -40,7 +38,6 @@ namespace Wing.RPGSystem
 
         public delegate void ValueChange(int value);
         public event ValueChange OnHpChanged;
-        public event ValueChange OnMpChanged;
 
         protected virtual void Awake()
         {
@@ -52,7 +49,10 @@ namespace Wing.RPGSystem
         public virtual void MoveToTile(TileController targetTile, Stack<Location> path, bool anim = false)
         {
             if (anim) {
-                if (path.Count > MovementPoint)
+                /***************************************************************************
+                 * improve by stopping at the nearest tile to the target tile.
+                 ***************************************************************************/
+                if (path.Count > ActionPoints)
                     return;
 
                 Location[] sortedPath = new Location[path.Count];
@@ -107,18 +107,6 @@ namespace Wing.RPGSystem
         public virtual void Death()
         {
 
-        }
-
-        public virtual bool CostMana(int value)
-        {
-            int adjustedValue = Mathf.RoundToInt((value - buffManager.GetReduceConstant(BuffType.Mana)) *
-                (1 - buffManager.GetReduceCof(BuffType.Mana)));
-            if (m_manaPoints >= adjustedValue) {
-                m_manaPoints -= adjustedValue;
-                OnMpChanged?.Invoke(m_manaPoints);
-                return true;
-            }
-            return false;
         }
     }
 }

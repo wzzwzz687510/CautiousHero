@@ -74,8 +74,10 @@ public class BattleManager : MonoBehaviour
     private void CompleteCast()
     {
         var skill = skills[selectedSkillID];
-        if (!player.CostMana(skill.castCost))
-            return;
+
+        /***************************************************************************
+         * if not cooldown, return 
+         ***************************************************************************/
 
         for (int i = 0; i < currentSelected.Count; i++) {
             TileController tc = GridManager.Instance.GetTileController(currentSelected[i]);
@@ -210,9 +212,9 @@ public class BattleManager : MonoBehaviour
             tmpPlayerVisual = Instantiate(player.Sprite.gameObject, player.transform.position + new Vector3(0, 0.2f, 0), Quaternion.identity);   
 
         player.Sprite.color = new Color(1, 1, 1, 0.5f);
-        for (int x = -player.MovementPoint; x < player.MovementPoint + 1; x++) {
-            for (int y = -player.MovementPoint; y < player.MovementPoint + 1; y++) {
-                if (Mathf.Abs(x) + Mathf.Abs(y) <= player.MovementPoint) {
+        for (int x = -player.ActionPoints; x < player.ActionPoints + 1; x++) {
+            for (int y = -player.ActionPoints; y < player.ActionPoints + 1; y++) {
+                if (Mathf.Abs(x) + Mathf.Abs(y) <= player.ActionPoints) {
                     Location loc = new Location(player.Loc.x + x, player.Loc.y + y);
                     GridManager.Instance.ChangeTileState(loc, TileState.MoveZone);
                     tileZone.Add(loc);

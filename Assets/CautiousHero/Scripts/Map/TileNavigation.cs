@@ -106,8 +106,6 @@ namespace Wing.TileUtils
 
         private Location start, goal;
 
-        // Note: a generic version of A* would abstract over Location and
-        // also Heuristic
         static public int Heuristic(Location a, Location b)
         {
             return Math.Abs(a.x - b.x) + Math.Abs(a.y - b.y);

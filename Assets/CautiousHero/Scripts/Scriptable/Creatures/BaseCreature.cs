@@ -9,27 +9,25 @@ namespace Wing.RPGSystem
     {
         public int level;
         public int maxHealth;
-        public int maxMana;
-        public int maxMovement;
+        public int maxAction;
         public int strength;
         public int intelligence;
         public int agility;
 
-        public EntityAttribute(int lvl, int maxHp, int maxMp, int maxMov, int str, int inte, int agi)
+        public EntityAttribute(int lvl, int maxHp, int maxAct, int str, int inte, int agi)
         {
             level = lvl;
             maxHealth = maxHp;
-            maxMana = maxMp;
-            maxMovement = maxMov;
+            maxAction = maxAct;
             strength = str;
             intelligence = inte;
             agility = agi;
         }
 
         public static EntityAttribute operator -(EntityAttribute a) =>
-            new EntityAttribute(-a.level, -a.maxHealth, -a.maxMana, -a.maxMovement, -a.strength, -a.intelligence, -a.agility);
+            new EntityAttribute(-a.level, -a.maxHealth, -a.maxAction, -a.strength, -a.intelligence, -a.agility);
         public static EntityAttribute operator +(EntityAttribute a, EntityAttribute b) =>
-            new EntityAttribute(a.level + b.level, a.maxHealth + b.maxHealth, a.maxMana + b.maxMana, a.maxMovement + b.maxMovement,
+            new EntityAttribute(a.level + b.level, a.maxHealth + b.maxHealth, a.maxAction + b.maxAction,
                 a.strength + b.strength, a.intelligence + b.intelligence, a.agility + b.agility);
         public static EntityAttribute operator -(EntityAttribute a, EntityAttribute b) => a + -(b);
     }

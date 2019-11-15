@@ -14,11 +14,9 @@ public class BattleUIController : MonoBehaviour
     public Image hpFill;
     public PlayerController player;
 
-    // Start is called before the first frame update
     void Awake()
     {
         player.OnHpChanged += OnPlayerHpChanged;
-        player.OnMpChanged += OnPlayerMpChanged;
     }
 
     private void OnPlayerHpChanged(int value)
@@ -28,11 +26,5 @@ public class BattleUIController : MonoBehaviour
         hpFill.fillAmount = tmp;
         //hpFill.color = slider_playerHp.value > 0.2f ? new Color(0.5f, 1, 0.4f) : Color.red;
         text_playerHp.text = value.ToString() + "/" + player.MaxHealthPoints.ToString();
-    }
-
-    private void OnPlayerMpChanged(int value)
-    {
-        DOTween.To(() => slider_playerMp.value, ratio => slider_playerMp.value = ratio, 1.0f * value / player.MaxManaPoints, 1);
-        text_playerMp.text = value.ToString() + "/" + player.MaxManaPoints.ToString();
     }
 }

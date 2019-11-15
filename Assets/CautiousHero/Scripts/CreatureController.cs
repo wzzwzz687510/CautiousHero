@@ -23,7 +23,6 @@ namespace Wing.RPGSystem {
             scriptableCreature = creature;
             m_attribute = scriptableCreature.attribute;
             m_healthPoints = MaxHealthPoints;
-            m_manaPoints = MaxManaPoints;
 
             foreach (var buff in scriptableCreature.buffs) {
                 buffManager.AddBuff(new BuffHandler(this,this,buff));
