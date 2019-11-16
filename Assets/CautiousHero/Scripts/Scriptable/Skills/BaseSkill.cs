@@ -38,8 +38,8 @@ namespace Wing.RPGSystem
 
     public enum Label
     {
-        HardMoveControll,
-        SoftMoveControll,
+        HardControll,
+        SoftControll,
         Obstacle,
         Debuff,
         SuicideAttack
@@ -66,7 +66,7 @@ namespace Wing.RPGSystem
         public DamageType damageType;
         public DamageElement damageElement;
         public CastType castType;
-        public Label[] labels;
+        public HashSet<Label> labels;
 
         [Header("Point Pattern")]
         public Location[] castPatterns;

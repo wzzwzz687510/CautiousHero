@@ -16,9 +16,24 @@ namespace Wing.RPGSystem
 
         private HashSet<Location> playerAffectZone;
 
+        public void PrepareDecisionMaking()
+        {
+            playerAffectZone = GridManager.Instance.CalculateEntityEffectZone(player);
+        }
+
         public void DecisionMaking(int index)
         {
+            var agent = creatures[index];
 
+            if()
+        }
+
+        private bool HasControlSkill(int index)
+        {
+            bool hasCS = false;
+            foreach (var skill in creatures[index].skills) {
+                if(skill.labels.Contains(Label.HardControll))
+            }
         }
 
         

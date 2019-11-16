@@ -97,7 +97,7 @@ public class GridManager : MonoBehaviour
 
     public bool IsEmptyLocation(Location id)
     {
-        return IsValidLocation(id) && GetTileController(id).isEmpty;
+        return IsValidLocation(id) && tileDic[id].isEmpty;
     }
 
     public bool ChangeTileState(Location id, TileState state)
@@ -168,15 +168,10 @@ public class GridManager : MonoBehaviour
         for (int i = 0; i < entity.ActionPoints + 1; i++) {
             foreach (var skill in entity.skills) {
                 if (skill.actionPointsCost <= entity.ActionPoints - i) {
-                    for (int x = -i; x < i + 1; x++) {
-                        for (int y = -i; y < i + 1; y++) {
-                            if (Mathf.Abs(x) + Mathf.Abs(y) <= i) {
-                                Location loc = new Location(entity.Loc.x + x, entity.Loc.y + y);
-                                foreach (var tile in skill.EffectZone(loc)) {
-                                    if (!EffectZone.Contains(tile))
-                                        EffectZone.Add(tile);
-                                }
-                            }
+                    foreach (var loc in Astar.GetGivenDistancePoints(entity.Loc,i)) {
+                        foreach (var effecLoc in skill.EffectZone(loc)) {
+                            if (!EffectZone.Contains(effecLoc))
+                                EffectZone.Add(effecLoc);
                         }
                     }
 
@@ -190,9 +185,9 @@ public class GridManager : MonoBehaviour
     public bool TryGetSafeTile(Entity entity, out TileController safeTile)
     {
         var zone = CalculateEntityEffectZone(entity);
-        foreach (var tile in tileDic.Values) {
-            if (tile.isEmpty && !zone.Contains(tile.Loc)) {
-                safeTile = tile;
+        foreach (var reachableLoc in Astar.GetGivenDistancePoints(entity.Loc,entity.ActionPoints)) {
+            if (!zone.Contains(reachableLoc) && IsEmptyLocation(reachableLoc)) {
+                safeTile = GetTileController(reachableLoc);
             }
         }
 

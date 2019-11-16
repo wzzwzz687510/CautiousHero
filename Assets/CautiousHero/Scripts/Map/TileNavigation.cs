@@ -42,14 +42,14 @@ namespace Wing.TileUtils
             return new AStarSearch(grid, from, to).cameFrom.ContainsKey(to);
         }
 
-        public IEnumerable<Location> GetGivenDistancePoints(Location origin, int distance)
+        public IEnumerable<Location> GetGivenDistancePoints(Location origin, int distance,bool includeInside = true)
         {
             Location destination;
             int heuristic = 0;
             for (int x = -distance; x < distance + 1; x++) {
                 for (int y = -distance; y < distance + 1; y++) {
                     heuristic = Math.Abs(x) + Math.Abs(y);
-                    if (heuristic <= distance) {
+                    if (includeInside ? heuristic <= distance : heuristic == distance) {
                         destination = new Location(origin.x + x, origin.y + y);
                         if (HasPath(origin, destination) && GetPath(origin, destination).Count == heuristic)
                             yield return destination;
