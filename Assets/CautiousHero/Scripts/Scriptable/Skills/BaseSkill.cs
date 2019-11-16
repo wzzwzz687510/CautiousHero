@@ -38,17 +38,20 @@ namespace Wing.RPGSystem
 
     public enum Label
     {
-        HardControll,
-        SoftControll,
+        HardControl,
+        SoftControl,
         Obstacle,
+        DefenseBuff,
+        Healing,
+        Damage,
         Debuff,
         SuicideAttack
     }
 
     [System.Serializable]
-    public struct SkillPattern
+    public struct EffectPattern
     {
-        public Location loc;
+        public Location pattern;
         public float coefficient;
     }
 
@@ -70,10 +73,12 @@ namespace Wing.RPGSystem
 
         [Header("Point Pattern")]
         public Location[] castPatterns;
-        public SkillPattern[] effectPatterns;
+        public EffectPattern[] effectPatterns;
 
-        public abstract IEnumerable<Location> GetFixedEffectPattern(Location castPattern);
-        public abstract IEnumerable<Location> EffectZone(Location origin);
-        public abstract void ApplyEffect(Entity castEntity, Entity targetEntity, int patternID);
+        public abstract Location GetFixedEffectPattern(Location cp, Location ep);
+        public abstract IEnumerable<Location> GetFixedEffectPatterns(Location cp);
+        public abstract IEnumerable<Location> SubEffectZone(Location casterLoc, Location cp, bool includingPassLocation = false);
+        public abstract IEnumerable<Location> EffectZone(Location casterLoc, bool includingPassLocation = false);
+        public abstract void ApplyEffect(Entity castEntity, Location castLoc);
     }    
 }

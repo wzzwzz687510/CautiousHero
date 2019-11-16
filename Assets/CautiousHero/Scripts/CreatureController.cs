@@ -17,18 +17,23 @@ namespace Wing.RPGSystem {
             base.Awake();
         }
 
-
         public void InitCreature(BaseCreature creature, TileController tile)
         {           
             scriptableCreature = creature;
             m_attribute = scriptableCreature.attribute;
-            m_healthPoints = MaxHealthPoints;
+            HealthPoints = MaxHealthPoints;
+            Skills = scriptableCreature.skills;
+            ActiveSkills = new InstanceSkill[Skills.Length];
+            for (int i = 0; i < Skills.Length; i++) {
+                ActiveSkills[i] = new InstanceSkill(Skills[i]);
+            }
 
             foreach (var buff in scriptableCreature.buffs) {
                 buffManager.AddBuff(new BuffHandler(this,this,buff));
             }
 
-            MoveToTile(tile, null);
+            MoveToTile(tile, false);
+            DropAnimation();
         }
 
         private void OnCreatureHpChanged(int value)

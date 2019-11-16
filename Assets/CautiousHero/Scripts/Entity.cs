@@ -6,12 +6,32 @@ using Wing.TileUtils;
 
 namespace Wing.RPGSystem
 {
+    public class InstanceSkill
+    {
+        public BaseSkill TSkill { get; private set; }
+        public int Cooldown { get; private set; }
+        public bool Castable { get { return Cooldown == 0; } }
+
+        public InstanceSkill(BaseSkill skill)
+        {
+            TSkill = skill;
+            Cooldown = 0;
+        }
+
+        public void SetCooldown(int num)
+        {
+            Cooldown = num;
+        }
+    }
+
     public class Entity : MonoBehaviour
     {
-        public int m_healthPoints { get; protected set; }
+        public int HealthPoints { get; protected set; }
         public int ActionPoints { get; protected set; }
-        public BaseSkill[] skills { get; protected set; }
+        public BaseSkill[] Skills { get; protected set; }
+        public InstanceSkill[] ActiveSkills { get; protected set; }
 
+        
         protected EntityAttribute m_attribute;
         public EntityAttribute Attribute {
             get {
@@ -24,6 +44,7 @@ namespace Wing.RPGSystem
         public int Strength { get { return Attribute.strength; } }
         public int Intelligence { get { return Attribute.intelligence; } }
         public int Agility { get { return Attribute.agility; } }
+        public int MoveCost { get { return Attribute.moveCost; } }
 
         protected BuffManager buffManager = new BuffManager();
 
@@ -47,13 +68,15 @@ namespace Wing.RPGSystem
             m_collider = GetComponentInChildren<BoxCollider2D>();
         }
 
-        public virtual void MoveToTile(TileController targetTile, Stack<Location> path, bool anim = false)
+        public virtual void MoveToTile(TileController targetTile, bool anim = true)
         {
+            if (targetTile == locateTile)
+                return;
+
             if (anim) {
-                /***************************************************************************
-                 * improve by stopping at the nearest tile to the target tile.
-                 ***************************************************************************/
-                if (path.Count > ActionPoints)
+                Stack<Location> path = GridManager.Instance.Astar.GetPath(Loc, targetTile.Loc);
+
+                if (path.Count * MoveCost > ActionPoints)
                     return;
 
                 Location[] sortedPath = new Location[path.Count];
@@ -66,12 +89,34 @@ namespace Wing.RPGSystem
             else {
                 transform.position = targetTile.transform.position;
             }
-            if (locateTile)
+            if (locateTile) {
                 locateTile.OnEntityLeaving();
+            }
 
             m_sprite.sortingOrder = targetTile.Loc.x + targetTile.Loc.y * 8;
             locateTile = targetTile;
             targetTile.OnEntityEntering(this);
+        }
+
+        public void CastSkill(int skillID, Location castLoc)
+        {
+            var tSkill = Skills[skillID];
+            ActionPoints -= tSkill.actionPointsCost;
+            ActiveSkills[skillID].SetCooldown(tSkill.cooldownTime);
+
+            tSkill.ApplyEffect(this, castLoc);
+            //Location effectLoc;
+            //foreach (var pattern in tSkill.effectPatterns) {
+            //    effectLoc = castLoc + pattern.loc;
+            //    if (!GridManager.Instance.IsEmptyLocation(effectLoc))
+            //        tSkill.ApplyEffect(this, GridManager.Instance.GetTileController(effectLoc).stayEntity, pattern.coefficient);
+            //}
+        }
+
+        public virtual void DropAnimation()
+        {
+            transform.GetChild(0).localPosition = new Vector3(0, 5, 0);
+            transform.GetChild(0).DOLocalMoveY(0.2f, 0.5f);
         }
 
         public virtual void ChangeOutlineColor(Color c)
@@ -97,10 +142,10 @@ namespace Wing.RPGSystem
 
         public virtual bool DealDamage(int value)
         {
-            m_healthPoints -= Mathf.RoundToInt((value - buffManager.GetReduceConstant(BuffType.Defend)) * 
+            HealthPoints -= Mathf.RoundToInt((value - buffManager.GetReduceConstant(BuffType.Defend)) * 
                 (1 - buffManager.GetReduceCof(BuffType.Defend)));
-            OnHpChanged?.Invoke(m_healthPoints);
-            if (m_healthPoints > 0)
+            OnHpChanged?.Invoke(HealthPoints);
+            if (HealthPoints > 0)
                 return true;
 
             Death();
@@ -111,5 +156,7 @@ namespace Wing.RPGSystem
         {
 
         }
+
+
     }
 }

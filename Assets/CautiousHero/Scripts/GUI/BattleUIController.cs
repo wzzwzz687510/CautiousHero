@@ -22,7 +22,7 @@ public class BattleUIController : MonoBehaviour
     {
         // For Test
         for (int i = 0; i < 4; i++) {
-            skills[i].sprite = player.skills[i].sprite;
+            skills[i].sprite = player.Skills[i].sprite;
         }
     }
 

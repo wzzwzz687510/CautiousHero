@@ -78,19 +78,19 @@ public class BattleManager : MonoBehaviour
 
     private void CompleteCast()
     {
-        var skill = skills[selectedSkillID];
-
         /***************************************************************************
          * if not cooldown, return 
          ***************************************************************************/
-        HashSet<Location> dlpCheck = new HashSet<Location>();
-        for (int i = 0; i < currentSelected.Count; i++) {
-            TileController tc = GridManager.Instance.GetTileController(currentSelected[i]);
-            if (!tc.isEmpty&& !dlpCheck.Contains(tc.Loc)) {
-                skill.ApplyEffect(player, tc.stayEntity, i);
-                dlpCheck.Add(tc.Loc);
-            }               
-        }
+        //HashSet<Location> repeatCheck = new HashSet<Location>();
+        //for (int i = 0; i < currentSelected.Count; i++) {
+        //    TileController tc = GridManager.Instance.GetTileController(currentSelected[i]);
+        //    if (!tc.isEmpty&& !repeatCheck.Contains(tc.Loc)) {
+        //        //skill.ApplyEffect(player, tc.stayEntity, skill.effectPatterns[i].coefficient);
+                
+        //        repeatCheck.Add(tc.Loc);
+        //    }               
+        //}
+        player.CastSkill(selectedSkillID, currentSelected[0]);
         ChangeState(BattleState.Animate);
     }
 
@@ -117,7 +117,8 @@ public class BattleManager : MonoBehaviour
 
                     if (Input.GetMouseButtonDown(0)) {
                         player.Sprite.color = Color.white;
-                        player.MoveToTile(tile, null);
+                        player.MoveToTile(tile,false);
+                        player.DropAnimation();
                         CompletePlacement();
                     }
                     break;
@@ -127,7 +128,7 @@ public class BattleManager : MonoBehaviour
                     if (Input.GetMouseButtonDown(0) && tileZone.Contains(currentSelected[0])) {
                         tmpPlayerVisual.SetActive(false);
                         player.Sprite.color = Color.white;
-                        player.MoveToTile(tile, GridManager.Instance.Astar.GetPath(player.Loc, tile.Loc), true);
+                        player.MoveToTile(tile, true);
                         CompleteMovement();
                     }
                     break;
@@ -221,7 +222,7 @@ public class BattleManager : MonoBehaviour
         }
 
         player.Sprite.color = new Color(1, 1, 1, 0.5f);
-        foreach (var loc in GridManager.Instance.Astar.GetGivenDistancePoints(player.Loc, player.ActionPoints)) {
+        foreach (var loc in GridManager.Instance.Astar.GetGivenDistancePoints(player.Loc, player.ActionPoints / player.MoveCost)) {
             GridManager.Instance.ChangeTileState(loc, TileState.MoveZone);
             tileZone.Add(loc);
         }
@@ -246,7 +247,7 @@ public class BattleManager : MonoBehaviour
                         continue;
                     tileZone.Add(castLoc);
 
-                    foreach (var pattern in skills[selectedSkillID].GetFixedEffectPattern(castPattern)) {
+                    foreach (var pattern in skills[selectedSkillID].GetFixedEffectPatterns(castPattern)) {
 
                         var hitPath = GridManager.Instance.GetTrajectoryHitTile(castLoc, pattern, false);
                         foreach (var passTile in hitPath) {
@@ -266,7 +267,7 @@ public class BattleManager : MonoBehaviour
         if (currentSelected.Count != 0) {
             if (currentSelected[0] == tile.Loc || (tile.isBind && currentSelected[0] == tile.CastLoc.Loc))
                 return;
-                
+
             foreach (var selected in currentSelected) {
                 if (tileZone.Contains(selected)) {
                     GridManager.Instance.ChangeTileState(selected, stateZone);
@@ -297,8 +298,10 @@ public class BattleManager : MonoBehaviour
             }
         }
         else {
-            if (tile.isBind && skills[selectedSkillID].castType == CastType.Trajectory)
-                HighlightAffectPoints(tile.CastLoc.Loc);
+            if (tile.isBind && skills[selectedSkillID].castType == CastType.Trajectory) {
+                if (currentSelected.Count == 0 || currentSelected[0] != tile.CastLoc.Loc)
+                    HighlightAffectPoints(tile.CastLoc.Loc);
+            }
             else
                 currentSelected.Add(tile.Loc);
         }
@@ -306,21 +309,18 @@ public class BattleManager : MonoBehaviour
 
     public void HighlightAffectPoints(Location castLoc)
     {
-        switch (skills[selectedSkillID].castType) {
+        var skill = skills[selectedSkillID];
+        switch (skill.castType) {
             case CastType.Instant:
-                foreach (var pattern in skills[selectedSkillID].GetFixedEffectPattern(castLoc-player.Loc)) {
-                    var targetLoc = castLoc + pattern;
-                    if (GridManager.Instance.ChangeTileState(targetLoc, TileState.CastSelected)) {
-                        currentSelected.Add(targetLoc);
+                foreach (var effectLoc in skill.SubEffectZone(player.Loc, castLoc-player.Loc)) {
+                    if (GridManager.Instance.ChangeTileState(effectLoc, TileState.CastSelected)) {
+                        currentSelected.Add(effectLoc);
                     }
                 }
                 break;
             case CastType.Trajectory:
-                foreach (var pattern in skills[selectedSkillID].GetFixedEffectPattern(castLoc - player.Loc)) {
-                    var hitPath = GridManager.Instance.GetTrajectoryHitTile(castLoc, pattern, true);
-                    foreach (var passTile in hitPath) {
-                        currentSelected.Add(passTile.Loc);
-                    }
+                foreach (var effectLoc in skill.SubEffectZone(player.Loc, castLoc - player.Loc, true)) {
+                    currentSelected.Add(effectLoc);
                 }
                 break;
             default:

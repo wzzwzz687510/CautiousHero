@@ -15,13 +15,11 @@ MonoBehaviour:
   skillName: Thunder 3
   description: A mystical skill
   sprite: {fileID: -6119718450461497363, guid: 95182df2e629f5c4c90c733881fc6d9c, type: 3}
-  damageType: 1
-  damageElement: 4
-  attribute: 1
-  skillType: 0
-  labels: 
   cooldownTime: 1
   actionPointsCost: 1
+  damageType: 1
+  damageElement: 4
+  castType: 0
   castPatterns:
   - x: 0
     y: 1
@@ -32,14 +30,15 @@ MonoBehaviour:
   - x: -1
     y: 0
   effectPatterns:
-  - loc:
+  - pattern:
       x: 1
       y: 1
-    coefficient: 0
-  - loc:
+    coefficient: 0.5
+  - pattern:
       x: -1
       y: 1
-    coefficient: 0
+    coefficient: 0.5
   baseValue: 30
   levelCof: 0
+  attribute: 1
   attributeCof: 0

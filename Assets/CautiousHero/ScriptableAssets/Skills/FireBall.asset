@@ -20,7 +20,6 @@ MonoBehaviour:
   damageType: 1
   damageElement: 1
   castType: 1
-  labels: 
   castPatterns:
   - x: 0
     y: 1
@@ -31,7 +30,7 @@ MonoBehaviour:
   - x: -1
     y: 0
   effectPatterns:
-  - loc:
+  - pattern:
       x: 0
       y: 1
     coefficient: 1

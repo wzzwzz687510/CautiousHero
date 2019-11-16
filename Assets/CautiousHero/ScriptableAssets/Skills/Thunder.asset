@@ -20,18 +20,11 @@ MonoBehaviour:
   damageType: 1
   damageElement: 5
   castType: 0
-  labels: 
   castPatterns:
   - x: 0
-    y: 1
-  - x: 1
-    y: 0
-  - x: 0
-    y: -1
-  - x: -1
     y: 0
   effectPatterns:
-  - loc:
+  - pattern:
       x: 0
       y: 0
     coefficient: 1

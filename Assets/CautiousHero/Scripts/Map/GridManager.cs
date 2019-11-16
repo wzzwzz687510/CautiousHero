@@ -165,27 +165,44 @@ public class GridManager : MonoBehaviour
     public HashSet<Location> CalculateEntityEffectZone(Entity entity)
     {
         HashSet<Location> EffectZone = new HashSet<Location>();
-        for (int i = 0; i < entity.ActionPoints + 1; i++) {
-            foreach (var skill in entity.skills) {
-                if (skill.actionPointsCost <= entity.ActionPoints - i) {
-                    foreach (var loc in Astar.GetGivenDistancePoints(entity.Loc,i)) {
+        for (int i = 0; i < entity.ActionPoints / entity.MoveCost + 1; i++) {
+            foreach (var skill in entity.Skills) {
+                if (skill.actionPointsCost <= entity.ActionPoints - i * entity.MoveCost) {
+                    foreach (var loc in Astar.GetGivenDistancePoints(entity.Loc, i, false)) {
                         foreach (var effecLoc in skill.EffectZone(loc)) {
                             if (!EffectZone.Contains(effecLoc))
                                 EffectZone.Add(effecLoc);
                         }
                     }
-
                 }
             }
         }
         return EffectZone;
-
     }
 
-    public bool TryGetSafeTile(Entity entity, out TileController safeTile)
+    public bool CalculateCastSkillTile(Entity entity,int skillID,Location target,out TileController destination)
     {
-        var zone = CalculateEntityEffectZone(entity);
-        foreach (var reachableLoc in Astar.GetGivenDistancePoints(entity.Loc,entity.ActionPoints)) {
+        destination = null;
+        var skill = entity.Skills[skillID];
+        int availableAP = entity.ActionPoints - skill.actionPointsCost;
+        if (availableAP < 0) return false;
+        for (int i = 0; i < availableAP/entity.MoveCost + 1; i++) {
+            foreach (var loc in Astar.GetGivenDistancePoints(entity.Loc, i)) {
+                foreach (var effecLoc in skill.EffectZone(loc)) {
+                    if (effecLoc.Equals(target)) {
+                        destination = GetTileController(loc);
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    public bool TryGetSafeTile(Entity self, Entity caster, out TileController safeTile)
+    {
+        var zone = CalculateEntityEffectZone(caster);
+        foreach (var reachableLoc in Astar.GetGivenDistancePoints(self.Loc, self.ActionPoints/self.MoveCost)) {
             if (!zone.Contains(reachableLoc) && IsEmptyLocation(reachableLoc)) {
                 safeTile = GetTileController(reachableLoc);
             }
