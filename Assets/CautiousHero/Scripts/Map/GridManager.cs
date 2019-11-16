@@ -1,7 +1,9 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Wing.RPGSystem;
 using Wing.TileUtils;
+using UnityEngine.AI;
 
 public class GridManager : MonoBehaviour
 {
@@ -11,14 +13,17 @@ public class GridManager : MonoBehaviour
 
     public GameObject prefab;
     public Sprite[] tileSprites;
-
-    private MapGenerator m_mg;
+    
+    public TileNavigation Astar { get; private set; }
     public Vector2 MapBoundingBox { get { return new Vector2(m_mg.width, m_mg.height); } }
+
+    private MapGenerator m_mg;    
     private GameObject tileHolder;
     private Dictionary<Location, TileController> tileDic 
         = new Dictionary<Location, TileController>();
+    private HashSet<Location> playerEffectZone = new HashSet<Location>();
 
-    public delegate void OnCompleteMapRendering(MapGenerator generator);
+    public delegate void OnCompleteMapRendering();
     public event OnCompleteMapRendering onCompleteMapRenderEvent;
 
     private void Awake()
@@ -31,8 +36,9 @@ public class GridManager : MonoBehaviour
     private IEnumerator Start()
     {
         RenderMap();
+        Astar = new TileNavigation(m_mg.width, m_mg.height, m_mg.map);
         yield return new WaitForSeconds(2);
-        onCompleteMapRenderEvent(m_mg);
+        onCompleteMapRenderEvent();      
     }
 
     private void Update()
@@ -75,7 +81,7 @@ public class GridManager : MonoBehaviour
         } 
     }
 
-    public bool IsLocationValid(Location id)
+    public bool IsValidLocation(Location id)
     {
         return tileDic.ContainsKey(id);
     }
@@ -89,9 +95,14 @@ public class GridManager : MonoBehaviour
         return null;
     }
 
+    public bool IsEmptyLocation(Location id)
+    {
+        return IsValidLocation(id) && GetTileController(id).isEmpty;
+    }
+
     public bool ChangeTileState(Location id, TileState state)
     {
-        if(!IsLocationValid(id))
+        if(!IsValidLocation(id))
             return false;
 
         GetTileController(id).ChangeTileState(state);
@@ -151,7 +162,43 @@ public class GridManager : MonoBehaviour
         yield return tc;
     }
 
+    public HashSet<Location> CalculateEntityEffectZone(Entity entity)
+    {
+        HashSet<Location> EffectZone = new HashSet<Location>();
+        for (int i = 0; i < entity.ActionPoints + 1; i++) {
+            foreach (var skill in entity.skills) {
+                if (skill.actionPointsCost <= entity.ActionPoints - i) {
+                    for (int x = -i; x < i + 1; x++) {
+                        for (int y = -i; y < i + 1; y++) {
+                            if (Mathf.Abs(x) + Mathf.Abs(y) <= i) {
+                                Location loc = new Location(entity.Loc.x + x, entity.Loc.y + y);
+                                foreach (var tile in skill.EffectZone(loc)) {
+                                    if (!EffectZone.Contains(tile))
+                                        EffectZone.Add(tile);
+                                }
+                            }
+                        }
+                    }
 
+                }
+            }
+        }
+        return EffectZone;
+
+    }
+
+    public bool TryGetSafeTile(Entity entity, out TileController safeTile)
+    {
+        var zone = CalculateEntityEffectZone(entity);
+        foreach (var tile in tileDic.Values) {
+            if (tile.isEmpty && !zone.Contains(tile.Loc)) {
+                safeTile = tile;
+            }
+        }
+
+        safeTile = null;
+        return false;
+    }
 
     IEnumerable<TileController> ValidTiles()
     {

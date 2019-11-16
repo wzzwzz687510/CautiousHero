@@ -99,6 +99,7 @@ public class TileController : MonoBehaviour
         // Do something to entity;
 
         stayEntity = entity;
+        GridManager.Instance.Astar.SetTileWeight(Loc, 0);
     }
 
     public void OnEntityLeaving()
@@ -106,6 +107,7 @@ public class TileController : MonoBehaviour
         // Do something to entity;
 
         stayEntity = null;
+        GridManager.Instance.Astar.SetTileWeight(Loc, 1);
     }
 
     public void BindCastLocation(TileController from)

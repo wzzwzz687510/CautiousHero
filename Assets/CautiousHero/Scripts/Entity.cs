@@ -68,6 +68,8 @@ namespace Wing.RPGSystem
             }
             if (locateTile)
                 locateTile.OnEntityLeaving();
+
+            m_sprite.sortingOrder = targetTile.Loc.x + targetTile.Loc.y * 8;
             locateTile = targetTile;
             targetTile.OnEntityEntering(this);
         }

@@ -70,6 +70,7 @@ namespace Wing.RPGSystem
         public SkillPattern[] effectPatterns;
 
         public abstract IEnumerable<Location> GetFixedEffectPattern(Location castPattern);
+        public abstract IEnumerable<Location> EffectZone(Location origin);
         public abstract void ApplyEffect(Entity castEntity, Entity targetEntity, int patternID);
     }    
 }

@@ -34,6 +34,17 @@ namespace Wing.TileUtils
 
             return path;
         }
+
+        public bool HasPath(Location from, Location to)
+        {
+            return AStarSearch.Heuristic(from, to) == GetPath(from, to).Count;
+
+        }
+
+        public void SetTileWeight(Location id, int cost)
+        {
+            grid.SetWeight(id, cost);
+        }
     }
 
     public interface WeightedGraph<L>

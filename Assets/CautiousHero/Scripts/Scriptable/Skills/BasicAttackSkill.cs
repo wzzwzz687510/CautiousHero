@@ -46,17 +46,24 @@ namespace Wing.RPGSystem
             }
         }
 
-        public IEnumerable<Location> AffectZone(Location origin)
+        public override IEnumerable<Location> EffectZone(Location origin)
         {
             switch (skillType) {
                 case SkillType.Instant:
-                    foreach (var loc in castPatterns) {
-                        foreach (var point in effectPatterns) {
-                            yield return origin + loc + point.loc;
+                    foreach (var cp in castPatterns) {
+                        foreach (var ep in GetFixedEffectPattern(cp)) {
+                            yield return origin + cp + ep;
                         }
                     }
                     break;
                 case SkillType.Trajectory:
+                    foreach (var cp in castPatterns) {
+                        foreach (var ep in GetFixedEffectPattern(cp)) {
+                            foreach (var tile in GridManager.Instance.GetTrajectoryHitTile(origin + cp,ep)) {
+                                yield return tile.Loc;
+                            }
+                        }                       
+                    }
                     break;
                 default:
                     break;

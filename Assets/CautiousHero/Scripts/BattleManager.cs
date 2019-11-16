@@ -30,7 +30,7 @@ public class BattleManager : MonoBehaviour
     public BattleState State { get; private set; }
 
     private GameObject tmpPlayerVisual;
-    private TileNavigation m_astar;
+    
     private List<Location> currentSelected = new List<Location>();
     private int selectedSkillID = 0;
 
@@ -41,16 +41,15 @@ public class BattleManager : MonoBehaviour
         if (!Instance)
             Instance = this;
         State = BattleState.PlacePlayer;
-        GridManager.Instance.onCompleteMapRenderEvent += SetAstarNavigation;
+        GridManager.Instance.onCompleteMapRenderEvent += PrepareBattleStart;
 
         // For test
         player.InitPlayer(skills);
         GetComponent<BattleUIController>().UpdateUI();
     }
 
-    public void SetAstarNavigation(MapGenerator generator)
-    {
-        m_astar = new TileNavigation(generator.width, generator.height, generator.map);
+    public void PrepareBattleStart()
+    {       
         PreparePlacePlayer();
 
         // For test
@@ -128,7 +127,7 @@ public class BattleManager : MonoBehaviour
                     if (Input.GetMouseButtonDown(0) && tileZone.Count != 0) {
                         tmpPlayerVisual.SetActive(false);
                         player.Sprite.color = Color.white;
-                        player.MoveToTile(tile, m_astar.GetPath(player.Loc, tile.Loc), true);
+                        player.MoveToTile(tile, GridManager.Instance.Astar.GetPath(player.Loc, tile.Loc), true);
                         CompleteMovement();
                     }
                     break;
@@ -216,14 +215,19 @@ public class BattleManager : MonoBehaviour
     private void PrepareMove()
     {
         player.SetActiveCollider(false);
-        if (!tmpPlayerVisual)
-            tmpPlayerVisual = Instantiate(player.Sprite.gameObject, player.transform.position + new Vector3(0, 0.2f, 0), Quaternion.identity);   
+        if (!tmpPlayerVisual) {
+            tmpPlayerVisual = Instantiate(player.Sprite.gameObject, player.transform.position + new Vector3(0, 0.2f, 0), Quaternion.identity);
+            tmpPlayerVisual.GetComponent<SpriteRenderer>().sortingOrder = player.Loc.x + player.Loc.y * 8 + 1;
+        }
+             
 
         player.Sprite.color = new Color(1, 1, 1, 0.5f);
         for (int x = -player.ActionPoints; x < player.ActionPoints + 1; x++) {
             for (int y = -player.ActionPoints; y < player.ActionPoints + 1; y++) {
                 if (Mathf.Abs(x) + Mathf.Abs(y) <= player.ActionPoints) {
                     Location loc = new Location(player.Loc.x + x, player.Loc.y + y);
+                    if (!GridManager.Instance.IsEmptyLocation(loc) || !GridManager.Instance.Astar.HasPath(player.Loc, loc))
+                        continue;
                     GridManager.Instance.ChangeTileState(loc, TileState.MoveZone);
                     tileZone.Add(loc);
                 }
