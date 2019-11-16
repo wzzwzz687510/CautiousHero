@@ -3900,9 +3900,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   slider_playerHp: {fileID: 558775769}
-  slider_playerMp: {fileID: 0}
   text_playerHp: {fileID: 924570636}
-  text_playerMp: {fileID: 0}
   hpFill: {fileID: 705795352}
   skills:
   - {fileID: 1954107029}

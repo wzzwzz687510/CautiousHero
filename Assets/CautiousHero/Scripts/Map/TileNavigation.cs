@@ -22,9 +22,11 @@ namespace Wing.TileUtils
         }
 
         public Stack<Location> GetPath(Location from, Location to)
-        {
-            var astar = new AStarSearch(grid, from, to);
+        {            
             Stack<Location> path = new Stack<Location>();
+
+
+            var astar = new AStarSearch(grid, from, to);
 
             Location tmp = to;
             while (!tmp.Equals(from)) {
@@ -37,8 +39,23 @@ namespace Wing.TileUtils
 
         public bool HasPath(Location from, Location to)
         {
-            return AStarSearch.Heuristic(from, to) == GetPath(from, to).Count;
+            return new AStarSearch(grid, from, to).cameFrom.ContainsKey(to);
+        }
 
+        public IEnumerable<Location> GetGivenDistancePoints(Location origin, int distance)
+        {
+            Location destination;
+            int heuristic = 0;
+            for (int x = -distance; x < distance + 1; x++) {
+                for (int y = -distance; y < distance + 1; y++) {
+                    heuristic = Math.Abs(x) + Math.Abs(y);
+                    if (heuristic <= distance) {
+                        destination = new Location(origin.x + x, origin.y + y);
+                        if (HasPath(origin, destination) && GetPath(origin, destination).Count == heuristic)
+                            yield return destination;
+                    }
+                }
+            }
         }
 
         public void SetTileWeight(Location id, int cost)

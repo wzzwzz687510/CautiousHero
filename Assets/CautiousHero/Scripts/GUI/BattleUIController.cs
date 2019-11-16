@@ -8,9 +8,7 @@ using Wing.RPGSystem;
 public class BattleUIController : MonoBehaviour
 {
     public Slider slider_playerHp;
-    public Slider slider_playerMp;
     public Text text_playerHp;
-    public Text text_playerMp;
     public Image hpFill;
     public Image[] skills;
     public PlayerController player;

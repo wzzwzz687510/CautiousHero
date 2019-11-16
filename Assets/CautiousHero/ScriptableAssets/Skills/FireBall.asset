@@ -9,41 +9,33 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 0}
+  m_Script: {fileID: 11500000, guid: 47a8051cd7d92b941bb1c646c112d213, type: 3}
   m_Name: Fireball
   m_EditorClassIdentifier: Assembly-CSharp:Wing.RPGSystem:BasicAttackSkill
-  skillName: Fire Ball
+  skillName: New skill
   description: A mystical skill
-  sprite: {fileID: -542545160671792255, guid: 95182df2e629f5c4c90c733881fc6d9c, type: 3}
-  damageType: 1
-  damageElement: 0
-  attribute: 1
-  skillType: 1
-  labels: 
+  sprite: {fileID: -1739163679129328277, guid: 95182df2e629f5c4c90c733881fc6d9c, type: 3}
   cooldownTime: 1
-  actionPointsCost: 1
+  actionPointsCost: 2
+  damageType: 1
+  damageElement: 1
+  castType: 1
+  labels: 
   castPatterns:
   - x: 0
     y: 1
-  - x: 1
-    y: 0
   - x: 0
     y: -1
+  - x: 1
+    y: 0
   - x: -1
     y: 0
   effectPatterns:
   - loc:
       x: 0
       y: 1
-    coefficient: 0
-  - loc:
-      x: 1
-      y: 1
-    coefficient: 0
-  - loc:
-      x: -1
-      y: 1
-    coefficient: 0
-  baseValue: 50
+    coefficient: 1
+  baseValue: 20
   levelCof: 0
+  attribute: 1
   attributeCof: 0

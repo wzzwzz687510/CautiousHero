@@ -38,7 +38,6 @@ namespace Wing.RPGSystem
         public string creatureName = "New Creature";
         public string description = "A secret creature";
         public Sprite sprite;
-
         public EntityAttribute attribute;
 
         public BaseSkill[] skills;

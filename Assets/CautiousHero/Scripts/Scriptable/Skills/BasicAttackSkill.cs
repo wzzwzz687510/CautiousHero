@@ -8,9 +8,11 @@ namespace Wing.RPGSystem
     [CreateAssetMenu(fileName = "Skill", menuName = "ScriptableSkills/BasicAttackSkill", order = 1)]
     public class BasicAttackSkill : BaseSkill
     {
+        [Header("Basic Attack Parameters")]
         // Final number = baseValue * (1 + levelCof * level + attributeCof * attribute)
         public int baseValue;
         public float levelCof;
+        public AdditiveAttribute attribute;
         public float attributeCof;
 
         public override IEnumerable<Location> GetFixedEffectPattern(Location castPattern)
@@ -48,15 +50,15 @@ namespace Wing.RPGSystem
 
         public override IEnumerable<Location> EffectZone(Location origin)
         {
-            switch (skillType) {
-                case SkillType.Instant:
+            switch (castType) {
+                case CastType.Instant:
                     foreach (var cp in castPatterns) {
                         foreach (var ep in GetFixedEffectPattern(cp)) {
                             yield return origin + cp + ep;
                         }
                     }
                     break;
-                case SkillType.Trajectory:
+                case CastType.Trajectory:
                     foreach (var cp in castPatterns) {
                         foreach (var ep in GetFixedEffectPattern(cp)) {
                             foreach (var tile in GridManager.Instance.GetTrajectoryHitTile(origin + cp,ep)) {

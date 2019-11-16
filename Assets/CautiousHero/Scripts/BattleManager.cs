@@ -124,7 +124,7 @@ public class BattleManager : MonoBehaviour
                 case BattleState.Move:
                     SelectVisual(tile, TileState.MoveZone);
 
-                    if (Input.GetMouseButtonDown(0) && tileZone.Count != 0) {
+                    if (Input.GetMouseButtonDown(0) && tileZone.Contains(currentSelected[0])) {
                         tmpPlayerVisual.SetActive(false);
                         player.Sprite.color = Color.white;
                         player.MoveToTile(tile, GridManager.Instance.Astar.GetPath(player.Loc, tile.Loc), true);
@@ -219,19 +219,11 @@ public class BattleManager : MonoBehaviour
             tmpPlayerVisual = Instantiate(player.Sprite.gameObject, player.transform.position + new Vector3(0, 0.2f, 0), Quaternion.identity);
             tmpPlayerVisual.GetComponent<SpriteRenderer>().sortingOrder = player.Loc.x + player.Loc.y * 8 + 1;
         }
-             
 
         player.Sprite.color = new Color(1, 1, 1, 0.5f);
-        for (int x = -player.ActionPoints; x < player.ActionPoints + 1; x++) {
-            for (int y = -player.ActionPoints; y < player.ActionPoints + 1; y++) {
-                if (Mathf.Abs(x) + Mathf.Abs(y) <= player.ActionPoints) {
-                    Location loc = new Location(player.Loc.x + x, player.Loc.y + y);
-                    if (!GridManager.Instance.IsEmptyLocation(loc) || !GridManager.Instance.Astar.HasPath(player.Loc, loc))
-                        continue;
-                    GridManager.Instance.ChangeTileState(loc, TileState.MoveZone);
-                    tileZone.Add(loc);
-                }
-            }
+        foreach (var loc in GridManager.Instance.Astar.GetGivenDistancePoints(player.Loc, player.ActionPoints)) {
+            GridManager.Instance.ChangeTileState(loc, TileState.MoveZone);
+            tileZone.Add(loc);
         }
     }
 
@@ -239,15 +231,15 @@ public class BattleManager : MonoBehaviour
     {
         player.SetActiveCollider(false);
 
-        switch (skills[selectedSkillID].skillType) {
-            case SkillType.Instant:
+        switch (skills[selectedSkillID].castType) {
+            case CastType.Instant:
                 foreach (var point in skills[selectedSkillID].castPatterns) {
                     var loc = player.Loc + point;
                     if (GridManager.Instance.ChangeTileState(loc, TileState.CastZone))
                         tileZone.Add(loc);
                 }
                 break;
-            case SkillType.Trajectory:
+            case CastType.Trajectory:
                 foreach (var castPattern in skills[selectedSkillID].castPatterns) {
                     var castLoc = player.Loc + castPattern;
                     if (!GridManager.Instance.ChangeTileState(castLoc, TileState.CastZone))
@@ -305,7 +297,7 @@ public class BattleManager : MonoBehaviour
             }
         }
         else {
-            if (tile.isBind && skills[selectedSkillID].skillType == SkillType.Trajectory)
+            if (tile.isBind && skills[selectedSkillID].castType == CastType.Trajectory)
                 HighlightAffectPoints(tile.CastLoc.Loc);
             else
                 currentSelected.Add(tile.Loc);
@@ -314,8 +306,8 @@ public class BattleManager : MonoBehaviour
 
     public void HighlightAffectPoints(Location castLoc)
     {
-        switch (skills[selectedSkillID].skillType) {
-            case SkillType.Instant:
+        switch (skills[selectedSkillID].castType) {
+            case CastType.Instant:
                 foreach (var pattern in skills[selectedSkillID].GetFixedEffectPattern(castLoc-player.Loc)) {
                     var targetLoc = castLoc + pattern;
                     if (GridManager.Instance.ChangeTileState(targetLoc, TileState.CastSelected)) {
@@ -323,7 +315,7 @@ public class BattleManager : MonoBehaviour
                     }
                 }
                 break;
-            case SkillType.Trajectory:
+            case CastType.Trajectory:
                 foreach (var pattern in skills[selectedSkillID].GetFixedEffectPattern(castLoc - player.Loc)) {
                     var hitPath = GridManager.Instance.GetTrajectoryHitTile(castLoc, pattern, true);
                     foreach (var passTile in hitPath) {

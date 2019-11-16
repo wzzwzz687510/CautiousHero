@@ -14,16 +14,16 @@ namespace Wing.RPGSystem
 
     public enum DamageElement
     {
+        None,
         Fire,
         Water,
         Earth,
         Air,
         Light,
-        Dark,
-        None
+        Dark
     }
 
-    public enum SkillType
+    public enum CastType
     {
         Instant,
         Trajectory
@@ -55,17 +55,20 @@ namespace Wing.RPGSystem
     //[CreateAssetMenu(fileName = "Skill", menuName = "ScriptableSkills/BaseSkill", order = 1)]
     public abstract class BaseSkill : ScriptableObject
     {
+        [Header("Basic Parameters")]
         public string skillName = "New skill";
         public string description = "A mystical skill";
         public Sprite sprite;
-        public DamageType damageType;
-        public DamageElement damageElement;
-        public AdditiveAttribute attribute;
-        public SkillType skillType;
-        public Label[] labels;
-
         public int cooldownTime;
         public int actionPointsCost;
+
+        [Header("Labels")]
+        public DamageType damageType;
+        public DamageElement damageElement;
+        public CastType castType;
+        public Label[] labels;
+
+        [Header("Point Pattern")]
         public Location[] castPatterns;
         public SkillPattern[] effectPatterns;
 

@@ -9,37 +9,33 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 0}
+  m_Script: {fileID: 11500000, guid: 47a8051cd7d92b941bb1c646c112d213, type: 3}
   m_Name: Thunder
   m_EditorClassIdentifier: Assembly-CSharp:Wing.RPGSystem:BasicAttackSkill
-  skillName: Thunder
+  skillName: New skill
   description: A mystical skill
-  sprite: {fileID: -2400394132761560739, guid: 95182df2e629f5c4c90c733881fc6d9c, type: 3}
-  damageType: 1
-  damageElement: 4
-  attribute: 1
-  skillType: 0
-  labels: 
+  sprite: {fileID: -6119718450461497363, guid: 95182df2e629f5c4c90c733881fc6d9c, type: 3}
   cooldownTime: 1
-  actionPointsCost: 1
+  actionPointsCost: 2
+  damageType: 1
+  damageElement: 5
+  castType: 0
+  labels: 
   castPatterns:
-  - x: 1
+  - x: 0
     y: 1
   - x: 1
+    y: 0
+  - x: 0
     y: -1
   - x: -1
-    y: -1
-  - x: -1
-    y: 1
+    y: 0
   effectPatterns:
   - loc:
-      x: 1
-      y: 1
-    coefficient: 0
-  - loc:
-      x: 2
-      y: 2
-    coefficient: 0
-  baseValue: 80
+      x: 0
+      y: 0
+    coefficient: 1
+  baseValue: 30
   levelCof: 0
+  attribute: 1
   attributeCof: 0
