@@ -303,6 +303,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0cb8d30e7a8d578499cb786563195a83, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  OnAnimationComplete:
+    m_PersistentCalls:
+      m_Calls: []
+  hpBar: {fileID: 4765559719442440406}
   mask_hp: {fileID: 859611184845833727}
   mask_hpEffect: {fileID: 7042038299788193301}
 --- !u!1 &5157026614429218927

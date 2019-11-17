@@ -44,7 +44,13 @@ namespace Wing.RPGSystem
     [System.Serializable]
     public class BuffManager
     {
+        public Entity host;
         public Dictionary<BaseBuff, BuffHandler> buffDic = new Dictionary<BaseBuff, BuffHandler>();
+
+        public BuffManager(Entity entity)
+        {
+            host = entity;
+        }
 
         public void AddBuff(BuffHandler buff)
         {
@@ -58,8 +64,12 @@ namespace Wing.RPGSystem
 
         public void UpdateBuffs()
         {
-            foreach (var buffHandler in buffDic.Values) {
-                buffHandler.UpdateBuff();
+            // Do something to host
+
+            foreach (var buff in buffDic.Keys) {
+                if (!buffDic[buff].UpdateBuff()) {
+                    buffDic.Remove(buff);
+                }
             }
         }
 

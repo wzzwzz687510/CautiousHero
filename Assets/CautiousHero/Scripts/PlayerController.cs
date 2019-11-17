@@ -16,40 +16,22 @@ namespace Wing.RPGSystem
         {
             HealthPoints = 100;
             m_attribute = new EntityAttribute(1, 100, 3, 1, 1, 1, 1);
-            ActionPoints = 3;
             base.Awake();
         }
 
-        public override void MoveToTile(TileController targetTile, bool anim = true)
+        public override void OnEntityTurnStart()
         {
-            if (targetTile == locateTile)
-                return;
+            base.OnEntityTurnStart();
 
-            if (anim) {
-                Stack<Location> path = GridManager.Instance.Astar.GetPath(Loc, targetTile.Loc);
-
-                if (path.Count * MoveCost > ActionPoints)
-                    return;
-
-                Location[] sortedPath = new Location[path.Count];
-                for (int i = 0; i < sortedPath.Length; i++) {
-                    sortedPath[i] = path.Pop();
-                }
-                paths.Add(sortedPath);
-                MoveAnimation();
-            }
-            else {
-                transform.position = targetTile.transform.position;
-            }
-            if (locateTile) {
-                locateTile.OnEntityLeaving();
-                lastTile = locateTile;
-            }
-            locateTile = targetTile;
-            targetTile.OnEntityEntering(this);
+            lastTile = LocateTile;
             lastActionPoints = ActionPoints;
-            ActionPoints -= paths.Count * MoveCost;
-            m_sprite.sortingOrder = targetTile.Loc.x + targetTile.Loc.y * 8;
+        }
+
+        public override void CastSkill(int skillID, Location castLoc)
+        {
+            base.CastSkill(skillID, castLoc);
+            lastTile = LocateTile;
+            lastActionPoints = ActionPoints;
         }
 
         public void CancelMove()
@@ -57,8 +39,9 @@ namespace Wing.RPGSystem
             if (!lastTile)
                 return;
 
-            transform.position = lastTile.transform.position;
+            MoveToTile(lastTile, false);
             ActionPoints = lastActionPoints;
+            OnAPChanged?.Invoke();
         }
 
         public void InitPlayer(BaseSkill[] skills)
@@ -66,7 +49,8 @@ namespace Wing.RPGSystem
             Skills = skills;
             ActiveSkills = new InstanceSkill[Skills.Length];
             for (int i = 0; i < Skills.Length; i++) {
-                ActiveSkills[i] = new InstanceSkill(Skills[i]);
+                
+ActiveSkills[i] = new InstanceSkill(Skills[i]);
             }
         }
     }

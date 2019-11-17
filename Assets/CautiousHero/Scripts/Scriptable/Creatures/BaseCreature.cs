@@ -9,17 +9,17 @@ namespace Wing.RPGSystem
     {
         public int level;
         public int maxHealth;
-        public int maxAction;
+        public int action;
         public int strength;
         public int intelligence;
         public int agility;
         public int moveCost;
 
-        public EntityAttribute(int lvl, int maxHp, int maxAct, int str, int inte, int agi,int mvCost)
+        public EntityAttribute(int lvl, int maxHp, int act, int str, int inte, int agi,int mvCost)
         {
             level = lvl;
             maxHealth = maxHp;
-            maxAction = maxAct;
+            action = act;
             strength = str;
             intelligence = inte;
             agility = agi;
@@ -27,14 +27,14 @@ namespace Wing.RPGSystem
         }
 
         public static EntityAttribute operator -(EntityAttribute a) =>
-            new EntityAttribute(-a.level, -a.maxHealth, -a.maxAction, -a.strength, -a.intelligence, -a.agility,-a.moveCost);
+            new EntityAttribute(-a.level, -a.maxHealth, -a.action, -a.strength, -a.intelligence, -a.agility,-a.moveCost);
         public static EntityAttribute operator +(EntityAttribute a, EntityAttribute b) =>
-            new EntityAttribute(a.level + b.level, a.maxHealth + b.maxHealth, a.maxAction + b.maxAction,
+            new EntityAttribute(a.level + b.level, a.maxHealth + b.maxHealth, a.action + b.action,
                 a.strength + b.strength, a.intelligence + b.intelligence, a.agility + b.agility, a.moveCost + b.moveCost);
         public static EntityAttribute operator -(EntityAttribute a, EntityAttribute b) => a + -(b);
     }
 
-    [CreateAssetMenu(fileName = "Creature", menuName = "ScriptableCreatures/BaseCreature", order = 1)]
+    [CreateAssetMenu(fileName = "Creature", menuName = "Wing/ScriptableCreatures/BaseCreature", order = 1)]
     public class BaseCreature : ScriptableObject
     {
         public string creatureName = "New Creature";

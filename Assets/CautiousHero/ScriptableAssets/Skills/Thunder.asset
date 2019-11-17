@@ -20,6 +20,7 @@ MonoBehaviour:
   damageType: 1
   damageElement: 5
   castType: 0
+  labels: 06000000
   castPatterns:
   - x: 0
     y: 0
@@ -28,7 +29,7 @@ MonoBehaviour:
       x: 0
       y: 0
     coefficient: 1
-  baseValue: 30
+  baseValue: 90
   levelCof: 0
   attribute: 1
   attributeCof: 0

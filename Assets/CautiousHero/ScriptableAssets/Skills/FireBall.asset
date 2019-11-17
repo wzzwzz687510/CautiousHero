@@ -15,11 +15,12 @@ MonoBehaviour:
   skillName: New skill
   description: A mystical skill
   sprite: {fileID: -1739163679129328277, guid: 95182df2e629f5c4c90c733881fc6d9c, type: 3}
-  cooldownTime: 1
+  cooldownTime: 2
   actionPointsCost: 2
   damageType: 1
   damageElement: 1
   castType: 1
+  labels: 06000000
   castPatterns:
   - x: 0
     y: 1

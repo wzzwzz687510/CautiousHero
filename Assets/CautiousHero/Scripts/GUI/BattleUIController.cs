@@ -11,11 +11,21 @@ public class BattleUIController : MonoBehaviour
     public Text text_playerHp;
     public Image hpFill;
     public Image[] skills;
+    public Image[] skillCovers;
     public PlayerController player;
+    public Toggle[] toggle_aps;
 
     void Awake()
     {
-        player.OnHpChanged += OnPlayerHpChanged;        
+        player.OnHPDropped += OnPlayerHPChanged;
+        player.OnSkillUpdated += OnPlayerSkillUpdated;
+        player.OnAPChanged.AddListener(OnPlayerAPChanged);
+    }
+
+    private void OnDestroy()
+    {
+        player.OnHPDropped -= OnPlayerHPChanged;
+        player.OnAPChanged.RemoveListener(OnPlayerAPChanged);
     }
 
     public void UpdateUI()
@@ -26,12 +36,39 @@ public class BattleUIController : MonoBehaviour
         }
     }
 
-    private void OnPlayerHpChanged(int value)
+    private void OnPlayerHPChanged(bool isDrop)
     {
-        float tmp = 1.0f * value / player.MaxHealthPoints;
+        float tmp = 1.0f * player.HealthPoints / player.MaxHealthPoints;
         DOTween.To(() => slider_playerHp.value, ratio => slider_playerHp.value = ratio, tmp, 1);
         hpFill.fillAmount = tmp;
-        //hpFill.color = slider_playerHp.value > 0.2f ? new Color(0.5f, 1, 0.4f) : Color.red;
-        text_playerHp.text = value.ToString() + "/" + player.MaxHealthPoints.ToString();
+        hpFill.color = tmp > 0.2f ? new Color(0.5f, 1, 0.4f) : Color.red;
+        text_playerHp.text = player.HealthPoints.ToString() + "/" + player.MaxHealthPoints.ToString();
+    }
+
+    private void OnPlayerAPChanged()
+    {
+        for (int i = 0; i < 8; i++) {
+            toggle_aps[i].isOn = i + 1 <= player.ActionPoints;
+        }
+    }
+
+    private void OnPlayerSkillUpdated(int skillID,int cooldown)
+    {
+        skillCovers[skillID].fillAmount = 1.0f * cooldown / player.Skills[skillID].cooldownTime;
+    }
+
+    public void Button_CancelMove()
+    {
+        BattleManager.Instance.CancelMove();
+    }
+
+    public void Button_EndTurn()
+    {
+        BattleManager.Instance.EndTurn();
+    }
+
+    public void Button_CastSkill(int skillID)
+    {
+        BattleManager.Instance.CastSkill(skillID);
     }
 }

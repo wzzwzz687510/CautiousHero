@@ -5,7 +5,7 @@ using Wing.TileUtils;
 
 namespace Wing.RPGSystem
 {
-    [CreateAssetMenu(fileName = "Skill", menuName = "ScriptableSkills/BasicAttackSkill", order = 1)]
+    [CreateAssetMenu(fileName = "Skill", menuName = "Wing/ScriptableSkills/BasicAttackSkill", order = 1)]
     public class BasicAttackSkill : BaseSkill
     {
         [Header("Basic Attack Parameters")]
@@ -80,7 +80,7 @@ namespace Wing.RPGSystem
         }
 
         // cast location = cast pattern(cp) + entity's location.
-        public override IEnumerable<Location> SubEffectZone(Location casterLoc, Location cp, bool includingPassLocation = false)
+        public override IEnumerable<Location> GetSubEffectZone(Location casterLoc, Location cp, bool includingPassLocation = false)
         {
             switch (castType) {
                 case CastType.Instant:
@@ -101,10 +101,10 @@ namespace Wing.RPGSystem
             }
         }
 
-        public override IEnumerable<Location> EffectZone(Location casterLoc, bool includingPassLocation = false)
+        public override IEnumerable<Location> GetEffectZone(Location casterLoc, bool includingPassLocation = false)
         {
             foreach (var cp in castPatterns) {
-                foreach (var effectLoc in SubEffectZone(casterLoc,cp, includingPassLocation)) {
+                foreach (var effectLoc in GetSubEffectZone(casterLoc,cp, includingPassLocation)) {
                     yield return effectLoc;
                 }
             }

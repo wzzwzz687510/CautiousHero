@@ -42,9 +42,9 @@ namespace Wing.RPGSystem
         SoftControl,
         Obstacle,
         DefenseBuff,
+        StrengthenBuff,
         Healing,
         Damage,
-        Debuff,
         SuicideAttack
     }
 
@@ -69,7 +69,8 @@ namespace Wing.RPGSystem
         public DamageType damageType;
         public DamageElement damageElement;
         public CastType castType;
-        public HashSet<Label> labels;
+        public List<Label> labels;
+        //public HashSet<Label> hashlabels;
 
         [Header("Point Pattern")]
         public Location[] castPatterns;
@@ -77,8 +78,8 @@ namespace Wing.RPGSystem
 
         public abstract Location GetFixedEffectPattern(Location cp, Location ep);
         public abstract IEnumerable<Location> GetFixedEffectPatterns(Location cp);
-        public abstract IEnumerable<Location> SubEffectZone(Location casterLoc, Location cp, bool includingPassLocation = false);
-        public abstract IEnumerable<Location> EffectZone(Location casterLoc, bool includingPassLocation = false);
+        public abstract IEnumerable<Location> GetSubEffectZone(Location casterLoc, Location cp, bool includingPassLocation = false);
+        public abstract IEnumerable<Location> GetEffectZone(Location casterLoc, bool includingPassLocation = false);
         public abstract void ApplyEffect(Entity castEntity, Location castLoc);
     }    
 }

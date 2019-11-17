@@ -20,6 +20,7 @@ MonoBehaviour:
   damageType: 1
   damageElement: 5
   castType: 0
+  labels: 06000000
   castPatterns:
   - x: 1
     y: 1

@@ -18,10 +18,12 @@ MonoBehaviour:
   attribute:
     level: 1
     maxHealth: 100
-    maxMana: 100
-    maxMovement: 2
-    strength: 1
-    intelligence: 1
-    agility: 1
-  skills: []
+    action: 4
+    strength: 10
+    intelligence: 10
+    agility: 10
+    moveCost: 1
+  skills:
+  - {fileID: 11400000, guid: 9e12c06f5f8d891468fa7cbdc246de3c, type: 2}
+  - {fileID: 11400000, guid: fb510444ae5d71f439acee90298e5c20, type: 2}
   buffs: []

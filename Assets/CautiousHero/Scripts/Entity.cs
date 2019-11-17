@@ -1,7 +1,9 @@
 ﻿using DG.Tweening;
 using SpriteGlow;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 using Wing.TileUtils;
 
 namespace Wing.RPGSystem
@@ -10,7 +12,7 @@ namespace Wing.RPGSystem
     {
         public BaseSkill TSkill { get; private set; }
         public int Cooldown { get; private set; }
-        public bool Castable { get { return Cooldown == 0; } }
+        public bool Castable { get { return Cooldown <= 0; } }
 
         public InstanceSkill(BaseSkill skill)
         {
@@ -22,95 +24,128 @@ namespace Wing.RPGSystem
         {
             Cooldown = num;
         }
+
+        public bool UpdateSkill()
+        {
+            return Castable || --Cooldown <= 0;
+        }
     }
 
     public class Entity : MonoBehaviour
     {
         public int HealthPoints { get; protected set; }
         public int ActionPoints { get; protected set; }
+        public bool isDeath { get; protected set; }
         public BaseSkill[] Skills { get; protected set; }
         public InstanceSkill[] ActiveSkills { get; protected set; }
+        public BuffManager BuffManager { get; protected set; }
 
-        
+        public TileController LocateTile { get; protected set; }
+        public Location Loc { get { return LocateTile.Loc; } }
+
         protected EntityAttribute m_attribute;
         public EntityAttribute Attribute {
             get {
-                return m_attribute + buffManager.GetAttributeAdjustment();
+                return m_attribute + BuffManager.GetAttributeAdjustment();
             }
         }
         public int Level { get { return Attribute.level; } }
         public int MaxHealthPoints { get { return Attribute.maxHealth; } }
-        public int MaxActionPoints { get { return Attribute.maxAction; } }
+        public int ActionPointsPerTurn { get { return Attribute.action; } }
         public int Strength { get { return Attribute.strength; } }
         public int Intelligence { get { return Attribute.intelligence; } }
         public int Agility { get { return Attribute.agility; } }
         public int MoveCost { get { return Attribute.moveCost; } }
 
-        protected BuffManager buffManager = new BuffManager();
-
-        public Location Loc { get { return locateTile.Loc; } }
-        public TileController LocateTile { get { return locateTile; } }
         public SpriteRenderer Sprite { get { return m_sprite; } }
 
         protected SpriteRenderer m_sprite;
         protected SpriteGlowEffect m_glowEffect;
         protected BoxCollider2D m_collider;
-        protected TileController locateTile;
-        protected List<Location[]> paths = new List<Location[]>();
+        protected Vector3[] movePath;
 
-        public delegate void ValueChange(int value);
-        public event ValueChange OnHpChanged;
+        public delegate void BCallback(bool isEligible);
+        public delegate void ICallback(int index,int cooldown);
+        public event BCallback OnHPDropped;
+        public event ICallback OnSkillUpdated;
+        [HideInInspector] public UnityEvent OnAPChanged;
+        [HideInInspector] public UnityEvent OnAnimationCompleted;
 
         protected virtual void Awake()
         {
             m_sprite = GetComponentInChildren<SpriteRenderer>();
             m_glowEffect = GetComponentInChildren<SpriteGlowEffect>();
             m_collider = GetComponentInChildren<BoxCollider2D>();
+            BuffManager = new BuffManager(this);
+            isDeath = false;
         }
 
+        public virtual void OnEntityTurnStart()
+        {
+            BuffManager.UpdateBuffs();
+            for (int i = 0; i < ActiveSkills.Length; i++) {
+                ActiveSkills[i].UpdateSkill();
+                OnSkillUpdated?.Invoke(i, ActiveSkills[i].Cooldown);
+            }
+
+            ActionPoints = Mathf.Min(ActionPoints + ActionPointsPerTurn, 8);
+            OnAPChanged?.Invoke();
+        }
+
+        /// <summary>
+        /// set anim false generally means move entity to one place instantly without move cost (e.g. by skill effect).
+        /// </summary>
+        /// <param name="targetTile"></param>
+        /// <param name="anim"></param>
         public virtual void MoveToTile(TileController targetTile, bool anim = true)
         {
-            if (targetTile == locateTile)
+            if (targetTile == LocateTile) {
+
                 return;
+            }
+                
 
             if (anim) {
                 Stack<Location> path = GridManager.Instance.Astar.GetPath(Loc, targetTile.Loc);
 
-                if (path.Count * MoveCost > ActionPoints)
-                    return;
+                if (path.Count * MoveCost > ActionPoints) {
 
-                Location[] sortedPath = new Location[path.Count];
+                    return;
+                }
+                    
+
+                Vector3[] sortedPath = new Vector3[path.Count];
                 for (int i = 0; i < sortedPath.Length; i++) {
                     sortedPath[i] = path.Pop();
                 }
-                paths.Add(sortedPath);
-                MoveAnimation();
+                movePath = sortedPath;
+                StartCoroutine(MoveAnimation());
+                ActionPoints -= movePath.Length * MoveCost;
+                OnAPChanged?.Invoke();
             }
             else {
                 transform.position = targetTile.transform.position;
             }
-            if (locateTile) {
-                locateTile.OnEntityLeaving();
-            }
 
-            m_sprite.sortingOrder = targetTile.Loc.x + targetTile.Loc.y * 8;
-            locateTile = targetTile;
+            if (LocateTile) {
+                LocateTile.OnEntityLeaving();
+            }
+            LocateTile = targetTile;
             targetTile.OnEntityEntering(this);
+
+            m_sprite.sortingOrder = targetTile.Loc.x + targetTile.Loc.y * 8;           
         }
 
-        public void CastSkill(int skillID, Location castLoc)
+        public virtual void CastSkill(int skillID, Location castLoc)
         {
             var tSkill = Skills[skillID];
             ActionPoints -= tSkill.actionPointsCost;
+            OnAPChanged?.Invoke();
             ActiveSkills[skillID].SetCooldown(tSkill.cooldownTime);
+            OnSkillUpdated?.Invoke(skillID, tSkill.cooldownTime);
 
             tSkill.ApplyEffect(this, castLoc);
-            //Location effectLoc;
-            //foreach (var pattern in tSkill.effectPatterns) {
-            //    effectLoc = castLoc + pattern.loc;
-            //    if (!GridManager.Instance.IsEmptyLocation(effectLoc))
-            //        tSkill.ApplyEffect(this, GridManager.Instance.GetTileController(effectLoc).stayEntity, pattern.coefficient);
-            //}
+            StartCoroutine(CastAnimation());
         }
 
         public virtual void DropAnimation()
@@ -129,22 +164,31 @@ namespace Wing.RPGSystem
             m_collider.enabled = bl;
         }
 
-        protected virtual void MoveAnimation()
+        protected virtual IEnumerator CastAnimation()
         {
-            int end = paths.Count - 1;
-            Vector3[] points = new Vector3[paths[end].Length];
-            for (int i = 0; i < points.Length; i++) {
-                points[i] = paths[end][i];
-            }
+            yield return null;
+            OnAnimationCompleted?.Invoke();
+        }
 
-            transform.DOPath(points, 0.3f);
+        protected virtual IEnumerator MoveAnimation()
+        {
+            transform.DOPath(movePath, 0.5f);
+            yield return new WaitForSeconds(0.5f);
+            if (OnAnimationCompleted == null)
+                Debug.Log(2);
+            OnAnimationCompleted?.Invoke();
+        }
+
+        public int GetDefendReducedValue(int value)
+        {
+            return Mathf.RoundToInt((value - BuffManager.GetReduceConstant(BuffType.Defend)) *
+                (1 - BuffManager.GetReduceCof(BuffType.Defend)));
         }
 
         public virtual bool DealDamage(int value)
         {
-            HealthPoints -= Mathf.RoundToInt((value - buffManager.GetReduceConstant(BuffType.Defend)) * 
-                (1 - buffManager.GetReduceCof(BuffType.Defend)));
-            OnHpChanged?.Invoke(HealthPoints);
+            HealthPoints -= GetDefendReducedValue(value);
+            OnHPDropped?.Invoke(true);
             if (HealthPoints > 0)
                 return true;
 
@@ -154,7 +198,8 @@ namespace Wing.RPGSystem
 
         public virtual void Death()
         {
-
+            isDeath = true;
+            BattleManager.Instance.GameConditionCheck();
         }
 
 

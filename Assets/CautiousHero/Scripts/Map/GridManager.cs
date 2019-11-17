@@ -3,7 +3,18 @@ using System.Collections.Generic;
 using UnityEngine;
 using Wing.RPGSystem;
 using Wing.TileUtils;
-using UnityEngine.AI;
+
+public struct CastSkillAction
+{
+    public TileController destination;
+    public Location castLocation;
+
+    public CastSkillAction(TileController moveto, Location castLoc)
+    {
+        destination = moveto;
+        castLocation = castLoc;
+    }
+}
 
 public class GridManager : MonoBehaviour
 {
@@ -162,14 +173,16 @@ public class GridManager : MonoBehaviour
         yield return tc;
     }
 
-    public HashSet<Location> CalculateEntityEffectZone(Entity entity)
+    public HashSet<Location> CalculateEntityEffectZone(Entity entity, bool isPrediction)
     {
         HashSet<Location> EffectZone = new HashSet<Location>();
-        for (int i = 0; i < entity.ActionPoints / entity.MoveCost + 1; i++) {
+        int entityAP = isPrediction ? entity.ActionPoints + entity.ActionPointsPerTurn : entity.ActionPoints;
+        int entityMoveStep = entityAP / entity.MoveCost;
+        for (int i = 0; i < entityMoveStep + 1; i++) {
             foreach (var skill in entity.Skills) {
-                if (skill.actionPointsCost <= entity.ActionPoints - i * entity.MoveCost) {
+                if (skill.actionPointsCost <= entityAP - i * entity.MoveCost) {
                     foreach (var loc in Astar.GetGivenDistancePoints(entity.Loc, i, false)) {
-                        foreach (var effecLoc in skill.EffectZone(loc)) {
+                        foreach (var effecLoc in skill.GetEffectZone(loc)) {
                             if (!EffectZone.Contains(effecLoc))
                                 EffectZone.Add(effecLoc);
                         }
@@ -180,18 +193,21 @@ public class GridManager : MonoBehaviour
         return EffectZone;
     }
 
-    public bool CalculateCastSkillTile(Entity entity,int skillID,Location target,out TileController destination)
+    public bool CalculateCastSkillTile(Entity entity,int skillID,Location target,out CastSkillAction action)
     {
-        destination = null;
+        action = new CastSkillAction();
         var skill = entity.Skills[skillID];
         int availableAP = entity.ActionPoints - skill.actionPointsCost;
         if (availableAP < 0) return false;
         for (int i = 0; i < availableAP/entity.MoveCost + 1; i++) {
             foreach (var loc in Astar.GetGivenDistancePoints(entity.Loc, i)) {
-                foreach (var effecLoc in skill.EffectZone(loc)) {
-                    if (effecLoc.Equals(target)) {
-                        destination = GetTileController(loc);
-                        return true;
+                foreach (var cp in skill.castPatterns) {
+                    foreach (var el in skill.GetSubEffectZone(loc,cp)) {
+                        if (el.Equals(target)) {
+                            action.destination = GetTileController(loc);
+                            action.castLocation = loc + cp;
+                            return true;
+                        }
                     }
                 }
             }
@@ -201,7 +217,7 @@ public class GridManager : MonoBehaviour
 
     public bool TryGetSafeTile(Entity self, Entity caster, out TileController safeTile)
     {
-        var zone = CalculateEntityEffectZone(caster);
+        var zone = CalculateEntityEffectZone(caster, true);
         foreach (var reachableLoc in Astar.GetGivenDistancePoints(self.Loc, self.ActionPoints/self.MoveCost)) {
             if (!zone.Contains(reachableLoc) && IsEmptyLocation(reachableLoc)) {
                 safeTile = GetTileController(reachableLoc);
