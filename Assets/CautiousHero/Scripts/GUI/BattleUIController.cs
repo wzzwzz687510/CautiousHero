@@ -58,8 +58,13 @@ public class BattleUIController : MonoBehaviour
 
     private void OnPlayerSkillUpdated(int skillID,int cooldown)
     {
-        float tmp = 1.0f * cooldown / player.Skills[skillID].cooldownTime;
-        DOTween.To(() => skillCovers[skillID].fillAmount, ratio => skillCovers[skillID].fillAmount = ratio, tmp, 1);
+        float tmp = Mathf.Clamp01(1.0f * cooldown / player.Skills[skillID].cooldownTime);
+        if (tmp == 1) {
+            skillCovers[skillID].fillAmount = tmp;
+        }
+        else {
+            DOTween.To(() => skillCovers[skillID].fillAmount, ratio => skillCovers[skillID].fillAmount = ratio, tmp, 1);
+        }
     }
 
     public void Button_CancelMove()
