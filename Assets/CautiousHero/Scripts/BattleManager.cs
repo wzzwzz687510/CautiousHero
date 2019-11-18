@@ -56,7 +56,6 @@ public class BattleManager : MonoBehaviour
     public void PrepareBattleStart()
     {
         AIManager.Instance.Init(config);
-        OnGameoverEvent?.Invoke();
         PreparePlacePlayer();
     }
 
