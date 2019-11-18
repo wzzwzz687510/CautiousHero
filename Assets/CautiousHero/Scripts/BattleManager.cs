@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Wing.TileUtils;
 using Wing.RPGSystem;
+using UnityEngine.Events;
 
 public enum BattleState
 {
@@ -21,6 +22,7 @@ public class BattleManager : MonoBehaviour
     [Header("Test")]
     public BaseSkill[] skills;
     public BattleConfig config;
+    public GameObject win;
 
     [Header("Component References")]
     public LayerMask tileLayer;
@@ -37,6 +39,8 @@ public class BattleManager : MonoBehaviour
 
     private HashSet<Location> tileZone = new HashSet<Location>();
 
+    public UnityEvent OnGameoverEvent;
+
     private void Awake()
     {
         if (!Instance)
@@ -52,7 +56,7 @@ public class BattleManager : MonoBehaviour
     public void PrepareBattleStart()
     {
         AIManager.Instance.Init(config);
-
+        OnGameoverEvent?.Invoke();
         PreparePlacePlayer();
     }
 
@@ -339,6 +343,7 @@ public class BattleManager : MonoBehaviour
         ChangeState(BattleState.NonInteractable);
         AIManager.Instance.StopBot();
         // To do
+        OnGameoverEvent?.Invoke();
         Debug.Log("You lost");
     }
 
@@ -346,6 +351,7 @@ public class BattleManager : MonoBehaviour
     {
         ChangeState(BattleState.NonInteractable);
         // To do
+        win.SetActive(true);
         Debug.Log("You win");
     }
 

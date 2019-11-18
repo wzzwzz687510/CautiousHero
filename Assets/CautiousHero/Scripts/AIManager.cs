@@ -96,6 +96,8 @@ namespace Wing.RPGSystem
         private IEnumerator BotTurn()
         {
             for (int i = 0; i < Creatures.Length; i++) {
+                if (Creatures[i].isDeath)
+                    continue;
                 Creatures[i].ChangeOutlineColor(Color.red);
                 yield return StartCoroutine(DecisionMaking(i));
                 Creatures[i].ChangeOutlineColor(Color.black);
@@ -111,37 +113,42 @@ namespace Wing.RPGSystem
                 yield return StartCoroutine(AvoidPlayerEffect(index));
             }
             else {
-                yield return StartCoroutine(ApplyStrategy(index));
+                yield return StartCoroutine(ApplyStrategy(index,true));
             }
         }
 
-        private IEnumerator ApplyStrategy(int index)
+        private IEnumerator ApplyStrategy(int index,bool isAvoidZone)
         {
-            HealAlley(index);
+            HealAlley(index,isAvoidZone);
             while (isCasting) {
                 yield return null;
             }
 
-            BuffAlley(index);
+            BuffAlley(index,isAvoidZone);
             while (isCasting) {
                 yield return null;
             }
 
-            AttackPlayer(index);
+            AttackPlayer(index,isAvoidZone);
             while (isCasting) {
                 yield return null;
             }
         }
 
-        private void AttackPlayer(int index)
+        private void AttackPlayer(int index,bool isAvoidZone)
         {
             if (Creatures[index].ActionPoints == 0 || !HasCastableGivenLabelSkill(index, Label.Damage))
                 return;
 
-            TryCastGivenLabelSkill(index, Label.Damage, player, playerEffectZone);
+            if (isAvoidZone) {
+                TryCastGivenLabelSkill(index, Label.Damage, player, playerEffectZone);
+            }   
+            else {
+                TryCastGivenLabelSkill(index, Label.Damage, player);
+            }
         }
 
-        private void BuffAlley(int index)
+        private void BuffAlley(int index,bool isAvoidZone)
         {
             if (Creatures[index].ActionPoints == 0 || !HasCastableGivenLabelSkill(index, Label.StrengthenBuff))
                 return;
@@ -165,11 +172,17 @@ namespace Wing.RPGSystem
                 }
             }
 
-            if (alleyID != -1)
-                TryCastGivenLabelSkill(index, Label.StrengthenBuff, Creatures[alleyID], playerEffectZone);
+            if (alleyID != -1) {
+                if (isAvoidZone) {
+                    TryCastGivenLabelSkill(index, Label.StrengthenBuff, Creatures[alleyID], playerEffectZone);
+                }
+                else {
+                    TryCastGivenLabelSkill(index, Label.StrengthenBuff, Creatures[alleyID]);
+                }
+            }
         }
 
-        private void HealAlley(int index)
+        private void HealAlley(int index,bool isAvoidZone)
         {
             if (Creatures[index].ActionPoints == 0 || !HasCastableGivenLabelSkill(index, Label.Healing))
                 return;
@@ -185,8 +198,14 @@ namespace Wing.RPGSystem
                 }
             }
 
-            if (lowestID != -1)
-                TryCastGivenLabelSkill(index, Label.Healing, Creatures[lowestID], playerEffectZone);
+            if (lowestID != -1) {
+                if (isAvoidZone) {
+                    TryCastGivenLabelSkill(index, Label.Healing, Creatures[lowestID], playerEffectZone);
+                }
+                else {
+                    TryCastGivenLabelSkill(index, Label.Healing, Creatures[lowestID]);
+                }
+            }               
         }
 
         private IEnumerator AvoidPlayerEffect(int index)
@@ -208,7 +227,7 @@ namespace Wing.RPGSystem
             while (isCasting) {
                 yield return null;
             }
-            yield return StartCoroutine(ApplyStrategy(index));
+            yield return StartCoroutine(ApplyStrategy(index, false));
         }
 
         private IEnumerator KillPlayer(int index)

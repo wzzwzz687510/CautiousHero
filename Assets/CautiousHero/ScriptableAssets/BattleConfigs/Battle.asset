@@ -15,7 +15,7 @@ MonoBehaviour:
   setName: New battle set
   description: A standard battle set
   creatureSets:
-  - tCreature: {fileID: 11400000, guid: 5ae52c28e22299242be1eead45c19af9, type: 2}
+  - tCreature: {fileID: 11400000, guid: 7032be28ce92d0940b7fc9c91d480f48, type: 2}
     location:
       x: 4
       y: 1

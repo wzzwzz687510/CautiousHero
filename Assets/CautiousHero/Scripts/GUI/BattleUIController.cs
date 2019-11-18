@@ -15,11 +15,15 @@ public class BattleUIController : MonoBehaviour
     public PlayerController player;
     public Toggle[] toggle_aps;
 
+    public Image blackBG;
+    public Image die;
+
     void Awake()
     {
         player.OnHPDropped += OnPlayerHPChanged;
         player.OnSkillUpdated += OnPlayerSkillUpdated;
         player.OnAPChanged.AddListener(OnPlayerAPChanged);
+        BattleManager.Instance.OnGameoverEvent.AddListener(Gameover);
     }
 
     private void OnDestroy()
@@ -70,5 +74,11 @@ public class BattleUIController : MonoBehaviour
     public void Button_CastSkill(int skillID)
     {
         BattleManager.Instance.CastSkill(skillID);
+    }
+
+    public void Gameover()
+    {
+        DOTween.ToAlpha(() => blackBG.color, color => blackBG.color = color, 0.7f, 0.5f);
+        DOTween.ToAlpha(() => die.color, color => die.color = color, 1, 2);
     }
 }
