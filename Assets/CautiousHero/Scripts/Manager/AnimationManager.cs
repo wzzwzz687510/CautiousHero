@@ -233,7 +233,7 @@ namespace Wing.RPGSystem
                     Vector3 fix = new Vector3(0, 0.4f, 0);
                     switch (castClip.castType) {
                         case CastType.Instant:
-                            effect = Instantiate(castClip.castEffect, castClip.start + fix, Quaternion.identity, effectHolder);
+                            effect = Instantiate(castClip.castEffect, castClip.end + fix, Quaternion.identity, effectHolder);
                             yield return new WaitForSeconds(castClip.duration);
                             Destroy(effect);
                             break;

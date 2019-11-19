@@ -10,39 +10,23 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 47a8051cd7d92b941bb1c646c112d213, type: 3}
-  m_Name: Thunder 3
+  m_Name: BiTree
   m_EditorClassIdentifier: Assembly-CSharp:Wing.RPGSystem:BasicAttackSkill
-  skillName: Thunder 3
+  skillName: "\u4E8C\u53C9\u6811\u5217"
   description: A mystical skill
   sprite: {fileID: -6119718450461497363, guid: 95182df2e629f5c4c90c733881fc6d9c, type: 3}
   cooldownTime: 2
   actionPointsCost: 1
-  damageType: 1
-  damageElement: 4
+  skillType: 1
+  skillElement: 3
   castType: 0
   labels: 06000000
-  castPatterns:
-  - x: 0
-    y: 1
-  - x: 1
-    y: 0
-  - x: 0
-    y: -1
-  - x: -1
-    y: 0
   castEffect:
-    prefab: {fileID: 119322, guid: e322ac6f694c2f84bb227112512c13ce, type: 3}
+    prefab: {fileID: 160150, guid: 135baa54467718346b4ec3b679824e50, type: 3}
     animDuration: 0.3
-  effectPatterns:
-  - pattern:
-      x: 1
-      y: 1
-    coefficient: 0.5
-  - pattern:
-      x: -1
-      y: 1
-    coefficient: 0.5
+  tCastPatterns: {fileID: 11400000, guid: ad611d959b4a33344acc948e13ec3d3e, type: 2}
+  tEffectPatterns: {fileID: 11400000, guid: 42d0097f6ac31e24c88b3e5353bfb689, type: 2}
   baseValue: 10
   levelCof: 0
-  attribute: 1
   attributeCof: 0
+  attribute: 1

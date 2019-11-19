@@ -12,33 +12,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 47a8051cd7d92b941bb1c646c112d213, type: 3}
   m_Name: Fireball
   m_EditorClassIdentifier: Assembly-CSharp:Wing.RPGSystem:BasicAttackSkill
-  skillName: New skill
+  skillName: "\u706B\u7403\u672F"
   description: A mystical skill
   sprite: {fileID: -1739163679129328277, guid: 95182df2e629f5c4c90c733881fc6d9c, type: 3}
   cooldownTime: 2
   actionPointsCost: 2
-  damageType: 1
-  damageElement: 1
+  skillType: 1
+  skillElement: 1
   castType: 1
   labels: 06000000
-  castPatterns:
-  - x: 0
-    y: 1
-  - x: 0
-    y: -1
-  - x: 1
-    y: 0
-  - x: -1
-    y: 0
   castEffect:
     prefab: {fileID: 141582, guid: 11306af72e9741044bdf0bbbcc5c69de, type: 3}
     animDuration: 0.1
-  effectPatterns:
-  - pattern:
-      x: 0
-      y: 1
-    coefficient: 1
+  tCastPatterns: {fileID: 11400000, guid: ad611d959b4a33344acc948e13ec3d3e, type: 2}
+  tEffectPatterns: {fileID: 11400000, guid: 35c43e361d112b04b869656d407daef2, type: 2}
   baseValue: 20
   levelCof: 0
-  attribute: 1
   attributeCof: 0
+  attribute: 1

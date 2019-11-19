@@ -59,7 +59,7 @@ public class BattleManager : MonoBehaviour
 
         // For test
         player.InitPlayer(100, new EntityAttribute(1, 100, 4, 1, 1, 1, 1), skills);
-        GetComponent<BattleUIController>().UpdateUI();
+        GetComponent<BattleUIController>().Init();
     }
 
     public void PrepareBattleStart()
@@ -263,8 +263,10 @@ public class BattleManager : MonoBehaviour
 
     private void PrepareMove()
     {
+        if (player.ActionPoints == 0)
+            return;
         player.SetActiveCollider(false);
-        SetVisualPlayer(player.transform.position, player.LocateTile.SortOrder + 64);
+        SetVisualPlayer(player.transform.position+new Vector3(0,0.2f,0), player.LocateTile.SortOrder + 64);
 
         player.Sprite.color = new Color(1, 1, 1, 0.5f);
         foreach (var loc in GridManager.Instance.Astar.GetGivenDistancePoints(player.Loc, player.ActionPoints / player.MoveCost)) {

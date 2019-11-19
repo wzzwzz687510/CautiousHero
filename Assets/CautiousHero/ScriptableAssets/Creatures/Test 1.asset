@@ -25,5 +25,5 @@ MonoBehaviour:
     moveCost: 1
   skills:
   - {fileID: 11400000, guid: 9e12c06f5f8d891468fa7cbdc246de3c, type: 2}
-  - {fileID: 11400000, guid: 2f4e48e200dd4304eb746afbd300448b, type: 2}
+  - {fileID: 11400000, guid: eb09e44329dbb55458eecbedaee6003a, type: 2}
   buffs: []

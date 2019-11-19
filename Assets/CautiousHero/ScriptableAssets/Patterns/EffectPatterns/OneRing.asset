@@ -12,4 +12,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b310617e927b1e04cac5e0c7a23f340b, type: 3}
   m_Name: OneRing
   m_EditorClassIdentifier: 
-  effectPatterns: []
+  effectPatterns:
+  - pattern:
+      x: 0
+      y: 1
+    coefficient: 1
+  - pattern:
+      x: 1
+      y: 0
+    coefficient: 1
+  - pattern:
+      x: 0
+      y: -1
+    coefficient: 1
+  - pattern:
+      x: -1
+      y: 0
+    coefficient: 1

@@ -17,54 +17,16 @@ MonoBehaviour:
   sprite: {fileID: -6119718450461497363, guid: 95182df2e629f5c4c90c733881fc6d9c, type: 3}
   cooldownTime: 1
   actionPointsCost: 4
-  damageType: 1
-  damageElement: 5
+  skillType: 0
+  skillElement: 0
   castType: 0
   labels: 0600000007000000
-  castPatterns:
-  - x: 0
-    y: 0
   castEffect:
     prefab: {fileID: 123764, guid: 5077e2ec8ec48d247af6fecd8d5bb756, type: 3}
     animDuration: 0.3
-  effectPatterns:
-  - pattern:
-      x: 0
-      y: 0
-    coefficient: 1
-  - pattern:
-      x: 1
-      y: 0
-    coefficient: 1
-  - pattern:
-      x: 0
-      y: 1
-    coefficient: 1
-  - pattern:
-      x: -1
-      y: 0
-    coefficient: 1
-  - pattern:
-      x: 0
-      y: -1
-    coefficient: 1
-  - pattern:
-      x: 1
-      y: 1
-    coefficient: 1
-  - pattern:
-      x: -1
-      y: -1
-    coefficient: 1
-  - pattern:
-      x: -1
-      y: 1
-    coefficient: 1
-  - pattern:
-      x: 1
-      y: -1
-    coefficient: 1
+  tCastPatterns: {fileID: 11400000, guid: b22b31c552c5ede4c9c6816ab839811b, type: 2}
+  tEffectPatterns: {fileID: 11400000, guid: 036f31f5ea7d1ae44a90d0500c77286b, type: 2}
   baseValue: 60
   levelCof: 0
-  attribute: 1
   attributeCof: 0
+  attribute: 1

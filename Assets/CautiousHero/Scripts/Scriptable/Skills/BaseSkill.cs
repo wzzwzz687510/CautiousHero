@@ -5,14 +5,14 @@ using Wing.TileUtils;
 
 namespace Wing.RPGSystem
 {
-    public enum DamageType
+    public enum SkillType
     {
         Physical,
         Magical,
         Pure
     }
 
-    public enum DamageElement
+    public enum SkillElement
     {
         None,
         Fire,
@@ -73,8 +73,8 @@ namespace Wing.RPGSystem
         public int actionPointsCost;
 
         [Header("Labels")]
-        public DamageType damageType;
-        public DamageElement damageElement;
+        public SkillType skillType;
+        public SkillElement skillElement;
         public CastType castType;
         public List<Label> labels;
         //public HashSet<Label> hashlabels;

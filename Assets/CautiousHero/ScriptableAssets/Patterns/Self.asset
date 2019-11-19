@@ -12,3 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c9fb430c7eab2db47b8237d422cb7623, type: 3}
   m_Name: Self
   m_EditorClassIdentifier: 
+  patterns:
+  - x: 0
+    y: 0

@@ -17,6 +17,7 @@ namespace Wing.RPGSystem
         public CreatureController[] Creatures { get; private set; }
         public bool isCalculating { get; private set; }
 
+        private int playerMaxDamage;
         private HashSet<Location> playerEffectZone;
         private CastSkillAction currentCSA;
         //private bool isCasting;
@@ -65,8 +66,20 @@ namespace Wing.RPGSystem
             StopAllCoroutines();
         }
 
+        private void CalculatePlayerMaxDamage()
+        {
+            playerMaxDamage = 0;
+            foreach (var skill in player.ActiveSkills) {
+                if (SkillCheck(skill,Label.Damage)) {
+                    int damage = (skill.TSkill as BasicAttackSkill).CalculateValue(player, 1);
+                    playerMaxDamage = Mathf.Max(playerMaxDamage, damage);
+                }
+            }
+        }
+
         private void PrepareDecisionMaking()
         {
+            CalculatePlayerMaxDamage();
             playerEffectZone = GridManager.Instance.CalculateEntityEffectZone(player, true);
             currentCSA = new CastSkillAction();
 
@@ -170,14 +183,15 @@ namespace Wing.RPGSystem
             int lowestHP = Creatures[0].HealthPoints;
             int lowestID = -1;
             for (int i = 0; i < Creatures.Length; i++) {
-                if (Creatures[i].HealthPoints < Creatures[i].MaxHealthPoints / 2) {
+                if (Creatures[i].HealthPoints < playerMaxDamage && 
+                    Creatures[i].HealthPoints!= Creatures[i].MaxHealthPoints) {
                     if (lowestID == -1 || Creatures[i].HealthPoints < lowestHP) {
                         lowestID = i;
                         lowestHP = Creatures[i].HealthPoints;
                     }
                 }
             }
-
+            
             if (lowestID != -1) {
                 if (isAvoidZone) {
                     TryCastGivenLabelSkill(index, Label.Healing, Creatures[lowestID], playerEffectZone);
