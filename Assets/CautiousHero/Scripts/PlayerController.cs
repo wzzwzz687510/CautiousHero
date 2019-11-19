@@ -12,19 +12,21 @@ namespace Wing.RPGSystem
         private TileController lastTile;
         private int lastActionPoints;
 
-        public void InitPlayer(int maxHP,EntityAttribute attributes, BaseSkill[] skills)
+        public void InitPlayer(EntityAttribute attributes, BaseSkill[] skills)
         {
-            HealthPoints = maxHP;
-            m_attribute = attributes;
+            
+            m_attribute = attributes;           
             EntityName = "Player";
-            EntityHash = EntityManager.Instance.AddEntity(this);
+            EntityHash = EntityManager.Instance.AddEntity(this);            
             BuffManager = new BuffManager(EntityHash);
+
+            HealthPoints = MaxHealthPoints;
             Skills = skills;
             ActiveSkills = new InstanceSkill[Skills.Length];
             for (int i = 0; i < Skills.Length; i++) {
 
                 ActiveSkills[i] = new InstanceSkill(Skills[i]);
-            }            
+            }
         }
 
         public override void OnEntityTurnStart()

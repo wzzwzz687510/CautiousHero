@@ -58,14 +58,14 @@ public class BattleManager : MonoBehaviour
         AnimationManager.Instance.OnAnimCompleted.AddListener(OnAnimCompleted);
 
         // For test
-        player.InitPlayer(100, new EntityAttribute(1, 100, 4, 1, 1, 1, 1), skills);
+        player.InitPlayer(new EntityAttribute(1, 150, 4, 1, 1, 1, 1), skills);
         GetComponent<BattleUIController>().Init();
     }
 
     public void PrepareBattleStart()
     {
         AIManager.Instance.Init(config);
-        PreparePlacePlayer();
+        PreparePlacePlayer();       
     }
 
     private void OnAnimCompleted()

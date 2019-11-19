@@ -11,7 +11,7 @@ public class BattleUIController : MonoBehaviour
     public PlayerController player;
 
     [Header("HP Visual")]
-    public Slider playerHpBar;
+    public Slider playerHPBar;
     public Text playerHpText;
     public Image hpFill;
 
@@ -66,15 +66,7 @@ public class BattleUIController : MonoBehaviour
 
     private void Start()
     {
-        player.OnSkillUpdated += OnPlayerSkillUpdated;
-        player.OnHPChanged += OnPlayerHPChanged;
-        player.OnAPChanged.AddListener(OnPlayerAPChanged);
-        for (int i = 0; i < 4; i++) {
-            skillSlots[i].SkillBoardEvent += OnSkillBoardEvent;
-        }
 
-        BattleManager.Instance.OnTurnSwitched += OnTurnSwitched;
-        AnimationManager.Instance.OnGameoverEvent.AddListener(Gameover);
     }
 
     private void OnDestroy()
@@ -84,15 +76,33 @@ public class BattleUIController : MonoBehaviour
 
     public void Init()
     {
+        player.OnSkillUpdated += OnPlayerSkillUpdated;
+        player.OnHPChanged += OnPlayerHPChanged;
+        player.OnAPChanged.AddListener(OnPlayerAPChanged);
+        for (int i = 0; i < 4; i++) {
+            skillSlots[i].SkillBoardEvent += OnSkillBoardEvent;
+        }
+
+        BattleManager.Instance.OnTurnSwitched += OnTurnSwitched;
+        AnimationManager.Instance.OnGameoverEvent.AddListener(Gameover);
+
         for (int i = 0; i < 4; i++) {
             skills[i].sprite = player.Skills[i].sprite;
         }
+
+        OnPlayerHPChanged(0, 0);
+        OnPlayerHPChanged(1, 2);
     }
 
     private void OnPlayerHPChanged(float hpRatio, float duration)
     {
-        DOTween.To(() => playerHpBar.value, ratio => playerHpBar.value = ratio, hpRatio, duration);
-        hpFill.fillAmount = hpRatio;
+        if(hpRatio< playerHPBar.value) {
+            hpFill.fillAmount = hpRatio;
+        }
+        else {
+            DOTween.To(() => hpFill.fillAmount, ratio => hpFill.fillAmount = ratio, hpRatio, duration);
+        }
+        DOTween.To(() => playerHPBar.value, ratio => playerHPBar.value = ratio, hpRatio, duration);
         hpFill.color = hpRatio > 0.2f ? new Color(0.5f, 1, 0.4f) : Color.red;
         playerHpText.text = ((int)(hpRatio * player.MaxHealthPoints)).ToString() + "/" + player.MaxHealthPoints.ToString();
     }

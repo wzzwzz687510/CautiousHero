@@ -160,7 +160,7 @@ namespace Wing.RPGSystem
         public virtual void DropAnimation()
         {
             transform.GetChild(0).localPosition = new Vector3(0, 5, 0);
-            transform.GetChild(0).DOLocalMoveY(0.2f, 0.5f);
+            transform.GetChild(0).DOLocalMoveY(0.35f, 0.5f);
         }
 
         public virtual void ChangeOutlineColor(Color c)
@@ -180,6 +180,7 @@ namespace Wing.RPGSystem
         /// <returns></returns>
         public virtual bool ChangeHP(int value)
         {
+            //Debug.Log("Entity: "+EntityName+", HP: " + HealthPoints);
             HealthPoints -= CalculateFinalDamage(value);
             AnimationManager.Instance.AddAnimClip(new HPChangeAnimClip(EntityHash, Mathf.Clamp01(1.0f * HealthPoints / MaxHealthPoints)));
             if (BattleManager.Instance.IsPlayerTurn)
