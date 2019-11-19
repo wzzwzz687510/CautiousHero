@@ -7,28 +7,45 @@ using Wing.RPGSystem;
 
 public class BattleUIController : MonoBehaviour
 {
+    public PlayerController player;
+
+    [Header("HP Visual")]
     public Slider slider_playerHp;
     public Text text_playerHp;
     public Image hpFill;
+
+    [Header("Skill Visual")]
     public Image[] skills;
     public Image[] skillCovers;
-    public PlayerController player;
+
+    [Header("AP Visual")]
     public Toggle[] toggle_aps;
 
-    public Image blackBG;
-    public Image die;
+    [Header("Turn Switch Visual")]
+    public Image image_turnBG;
+    public Text text_turnText;
+
+    [Header("Battle End Visual")]
+    public Image image_blackBG;
+    public Image image_die;
 
     void Awake()
     {
-        player.OnHPDropped += OnPlayerHPChanged;
+
+    }
+
+    private void Start()
+    {
         player.OnSkillUpdated += OnPlayerSkillUpdated;
+        player.OnHPChanged += OnPlayerHPChanged;
         player.OnAPChanged.AddListener(OnPlayerAPChanged);
-        BattleManager.Instance.OnGameoverEvent.AddListener(Gameover);
+
+        BattleManager.Instance.OnTurnSwitched += OnTurnSwitched;
+        AnimationManager.Instance.OnGameoverEvent.AddListener(Gameover);
     }
 
     private void OnDestroy()
     {
-        player.OnHPDropped -= OnPlayerHPChanged;
         player.OnAPChanged.RemoveListener(OnPlayerAPChanged);
     }
 
@@ -40,13 +57,12 @@ public class BattleUIController : MonoBehaviour
         }
     }
 
-    private void OnPlayerHPChanged(bool isDrop)
+    private void OnPlayerHPChanged(float hpRatio,float duration)
     {
-        float tmp = 1.0f * player.HealthPoints / player.MaxHealthPoints;
-        DOTween.To(() => slider_playerHp.value, ratio => slider_playerHp.value = ratio, tmp, 1);
-        hpFill.fillAmount = tmp;
-        hpFill.color = tmp > 0.2f ? new Color(0.5f, 1, 0.4f) : Color.red;
-        text_playerHp.text = player.HealthPoints.ToString() + "/" + player.MaxHealthPoints.ToString();
+        DOTween.To(() => slider_playerHp.value, ratio => slider_playerHp.value = ratio, hpRatio, duration);
+        hpFill.fillAmount = hpRatio;
+        hpFill.color = hpRatio > 0.2f ? new Color(0.5f, 1, 0.4f) : Color.red;
+        text_playerHp.text = ((int)(hpRatio * player.MaxHealthPoints)).ToString() + "/" + player.MaxHealthPoints.ToString();
     }
 
     private void OnPlayerAPChanged()
@@ -67,6 +83,39 @@ public class BattleUIController : MonoBehaviour
         }
     }
 
+    public void OnTurnSwitched(bool isPlayerTurn)
+    {
+        StartCoroutine(TurnSwitchAnimation(isPlayerTurn));
+    }
+
+    public IEnumerator TurnSwitchAnimation(bool isPlayerTurn)
+    {
+        while (AnimationManager.Instance.IsPlaying) {
+            yield return null;
+        }
+        string text;
+        if (isPlayerTurn) {
+            text = "我  方  回  合";
+        }
+        else {
+            text = "敌  方  回  合";
+        }
+
+        text_turnText.text = text;
+        text_turnText.color = Color.white;
+        image_turnBG.fillAmount = 0;
+        image_turnBG.color = Color.white;
+        DOTween.To(() => image_turnBG.fillAmount, ratio => image_turnBG.fillAmount = ratio, 1f, 0.5f);
+        yield return new WaitForSeconds(0.5f);
+        DOTween.ToAlpha(() => text_turnText.color, color => text_turnText.color = color, 1f, 0.5f);
+        yield return new WaitForSeconds(0.5f);
+        DOTween.ToAlpha(() => image_turnBG.color, color => image_turnBG.color = color, 0f, 0.5f);
+        DOTween.ToAlpha(() => text_turnText.color, color => text_turnText.color = color, 0f, 0.5f);
+        yield return new WaitForSeconds(0.5f);
+
+        BattleManager.Instance.StartNewTurn(isPlayerTurn);
+    }
+
     public void Button_CancelMove()
     {
         BattleManager.Instance.CancelMove();
@@ -84,7 +133,9 @@ public class BattleUIController : MonoBehaviour
 
     public void Gameover()
     {
-        DOTween.ToAlpha(() => blackBG.color, color => blackBG.color = color, 0.7f, 0.5f);
-        DOTween.ToAlpha(() => die.color, color => die.color = color, 1, 2);
+        DOTween.ToAlpha(() => image_blackBG.color, color => image_blackBG.color = color, 0.7f, 0.5f);
+        DOTween.ToAlpha(() => image_die.color, color => image_die.color = color, 1, 2);
     }
+
+  
 }

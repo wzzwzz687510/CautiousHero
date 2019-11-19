@@ -18,7 +18,7 @@ MonoBehaviour:
   attribute:
     level: 1
     maxHealth: 40
-    action: 4
+    action: 3
     strength: 10
     intelligence: 10
     agility: 10

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using DG.Tweening;
+using Wing.TileUtils;
 
 namespace Wing.RPGSystem {
     public class CreatureController : Entity
@@ -15,54 +16,54 @@ namespace Wing.RPGSystem {
 
         protected override void Awake()
         {
-            OnHPDropped += OnCreatureHpChanged;
+            OnHPChanged += OnCreatureHpChanged;
             base.Awake();
         }
 
-        public override void MoveToTile(TileController targetTile, bool anim = true)
+        public override void MoveToTile(TileController targetTile, bool isInstant = false)
         {
-            base.MoveToTile(targetTile, anim);
-            hpBar.sortingOrder = m_sprite.sortingOrder + 1;
+            base.MoveToTile(targetTile, isInstant);
+            hpBar.sortingOrder = m_spriteRenderer.sortingOrder + 1;
         }
 
         public IEnumerator InitCreature(BaseCreature creature, TileController tile)
         {           
             scriptableCreature = creature;
-            m_sprite.sprite = scriptableCreature.sprite;
+            EntityName = scriptableCreature.creatureName;
+            EntityHash = EntityManager.Instance.AddEntity(this);
+            BuffManager = new BuffManager(EntityHash);
+            foreach (var buff in scriptableCreature.buffs) {
+                BuffManager.AddBuff(new BuffHandler(this, this, buff));
+            }
+            m_spriteRenderer.sprite = scriptableCreature.sprite;
             m_attribute = scriptableCreature.attribute;
             HealthPoints = MaxHealthPoints;
             Skills = scriptableCreature.skills;
             ActiveSkills = new InstanceSkill[Skills.Length];
             for (int i = 0; i < Skills.Length; i++) {
                 ActiveSkills[i] = new InstanceSkill(Skills[i]);
-            }
-
-            foreach (var buff in scriptableCreature.buffs) {
-                BuffManager.AddBuff(new BuffHandler(this,this,buff));
-            }
+            }    
 
             hpBar.enabled = false;
             mask_hpEffect.alphaCutoff = 1;
             mask_hp.alphaCutoff = 1;
-            MoveToTile(tile, false);
+            MoveToTile(tile, true);
             DropAnimation();
             yield return new WaitForSeconds(0.5f);
             hpBar.enabled = true;
-            OnCreatureHpChanged(false);
+            OnCreatureHpChanged(1,1);
         }
 
-        private void OnCreatureHpChanged(bool isDrop)
+        private void OnCreatureHpChanged(float hpRatio, float duraion)
         {
-            float tmp = 1 - 1.0f * HealthPoints / MaxHealthPoints;
-            if (isDrop) {
-                mask_hp.alphaCutoff = tmp;
-                DOTween.To(() => mask_hpEffect.alphaCutoff, alpha => mask_hpEffect.alphaCutoff = alpha, tmp, 1);
+            if (1 - mask_hp.alphaCutoff > hpRatio) {
+                mask_hp.alphaCutoff = 1 - hpRatio;
+                DOTween.To(() => mask_hpEffect.alphaCutoff, alpha => mask_hpEffect.alphaCutoff = alpha, 1 - hpRatio, 1);
             }
-            else
-            {
-                DOTween.To(() => mask_hp.alphaCutoff, alpha => mask_hp.alphaCutoff = alpha, tmp, 1.5f);
-                DOTween.To(() => mask_hpEffect.alphaCutoff, alpha => mask_hpEffect.alphaCutoff = alpha, tmp, 1.5f);
-            }          
+            else {
+                DOTween.To(() => mask_hp.alphaCutoff, alpha => mask_hp.alphaCutoff = alpha, 1 - hpRatio, 1.5f);
+                DOTween.To(() => mask_hpEffect.alphaCutoff, alpha => mask_hpEffect.alphaCutoff = alpha, 1 - hpRatio, 1.5f);
+            }
         }
     }
 }

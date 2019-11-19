@@ -44,12 +44,12 @@ namespace Wing.RPGSystem
     [System.Serializable]
     public class BuffManager
     {
-        public Entity host;
+        public int entityHash;
         public Dictionary<BaseBuff, BuffHandler> buffDic = new Dictionary<BaseBuff, BuffHandler>();
 
-        public BuffManager(Entity entity)
+        public BuffManager(int entityHash)
         {
-            host = entity;
+            this.entityHash = entityHash;
         }
 
         public void AddBuff(BuffHandler buff)

@@ -15,11 +15,12 @@ namespace Wing.RPGSystem
 
         public PlayerController player;
         public CreatureController[] Creatures { get; private set; }
+        public bool isCalculating { get; private set; }
 
         private HashSet<Location> playerEffectZone;
         private CastSkillAction currentCSA;
-        private bool isCasting;
-        private bool isAnimating;
+        //private bool isCasting;
+        //private bool isAnimating;
 
         private void Awake()
         {
@@ -42,15 +43,12 @@ namespace Wing.RPGSystem
                 StartCoroutine(Creatures[i].InitCreature(config.creatureSets[i].tCreature,
                      GridManager.Instance.GetTileController(config.creatureSets[i].location)));
             }
-
-            BindAnimationEvents();
         }
 
-        public IEnumerator OnBotTurnStart()
+        public void OnBotTurnStart()
         {
             PrepareDecisionMaking();
-            yield return StartCoroutine(BotTurn());
-            BattleManager.Instance.CompleteBotTurn();
+            BotTurn();
         }
 
         public bool IsAllBotsDeath()
@@ -67,72 +65,54 @@ namespace Wing.RPGSystem
             StopAllCoroutines();
         }
 
-        private void BindAnimationEvents()
-        {
-            foreach (var creature in Creatures) {
-                creature.OnAnimationCompleted.AddListener(OnAnimationComplete);
-            }
-        }
-
-        private void DebindAnimationEvents()
-        {
-            foreach (var creature in Creatures) {
-                creature.OnAnimationCompleted.RemoveListener(OnAnimationComplete);
-            }
-        }
-
         private void PrepareDecisionMaking()
         {
             playerEffectZone = GridManager.Instance.CalculateEntityEffectZone(player, true);
             currentCSA = new CastSkillAction();
-            isCasting = false;
-            isAnimating = false;
 
             foreach (var creature in Creatures) {
                 creature.OnEntityTurnStart();
             }
         }
 
-        private IEnumerator BotTurn()
+        private void BotTurn()
         {
+            isCalculating = true;
+            AnimationManager.Instance.PlayAll();
             for (int i = 0; i < Creatures.Length; i++) {
                 if (Creatures[i].isDeath)
                     continue;
-                Creatures[i].ChangeOutlineColor(Color.red);
-                yield return StartCoroutine(DecisionMaking(i));
-                Creatures[i].ChangeOutlineColor(Color.black);
+
+                if (player.isDeath) break;
+                AnimationManager.Instance.AddAnimClip(new OutlineEntityAnimClip(Creatures[i], Color.red));
+                AnimationManager.Instance.AddAnimClip(new BaseAnimClip(AnimType.Delay, 0.5f));
+                DecisionMaking(i);
+                if (player.isDeath) break;
+                AnimationManager.Instance.AddAnimClip(new OutlineEntityAnimClip(Creatures[i], Color.black));
+
             }
+            isCalculating = false;
         }
 
-        private IEnumerator DecisionMaking(int index)
+        private void DecisionMaking(int index)
         {
-            yield return StartCoroutine(KillPlayer(index));
+            KillPlayer(index);
 
             // if player can effect agent
             if (playerEffectZone.Contains(Creatures[index].Loc)) {
-                yield return StartCoroutine(AvoidPlayerEffect(index));
+                AvoidPlayerEffect(index);
             }
             else {
-                yield return StartCoroutine(ApplyStrategy(index,true));
+                ApplyStrategy(index,true);
             }
         }
 
-        private IEnumerator ApplyStrategy(int index,bool isAvoidZone)
+        private void ApplyStrategy(int index,bool isAvoidZone)
         {
+            if (player.isDeath) return;
             HealAlley(index,isAvoidZone);
-            while (isCasting) {
-                yield return null;
-            }
-
             BuffAlley(index,isAvoidZone);
-            while (isCasting) {
-                yield return null;
-            }
-
             AttackPlayer(index,isAvoidZone);
-            while (isCasting) {
-                yield return null;
-            }
         }
 
         private void AttackPlayer(int index,bool isAvoidZone)
@@ -208,14 +188,14 @@ namespace Wing.RPGSystem
             }               
         }
 
-        private IEnumerator AvoidPlayerEffect(int index)
+        private void AvoidPlayerEffect(int index)
         {
             if (!TryCastGivenLabelSkill(index,Label.HardControl,player)) {
                 if (!TryCastGivenLabelSkill(index, Label.SoftControl, player)) {
                     if (!TryCastGivenLabelSkill(index, Label.Obstacle, player)) {
                         TileController tc;
                         if (GridManager.Instance.TryGetSafeTile(Creatures[index], player, out tc)) {
-                            yield return StartCoroutine(MoveToTile(index, tc));
+                            Creatures[index].MoveToTile(tc);
                         }
                         else {
                             TryCastGivenLabelSkill(index, Label.DefenseBuff, Creatures[index]);
@@ -224,24 +204,17 @@ namespace Wing.RPGSystem
                 }
             }
 
-            while (isCasting) {
-                yield return null;
-            }
-            yield return StartCoroutine(ApplyStrategy(index, false));
+            ApplyStrategy(index, false);
         }
 
-        private IEnumerator KillPlayer(int index)
+        private void KillPlayer(int index)
         {
             var skills = Creatures[index].ActiveSkills;
             for (int i = 0; i < skills.Length; i++) {
                 if (SkillCheck(skills[i], Label.Damage)) {
-                    if (player.GetDefendReducedValue((skills[i].TSkill as BasicAttackSkill).baseValue) > player.HealthPoints)
+                    if (player.CalculateFinalDamage((skills[i].TSkill as BasicAttackSkill).baseValue) > player.HealthPoints)
                         TryCastGivenIDSkill(index, i, player);
                 }
-            }
-
-            while (isCasting) {
-                yield return null;
             }
         }
 
@@ -266,7 +239,7 @@ namespace Wing.RPGSystem
         {
             var skill = Creatures[index].ActiveSkills[skillID];
             if (GridManager.Instance.CalculateCastSkillTile(Creatures[index], skillID, target.Loc, out currentCSA)) {
-                StartCoroutine(CastSkillActionAnimation(index, skillID));
+                CastSkillActionAnimation(index, skillID);
                 return true;
             }
 
@@ -286,7 +259,7 @@ namespace Wing.RPGSystem
             for (int i = 0; i < skills.Length; i++) {
                 if (SkillCheck(skills[i],label)) {
                     if (GridManager.Instance.CalculateCastSkillTile(Creatures[index], i, target.Loc, out currentCSA)) {
-                        StartCoroutine(CastSkillActionAnimation(index,i));
+                        CastSkillActionAnimation(index,i);
                         return true;
                     }
                 }
@@ -309,7 +282,7 @@ namespace Wing.RPGSystem
                 if (SkillCheck(skills[i], label)) {
                     if (GridManager.Instance.CalculateCastSkillTile(Creatures[index], i, target.Loc, out currentCSA) &&
                         !avoidZone.Contains(currentCSA.destination.Loc)) {
-                        StartCoroutine(CastSkillActionAnimation(index, i));
+                        CastSkillActionAnimation(index, i);
                         return true;
                     }
                 }
@@ -317,41 +290,11 @@ namespace Wing.RPGSystem
             return false;
         }
 
-        // On animation complete callback
-        private void OnAnimationComplete()
+        private void CastSkillActionAnimation(int index,int skillID)
         {
-            isAnimating = false;
-        }
-
-        IEnumerator MoveToTile(int index, TileController moveto)
-        {
-            if (Creatures[index].Loc.Equals(moveto.Loc))
-                yield break;
-
-            isAnimating = true;
-            Creatures[index].MoveToTile(moveto);
-            while (isAnimating) {
-                yield return null;
-            }
-        }
-
-        IEnumerator CastSkill(int index, int skillID)
-        {
-            isAnimating = true;
+            Creatures[index].MoveToTile(currentCSA.destination);
             Creatures[index].CastSkill(skillID, currentCSA.castLocation);
-            while (isAnimating) {
-                yield return null;
-            }
-        }
 
-        IEnumerator CastSkillActionAnimation(int index,int skillID)
-        {
-            isCasting = true;
-
-            yield return StartCoroutine(MoveToTile(index,currentCSA.destination));
-            yield return StartCoroutine(CastSkill(index, skillID));
-
-            isCasting = false;
         }
 
     }

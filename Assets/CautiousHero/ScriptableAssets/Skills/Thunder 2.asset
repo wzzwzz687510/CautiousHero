@@ -30,6 +30,9 @@ MonoBehaviour:
     y: -1
   - x: -1
     y: 1
+  castEffect:
+    prefab: {fileID: 119322, guid: e322ac6f694c2f84bb227112512c13ce, type: 3}
+    animDuration: 0.3
   effectPatterns:
   - pattern:
       x: 1

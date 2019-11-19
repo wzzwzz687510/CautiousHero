@@ -53,6 +53,13 @@ namespace Wing.RPGSystem
     {
         public Location pattern;
         public float coefficient;
+
+    }
+    [System.Serializable]
+    public struct CastEffect
+    {
+        public GameObject prefab;
+        public float animDuration;
     }
 
     //[CreateAssetMenu(fileName = "Skill", menuName = "ScriptableSkills/BaseSkill", order = 1)]
@@ -74,6 +81,7 @@ namespace Wing.RPGSystem
 
         [Header("Point Pattern")]
         public Location[] castPatterns;
+        public CastEffect castEffect;
         public EffectPattern[] effectPatterns;
 
         public abstract Location GetFixedEffectPattern(Location cp, Location ep);

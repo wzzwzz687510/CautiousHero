@@ -8,11 +8,12 @@ using UnityEngine.Events;
 public enum BattleState
 {
     PlacePlayer,
-    Move,
-    CastSkill,
+    PlayerMove,
+    PlayerCast,    
+    PlayerAnim,
     BotTurn,
-    Animate,
-    NonInteractable  
+    NonInteractable,
+    End
 }
 
 public class BattleManager : MonoBehaviour
@@ -31,25 +32,33 @@ public class BattleManager : MonoBehaviour
     public CreatureController enemy;
 
     public BattleState State { get; private set; }
+    public bool IsPlayerTurn { get { return State == BattleState.PlayerMove || State == BattleState.PlayerCast|| State == BattleState.PlayerAnim; } }
+    
 
-    private SpriteRenderer tmpPlayerVisual;
+    private SpriteRenderer tmpVisualPlayer;
     
     private List<Location> currentSelected = new List<Location>();
     private int selectedSkillID = 0;
 
     private HashSet<Location> tileZone = new HashSet<Location>();
 
-    public UnityEvent OnGameoverEvent;
+    public delegate void TurnSwitchCallback(bool isPlayerTurn);
+    public event TurnSwitchCallback OnTurnSwitched;
 
     private void Awake()
     {
         if (!Instance)
             Instance = this;
+    }
+
+    private void Start()
+    {
         State = BattleState.PlacePlayer;
         GridManager.Instance.onCompleteMapRenderEvent += PrepareBattleStart;
+        AnimationManager.Instance.OnAnimCompleted.AddListener(OnAnimCompleted);
 
         // For test
-        player.InitPlayer(skills);
+        player.InitPlayer(100, new EntityAttribute(1, 100, 4, 1, 1, 1, 1), skills);
         GetComponent<BattleUIController>().UpdateUI();
     }
 
@@ -57,6 +66,16 @@ public class BattleManager : MonoBehaviour
     {
         AIManager.Instance.Init(config);
         PreparePlacePlayer();
+    }
+
+    private void OnAnimCompleted()
+    {
+        if (State == BattleState.PlayerAnim)
+            State = BattleState.PlayerMove;
+        else if (State == BattleState.BotTurn && !GameConditionCheck()) {
+            CompleteBotTurn();
+        }
+
     }
 
     private void ChangeState(BattleState state)
@@ -68,48 +87,48 @@ public class BattleManager : MonoBehaviour
         tileZone.Clear();
         player.SetActiveCollider(true);
         player.Sprite.color = Color.white;
-        if (tmpPlayerVisual)
-            tmpPlayerVisual.gameObject.SetActive(false);
+        if (tmpVisualPlayer)
+            tmpVisualPlayer.gameObject.SetActive(false);
     }
 
     private void CompletePlacement()
     {
-        ChangeState(BattleState.Move);
+        ChangeState(BattleState.PlayerMove);
         player.OnEntityTurnStart();
     }
 
     private void CompleteMovement()
     {
-        if (player.ActionPoints > 0)
-            ChangeState(BattleState.Move);
-        else {
-            CompletePlayerTurn();
-        }
+        ChangeState(BattleState.PlayerMove);
     }
 
-    private void CompleteCast()
+    private void ApplyCast()
     {
-        /***************************************************************************
-         * if not cooldown, return 
-         ***************************************************************************/
         player.CastSkill(selectedSkillID, currentSelected[0]);
-        if (player.ActionPoints > 0)
-            ChangeState(BattleState.Move);
-        else {
-            CompletePlayerTurn();
-        }
+        ChangeState(BattleState.PlayerAnim);
+        //ChangeState(BattleState.Move);
     }
 
     private void CompletePlayerTurn()
     {
         ChangeState(BattleState.BotTurn);
-        StartCoroutine(AIManager.Instance.OnBotTurnStart());
+        OnTurnSwitched?.Invoke(false);
     }
 
     public void CompleteBotTurn()
     {
-        ChangeState(BattleState.Move);
-        player.OnEntityTurnStart();
+        OnTurnSwitched?.Invoke(true);      
+    }
+
+    public void StartNewTurn(bool isPlayerTurn)
+    {
+        if (isPlayerTurn) {
+            ChangeState(BattleState.PlayerMove);
+            player.OnEntityTurnStart();
+        }
+        else {
+            AIManager.Instance.OnBotTurnStart();
+        }
     }
 
     private void Update()
@@ -123,8 +142,8 @@ public class BattleManager : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.R))
             CastSkill(3);
 
-        if (Input.GetMouseButtonDown(1) && (State == BattleState.Move || State == BattleState.CastSkill)) {
-            ChangeState(BattleState.Move);
+        if (Input.GetMouseButtonDown(1) && (State == BattleState.PlayerMove || State == BattleState.PlayerCast)) {
+            ChangeState(BattleState.PlayerMove);
         }
 
         var ray = Camera.main.ViewportPointToRay(new Vector3(Input.mousePosition.x / Screen.width,
@@ -137,31 +156,35 @@ public class BattleManager : MonoBehaviour
                 case BattleState.PlacePlayer:
                     SelectVisual(tile, TileState.PlaceZone);
 
-                    if (Input.GetMouseButtonDown(0)) {
-                        player.MoveToTile(tile,false);
+                    if (Input.GetMouseButtonDown(0) && tileZone.Contains(tile.Loc)) {
+                        player.MoveToTile(tile, true);
                         player.DropAnimation();
                         CompletePlacement();
                     }
                     break;
-                case BattleState.Move:
+                case BattleState.PlayerMove:
                     SelectVisual(tile, TileState.MoveZone);
 
                     if (Input.GetMouseButtonDown(0) && tileZone.Contains(currentSelected[0])) {
-                        player.MoveToTile(tile, true);
-                        CompleteMovement();
+                        var tc = player.LocateTile;
+                        player.MoveToTile(tile);
+                        if (tile != tc) {
+                            ChangeState(BattleState.PlayerAnim);
+                            AnimationManager.Instance.PlayOnce();
+                        }
                     }
                     break;
-                case BattleState.CastSkill:
+                case BattleState.PlayerCast:
                     SelectVisual(tile, TileState.CastZone);
 
                     if (Input.GetMouseButtonDown(0) && currentSelected.Count != 0) {
                         if (tileZone.Contains(tile.Loc) || (tile.isBind && currentSelected[0] == tile.CastLoc.Loc))
-                            CompleteCast();
+                            ApplyCast();
                     }
                     break;
                 case BattleState.BotTurn:
                     break;
-                case BattleState.Animate:
+                case BattleState.PlayerAnim:
                     break;
                 case BattleState.NonInteractable:
                     break;
@@ -177,16 +200,16 @@ public class BattleManager : MonoBehaviour
                 switch (State) {
                     case BattleState.PlacePlayer:
                         break;
-                    case BattleState.Move:
+                    case BattleState.PlayerMove:
                         if (Input.GetMouseButtonDown(0)) {
                             PrepareMove();
                         }
                         break;
-                    case BattleState.CastSkill:
+                    case BattleState.PlayerCast:
                         break;
                     case BattleState.BotTurn:
                         break;
-                    case BattleState.Animate:
+                    case BattleState.PlayerAnim:
                         break;
                     case BattleState.NonInteractable:
                         break;
@@ -194,7 +217,7 @@ public class BattleManager : MonoBehaviour
                         break;
                 }
             }
-            else if(State!= BattleState.CastSkill){
+            else if(State!= BattleState.PlayerCast){
                 player.ChangeOutlineColor(Color.black);
             }
         }
@@ -204,18 +227,18 @@ public class BattleManager : MonoBehaviour
                 switch (State) {
                     case BattleState.PlacePlayer:
                         break;
-                    case BattleState.Move:
+                    case BattleState.PlayerMove:
                         break;
-                    case BattleState.CastSkill:
+                    case BattleState.PlayerCast:
                         SelectVisual(hit.transform.parent.GetComponent<CreatureController>().LocateTile, TileState.CastZone);
 
                         if (Input.GetMouseButtonDown(0) && currentSelected.Count != 0) {
-                            CompleteCast();
+                            ApplyCast();
                         }
                         break;
                     case BattleState.BotTurn:
                         break;
-                    case BattleState.Animate:
+                    case BattleState.PlayerAnim:
                         break;
                     case BattleState.NonInteractable:
                         break;
@@ -241,20 +264,28 @@ public class BattleManager : MonoBehaviour
     private void PrepareMove()
     {
         player.SetActiveCollider(false);
-        if (!tmpPlayerVisual) {
-            tmpPlayerVisual = Instantiate(player.Sprite.gameObject, player.transform.position + new Vector3(0, 0.2f, 0),
-                Quaternion.identity).GetComponent<SpriteRenderer>();
-            tmpPlayerVisual.GetComponent<SpriteRenderer>().sortingOrder = player.Loc.x + player.Loc.y * 8 + 1;
-        }
-        else {
-            tmpPlayerVisual.gameObject.SetActive(true);
-        }
+        SetVisualPlayer(player.transform.position, player.LocateTile.SortOrder + 64);
 
         player.Sprite.color = new Color(1, 1, 1, 0.5f);
         foreach (var loc in GridManager.Instance.Astar.GetGivenDistancePoints(player.Loc, player.ActionPoints / player.MoveCost)) {
             GridManager.Instance.ChangeTileState(loc, TileState.MoveZone);
             tileZone.Add(loc);
         }
+    }
+
+    private void SetVisualPlayer(Vector3 des,int sortingOrder)
+    {
+        if (!tmpVisualPlayer) {
+            tmpVisualPlayer = Instantiate(player.Sprite.gameObject, player.transform.position + new Vector3(0, 0.2f, 0),
+                Quaternion.identity).GetComponent<SpriteRenderer>();
+            tmpVisualPlayer.GetComponent<SpriteRenderer>().sortingOrder = player.Loc.x + player.Loc.y * 8 + 1;
+        }
+        else {
+            tmpVisualPlayer.transform.position = des;
+            tmpVisualPlayer.sortingOrder = sortingOrder;
+            tmpVisualPlayer.gameObject.SetActive(true);
+        }
+        
     }
 
     private void PrepareSkill()
@@ -310,8 +341,7 @@ public class BattleManager : MonoBehaviour
 
         if (tileZone.Contains(tile.Loc)) {
             if (stateZone == TileState.MoveZone) {
-                tmpPlayerVisual.transform.position = tile.Archor;
-                tmpPlayerVisual.sortingOrder = tile.SortOrder + 64;
+                SetVisualPlayer(tile.Archor, tile.SortOrder + 64);
             }
 
             currentSelected.Add(tile.Loc);
@@ -339,19 +369,24 @@ public class BattleManager : MonoBehaviour
 
     private void Gameover()
     {
-        ChangeState(BattleState.NonInteractable);
-        AIManager.Instance.StopBot();
+        ChangeState(BattleState.End);
         // To do
-        OnGameoverEvent?.Invoke();
+        AnimationManager.Instance.AddAnimClip(new BaseAnimClip(AnimType.Gameover, 0.5f));
+        AnimationManager.Instance.PlayOnce();
         Debug.Log("You lost");
     }
 
     private void BattleVictory()
     {
-        ChangeState(BattleState.NonInteractable);
+        ChangeState(BattleState.End);
         // To do
         win.SetActive(true);
         Debug.Log("You win");
+    }
+
+    private void InformLackAP()
+    {
+
     }
 
     public void HighlightAffectPoints(Location castLoc)
@@ -377,33 +412,51 @@ public class BattleManager : MonoBehaviour
 
     public void CastSkill(int id)
     {
-        if (!player.ActiveSkills[id].Castable || 
-            (State != BattleState.Move && State != BattleState.CastSkill))
+        if (!player.ActiveSkills[id].Castable || !IsPlayerTurn)
             return;
+
+        if(player.ActionPoints < player.Skills[id].actionPointsCost) {
+            InformLackAP();
+            return;
+        }
         selectedSkillID = id;
-        ChangeState(BattleState.CastSkill);
+        ChangeState(BattleState.PlayerCast);
         PrepareSkill();
     }
 
     public void CancelMove()
     {
-        if (State != BattleState.Move && State != BattleState.CastSkill)
-            return;
-        ChangeState(BattleState.Move);
+        if (!IsPlayerTurn) return;
+        player.CancelMove();
+        ChangeState(BattleState.PlayerMove);
     }
 
     public void EndTurn()
     {
-        if (State != BattleState.Move && State != BattleState.CastSkill)
-            return;
+        if (!IsPlayerTurn) return;
         CompletePlayerTurn();
     }
 
-    public void GameConditionCheck()
+    /// <summary>
+    /// Check whether battle to be end
+    /// </summary>
+    /// <returns>True for battle end</returns>
+    public bool GameConditionCheck()
     {
-        if (player.isDeath)
+        bool res = true;
+        if (player.isDeath) {
             Gameover();
-        if (AIManager.Instance.IsAllBotsDeath())
-            BattleVictory();
+        }
+        else 
+        {
+            if (AIManager.Instance.IsAllBotsDeath())
+                BattleVictory();
+            else
+                res = false;
+        }
+
+        return res;
     }
+
+
 }

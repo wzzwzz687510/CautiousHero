@@ -24,6 +24,9 @@ MonoBehaviour:
   castPatterns:
   - x: 0
     y: 0
+  castEffect:
+    prefab: {fileID: 156488, guid: dea1f08dc19ca07458e689ec70311e5d, type: 3}
+    animDuration: 0.3
   effectPatterns:
   - pattern:
       x: 1

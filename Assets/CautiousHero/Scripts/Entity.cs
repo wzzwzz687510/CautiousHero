@@ -33,6 +33,8 @@ namespace Wing.RPGSystem
 
     public class Entity : MonoBehaviour
     {
+        public string EntityName { get; protected set; }
+        public int EntityHash { get; protected set; }
         public int HealthPoints { get; protected set; }
         public int ActionPoints { get; protected set; }
         public bool isDeath { get; protected set; }
@@ -42,6 +44,7 @@ namespace Wing.RPGSystem
 
         public TileController LocateTile { get; protected set; }
         public Location Loc { get { return LocateTile.Loc; } }
+        public Vector3[] movePath { get; protected set; }
 
         protected EntityAttribute m_attribute;
         public EntityAttribute Attribute {
@@ -57,26 +60,25 @@ namespace Wing.RPGSystem
         public int Agility { get { return Attribute.agility; } }
         public int MoveCost { get { return Attribute.moveCost; } }
 
-        public SpriteRenderer Sprite { get { return m_sprite; } }
+        public SpriteRenderer Sprite { get { return m_spriteRenderer; } }
 
-        protected SpriteRenderer m_sprite;
+        protected SpriteRenderer m_spriteRenderer;
         protected SpriteGlowEffect m_glowEffect;
         protected BoxCollider2D m_collider;
-        protected Vector3[] movePath;
 
-        public delegate void BCallback(bool isEligible);
+
+        public delegate void HPChange(float hpRatio, float duraion);
+        public HPChange OnHPChanged;
         public delegate void ICallback(int index,int cooldown);
-        public event BCallback OnHPDropped;
         public event ICallback OnSkillUpdated;
         [HideInInspector] public UnityEvent OnAPChanged;
         [HideInInspector] public UnityEvent OnAnimationCompleted;
 
         protected virtual void Awake()
         {
-            m_sprite = GetComponentInChildren<SpriteRenderer>();
+            m_spriteRenderer = GetComponentInChildren<SpriteRenderer>();
             m_glowEffect = GetComponentInChildren<SpriteGlowEffect>();
             m_collider = GetComponentInChildren<BoxCollider2D>();
-            BuffManager = new BuffManager(this);
             isDeath = false;
         }
 
@@ -96,35 +98,31 @@ namespace Wing.RPGSystem
         /// set anim false generally means move entity to one place instantly without move cost (e.g. by skill effect).
         /// </summary>
         /// <param name="targetTile"></param>
-        /// <param name="anim"></param>
-        public virtual void MoveToTile(TileController targetTile, bool anim = true)
+        /// <param name="isInstance"></param>
+        public virtual void MoveToTile(TileController targetTile, bool isInstance = false)
         {
             if (targetTile == LocateTile) {
-
                 return;
             }
-                
 
-            if (anim) {
+            if (!isInstance) {
                 Stack<Location> path = GridManager.Instance.Astar.GetPath(Loc, targetTile.Loc);
 
                 if (path.Count * MoveCost > ActionPoints) {
 
                     return;
                 }
-                    
 
                 Vector3[] sortedPath = new Vector3[path.Count];
                 for (int i = 0; i < sortedPath.Length; i++) {
                     sortedPath[i] = path.Pop();
                 }
                 movePath = sortedPath;
-                StartCoroutine(MoveAnimation());
-                ActionPoints -= movePath.Length * MoveCost;
+
+                // AP cost and invoke event
+                ActionPoints -= sortedPath.Length * MoveCost;
                 OnAPChanged?.Invoke();
-            }
-            else {
-                transform.position = targetTile.transform.position;
+                // Animation move
             }
 
             if (LocateTile) {
@@ -133,19 +131,28 @@ namespace Wing.RPGSystem
             LocateTile = targetTile;
             targetTile.OnEntityEntering(this);
 
-            m_sprite.sortingOrder = targetTile.Loc.x + targetTile.Loc.y * 8;           
+
+            if (isInstance) {               
+                AnimationManager.Instance.AddAnimClip(new MoveInstantAnimClip(EntityHash, targetTile.Loc, 0.2f));
+                AnimationManager.Instance.PlayOnce();
+            }
+            else {
+                AnimationManager.Instance.AddAnimClip(new MovePathAnimClip(EntityHash, movePath, 0.2f));
+            }
+                
         }
 
         public virtual void CastSkill(int skillID, Location castLoc)
         {
             var tSkill = Skills[skillID];
+            if (ActionPoints < tSkill.actionPointsCost)
+                return;
             ActionPoints -= tSkill.actionPointsCost;
             OnAPChanged?.Invoke();
             ActiveSkills[skillID].SetCooldown(tSkill.cooldownTime);
             OnSkillUpdated?.Invoke(skillID, tSkill.cooldownTime);
 
             tSkill.ApplyEffect(this, castLoc);
-            StartCoroutine(CastAnimation());
         }
 
         public virtual void DropAnimation()
@@ -164,22 +171,7 @@ namespace Wing.RPGSystem
             m_collider.enabled = bl;
         }
 
-        protected virtual IEnumerator CastAnimation()
-        {
-            yield return null;
-            OnAnimationCompleted?.Invoke();
-        }
-
-        protected virtual IEnumerator MoveAnimation()
-        {
-            transform.DOPath(movePath, 0.5f);
-            yield return new WaitForSeconds(0.5f);
-            if (OnAnimationCompleted == null)
-                Debug.Log(2);
-            OnAnimationCompleted?.Invoke();
-        }
-
-        public int GetDefendReducedValue(int value)
+        public virtual int CalculateFinalDamage(int value)
         {
             return Mathf.RoundToInt((value - BuffManager.GetReduceConstant(BuffType.Defend)) *
                 (1 - BuffManager.GetReduceCof(BuffType.Defend)));
@@ -187,8 +179,10 @@ namespace Wing.RPGSystem
 
         public virtual bool DealDamage(int value)
         {
-            HealthPoints -= GetDefendReducedValue(value);
-            OnHPDropped?.Invoke(true);
+            HealthPoints -= CalculateFinalDamage(value);
+            AnimationManager.Instance.AddAnimClip(new HPChangeAnimClip(EntityHash, Mathf.Clamp01(1.0f * HealthPoints / MaxHealthPoints)));
+            if (BattleManager.Instance.IsPlayerTurn)
+                AnimationManager.Instance.PlayOnce(false);
             if (HealthPoints > 0)
                 return true;
 
@@ -198,8 +192,8 @@ namespace Wing.RPGSystem
 
         public virtual void Death()
         {
+            Debug.Log(EntityName + " dead");
             isDeath = true;
-            BattleManager.Instance.GameConditionCheck();
         }
 
 
