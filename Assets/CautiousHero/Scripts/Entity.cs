@@ -66,7 +66,8 @@ namespace Wing.RPGSystem
         protected SpriteGlowEffect m_glowEffect;
         protected BoxCollider2D m_collider;
 
-
+        public delegate void SortingOrderChange(int sortingOrder);
+        public SortingOrderChange OnSortingOrderChanged;
         public delegate void HPChange(float hpRatio, float duraion);
         public HPChange OnHPChanged;
         public delegate void ICallback(int index,int cooldown);
@@ -80,6 +81,7 @@ namespace Wing.RPGSystem
             m_glowEffect = GetComponentInChildren<SpriteGlowEffect>();
             m_collider = GetComponentInChildren<BoxCollider2D>();
             isDeath = false;
+            OnSortingOrderChanged += OnSortingOrderChangedEvent;
         }
 
         public virtual void OnEntityTurnStart()
@@ -171,13 +173,12 @@ namespace Wing.RPGSystem
             m_collider.enabled = bl;
         }
 
-        public virtual int CalculateFinalDamage(int value)
-        {
-            return Mathf.RoundToInt((value - BuffManager.GetReduceConstant(BuffType.Defend)) *
-                (1 - BuffManager.GetReduceCof(BuffType.Defend)));
-        }
-
-        public virtual bool DealDamage(int value)
+        /// <summary>
+        /// HP -= adjusted value
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public virtual bool ChangeHP(int value)
         {
             HealthPoints -= CalculateFinalDamage(value);
             AnimationManager.Instance.AddAnimClip(new HPChangeAnimClip(EntityHash, Mathf.Clamp01(1.0f * HealthPoints / MaxHealthPoints)));
@@ -190,12 +191,21 @@ namespace Wing.RPGSystem
             return false;
         }
 
-        public virtual void Death()
+        public virtual int CalculateFinalDamage(int value)
+        {
+            return Mathf.RoundToInt((value - BuffManager.GetReduceConstant(BuffType.Defend)) *
+                (1 - BuffManager.GetReduceCof(BuffType.Defend)));
+        }
+
+        protected virtual void Death()
         {
             Debug.Log(EntityName + " dead");
             isDeath = true;
         }
 
-
+        protected virtual void OnSortingOrderChangedEvent(int sortingOrder)
+        {
+            Sprite.sortingOrder = sortingOrder;
+        }
     }
 }

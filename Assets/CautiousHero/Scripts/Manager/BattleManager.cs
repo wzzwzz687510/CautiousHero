@@ -294,14 +294,14 @@ public class BattleManager : MonoBehaviour
 
         switch (skills[selectedSkillID].castType) {
             case CastType.Instant:
-                foreach (var point in skills[selectedSkillID].castPatterns) {
+                foreach (var point in skills[selectedSkillID].CastPatterns) {
                     var loc = player.Loc + point;
                     if (GridManager.Instance.ChangeTileState(loc, TileState.CastZone))
                         tileZone.Add(loc);
                 }
                 break;
             case CastType.Trajectory:
-                foreach (var castPattern in skills[selectedSkillID].castPatterns) {
+                foreach (var castPattern in skills[selectedSkillID].CastPatterns) {
                     var castLoc = player.Loc + castPattern;
                     if (!GridManager.Instance.ChangeTileState(castLoc, TileState.CastZone))
                         continue;

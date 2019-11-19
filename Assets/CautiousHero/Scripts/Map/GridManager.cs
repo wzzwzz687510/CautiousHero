@@ -201,7 +201,7 @@ public class GridManager : MonoBehaviour
         if (availableAP < 0) return false;
         for (int i = 0; i < availableAP/entity.MoveCost + 1; i++) {
             foreach (var loc in Astar.GetGivenDistancePoints(entity.Loc, i)) {
-                foreach (var cp in skill.castPatterns) {
+                foreach (var cp in skill.CastPatterns) {
                     foreach (var el in skill.GetSubEffectZone(loc,cp)) {
                         if (el.Equals(target)) {
                             action.destination = GetTileController(loc);

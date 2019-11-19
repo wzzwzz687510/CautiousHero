@@ -23,7 +23,6 @@ namespace Wing.RPGSystem {
         public override void MoveToTile(TileController targetTile, bool isInstant = false)
         {
             base.MoveToTile(targetTile, isInstant);
-            hpBar.sortingOrder = m_spriteRenderer.sortingOrder + 1;
         }
 
         public IEnumerator InitCreature(BaseCreature creature, TileController tile)
@@ -54,6 +53,12 @@ namespace Wing.RPGSystem {
             OnCreatureHpChanged(1,1);
         }
 
+        protected override void OnSortingOrderChangedEvent(int sortingOrder)
+        {
+            base.OnSortingOrderChangedEvent(sortingOrder);
+            hpBar.sortingOrder = sortingOrder + 1;
+        }
+
         private void OnCreatureHpChanged(float hpRatio, float duraion)
         {
             if (1 - mask_hp.alphaCutoff > hpRatio) {
@@ -63,6 +68,13 @@ namespace Wing.RPGSystem {
             else {
                 DOTween.To(() => mask_hp.alphaCutoff, alpha => mask_hp.alphaCutoff = alpha, 1 - hpRatio, 1.5f);
                 DOTween.To(() => mask_hpEffect.alphaCutoff, alpha => mask_hpEffect.alphaCutoff = alpha, 1 - hpRatio, 1.5f);
+            }
+
+            if(isDeath) {
+                hpBar.enabled = false;
+                mask_hp.alphaCutoff = 1;
+                mask_hpEffect.alphaCutoff = 1;
+                Sprite.DOColor(Color.black, 1);
             }
         }
     }

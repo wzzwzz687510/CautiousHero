@@ -135,6 +135,7 @@ public class BattleUIController : MonoBehaviour
     {
         DOTween.ToAlpha(() => image_blackBG.color, color => image_blackBG.color = color, 0.7f, 0.5f);
         DOTween.ToAlpha(() => image_die.color, color => image_die.color = color, 1, 2);
+        image_blackBG.raycastTarget = true;
     }
 
   

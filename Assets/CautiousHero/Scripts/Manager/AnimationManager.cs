@@ -211,10 +211,13 @@ namespace Wing.RPGSystem
                     if (!EntityManager.Instance.TryGetEntity(movePathClip.entityHash, out entity))
                         break;
 
-                    var pathLoc = (Location)movePathClip.path[movePathClip.path.Length - 1];
+                    //var pathLoc = (Location)movePathClip.path[movePathClip.path.Length - 1];
                     entity.transform.DOPath(entity.movePath, movePathClip.duration * entity.movePath.Length);
-                    yield return new WaitForSeconds(clip.duration * entity.movePath.Length);
-                    entity.Sprite.sortingOrder = pathLoc.x + pathLoc.y * 8;
+                    for (int i = 0; i < movePathClip.path.Length; i++) {
+                        var pathLoc = (Location)movePathClip.path[i];
+                        yield return new WaitForSeconds(clip.duration);
+                        entity.OnSortingOrderChanged?.Invoke(pathLoc.x + pathLoc.y * 8);
+                    }
                     break;
                 case AnimType.MoveInstant:
                     var moveInstantClip = clip as MoveInstantAnimClip;
@@ -222,7 +225,7 @@ namespace Wing.RPGSystem
                         break;
 
                     entity.transform.position = moveInstantClip.destination;
-                    entity.Sprite.sortingOrder = moveInstantClip.destination.x + moveInstantClip.destination.y * 8;
+                    entity.OnSortingOrderChanged?.Invoke(moveInstantClip.destination.x + moveInstantClip.destination.y * 8);
                     break;
                 case AnimType.Cast:
                     var castClip = clip as CastAnimClip;

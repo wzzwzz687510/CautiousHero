@@ -34,7 +34,7 @@ namespace Wing.RPGSystem
         public static EntityAttribute operator -(EntityAttribute a, EntityAttribute b) => a + -(b);
     }
 
-    [CreateAssetMenu(fileName = "Creature", menuName = "Wing/ScriptableCreatures/BaseCreature", order = 1)]
+    [CreateAssetMenu(fileName = "Creature", menuName = "Wing/Scriptable Creatures/BaseCreature", order = 1)]
     public class BaseCreature : ScriptableObject
     {
         public string creatureName = "New Creature";

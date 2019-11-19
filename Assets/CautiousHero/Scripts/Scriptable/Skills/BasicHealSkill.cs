@@ -5,8 +5,8 @@ using Wing.TileUtils;
 
 namespace Wing.RPGSystem
 {
-    [CreateAssetMenu(fileName = "Skill", menuName = "Wing/Scriptable Skills/BasicAttackSkill", order = 2)]
-    public class BasicAttackSkill : ValueBasedSkill
+    [CreateAssetMenu(fileName = "Skill", menuName = "Wing/Scriptable Skills/BasicHealSkill", order = 3)]
+    public class BasicHealSkill : ValueBasedSkill
     {
         public override void ApplyEffect(Entity castEntity, Location castLoc)
         {
@@ -19,10 +19,10 @@ namespace Wing.RPGSystem
                     if (BattleManager.Instance.IsPlayerTurn)
                         AnimationManager.Instance.PlayOnce();
                     foreach (var ep in EffectPatterns) {
-                        effectLocation = castLoc + GetFixedEffectPattern(castLoc - castEntity.Loc, ep.pattern);                        
+                        effectLocation = castLoc + GetFixedEffectPattern(castLoc - castEntity.Loc, ep.pattern);
                         if (!GridManager.Instance.IsEmptyLocation(effectLocation)) {
                             GridManager.Instance.GetTileController(effectLocation).stayEntity.
-                                ChangeHP(CalculateDamage(castEntity, ep.coefficient));
+                                ChangeHP(CalculateHealing(castEntity, ep.coefficient));
                         }
                     }
                     break;
@@ -36,7 +36,7 @@ namespace Wing.RPGSystem
                                     castEffect.prefab, castEntity.Loc, loc.Loc, castEffect.animDuration));
                                 if (BattleManager.Instance.IsPlayerTurn)
                                     AnimationManager.Instance.PlayOnce();
-                                loc.stayEntity.ChangeHP(CalculateDamage(castEntity, ep.coefficient));
+                                loc.stayEntity.ChangeHP(CalculateHealing(castEntity, ep.coefficient));
                                 break;
                             }
                         }
@@ -45,22 +45,12 @@ namespace Wing.RPGSystem
                 default:
                     break;
             }
-
-            //Debug.Log("cof: " + cof + ", base value: " + baseValue + ", levelCof: " + levelCof + ", attributeCof: " + attributeCof);
-            //Debug.Log(cof * baseValue * (1 + levelCof * castEntity.Level + attributeCof * aa));
         }
 
-        protected virtual int CalculateDamage(Entity caster,float cof)
+        protected virtual int CalculateHealing(Entity caster,float cof)
         {
-            int aa = 0;
-            if (attribute == AdditiveAttribute.Agility)
-                aa = caster.Agility;
-            else if (attribute == AdditiveAttribute.Intelligence)
-                aa = caster.Intelligence;
-            else if (attribute == AdditiveAttribute.Strength)
-                aa = caster.Strength;
-
-            return Mathf.RoundToInt(cof * baseValue * (1 + levelCof * caster.Level + attributeCof * aa));
+            return -Mathf.RoundToInt(cof * baseValue * (1 + levelCof * caster.Level + attributeCof * caster.Intelligence));
         }
     }
 }
+
