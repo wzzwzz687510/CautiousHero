@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
-using Wing.TileUtils;
 using DG.Tweening;
 
 namespace Wing.RPGSystem
@@ -212,7 +211,7 @@ namespace Wing.RPGSystem
                         break;
 
                     //var pathLoc = (Location)movePathClip.path[movePathClip.path.Length - 1];
-                    entity.transform.DOPath(entity.movePath, movePathClip.duration * entity.movePath.Length);
+                    entity.transform.DOPath(entity.MovePath, movePathClip.duration * entity.MovePath.Length);
                     for (int i = 0; i < movePathClip.path.Length; i++) {
                         var pathLoc = (Location)movePathClip.path[i];
                         yield return new WaitForSeconds(clip.duration);

@@ -1,9 +1,8 @@
 ﻿using System;
 using Priority_Queue;
 using System.Collections.Generic;
-using UnityEngine;
 
-namespace Wing.TileUtils
+namespace Wing.RPGSystem
 {
     public class TileNavigation
     {

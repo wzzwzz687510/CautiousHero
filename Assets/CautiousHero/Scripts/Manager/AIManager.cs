@@ -1,7 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Wing.TileUtils;
 
 namespace Wing.RPGSystem
 {
@@ -56,7 +55,7 @@ namespace Wing.RPGSystem
         {
             bool res = true;
             foreach (var creature in Creatures) {
-                res &= creature.isDeath;
+                res &= creature.IsDeath;
             }
             return res;
         }
@@ -93,14 +92,14 @@ namespace Wing.RPGSystem
             isCalculating = true;
             AnimationManager.Instance.PlayAll();
             for (int i = 0; i < Creatures.Length; i++) {
-                if (Creatures[i].isDeath)
+                if (Creatures[i].IsDeath)
                     continue;
 
-                if (player.isDeath) break;
+                if (player.IsDeath) break;
                 AnimationManager.Instance.AddAnimClip(new OutlineEntityAnimClip(Creatures[i], Color.red));
                 AnimationManager.Instance.AddAnimClip(new BaseAnimClip(AnimType.Delay, 0.5f));
                 DecisionMaking(i);
-                if (player.isDeath) break;
+                if (player.IsDeath) break;
                 AnimationManager.Instance.AddAnimClip(new OutlineEntityAnimClip(Creatures[i], Color.black));
 
             }
@@ -122,7 +121,7 @@ namespace Wing.RPGSystem
 
         private void ApplyStrategy(int index,bool isAvoidZone)
         {
-            if (player.isDeath) return;
+            if (player.IsDeath) return;
             HealAlley(index,isAvoidZone);
             BuffAlley(index,isAvoidZone);
             AttackPlayer(index,isAvoidZone);
@@ -183,7 +182,7 @@ namespace Wing.RPGSystem
             int lowestHP = Creatures[0].HealthPoints;
             int lowestID = -1;
             for (int i = 0; i < Creatures.Length; i++) {
-                if (!Creatures[i].isDeath && Creatures[i].HealthPoints < playerMaxDamage && 
+                if (!Creatures[i].IsDeath && Creatures[i].HealthPoints < playerMaxDamage && 
                     Creatures[i].HealthPoints!= Creatures[i].MaxHealthPoints) {
                     if (lowestID == -1 || Creatures[i].HealthPoints < lowestHP) {
                         lowestID = i;

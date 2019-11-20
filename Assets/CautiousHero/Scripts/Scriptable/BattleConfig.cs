@@ -1,8 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Wing.TileUtils;
-
 namespace Wing.RPGSystem
 {
     [System.Serializable]
@@ -11,6 +9,12 @@ namespace Wing.RPGSystem
         public BaseCreature tCreature;
         public Location location;
     }
+    [System.Serializable]
+    public struct AbioticSet
+    {
+        public BaseAbiotic tAbiotic;
+        public int power;
+    }
 
     [CreateAssetMenu(fileName = "Battle", menuName = "Wing/BattleConfig", order = 0)]
     public class BattleConfig : ScriptableObject
@@ -18,7 +22,8 @@ namespace Wing.RPGSystem
         public string setName = "New battle set";
         public string description = "A standard battle set";
         public CreatureSet[] creatureSets;
-        public AbioticEntity[] abioticEntities;
+        public AbioticSet[] abioticSets;
+        [Range(0, 1)] public float coverage;
     }
 }
 

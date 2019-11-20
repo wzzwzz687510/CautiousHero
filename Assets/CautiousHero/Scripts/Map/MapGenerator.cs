@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Wing.TileUtils
+namespace Wing.RPGSystem
 {
     public class MapGenerator : MonoBehaviour
     {
@@ -15,16 +15,9 @@ namespace Wing.TileUtils
         public int blockThresholdSize = 10;
         public int passageWidth = 4;
         public int smoothTimes = 4;
-
-        [Space]
-
-        public string seed;
-        public bool useRandomSeed = true;
         [Range(30, 60)]
         public int randomFillPercent = 45;
-
         public int[,] map { get; private set; }
-        private System.Random pseudoRandom;
         private int terrainTypeCount = 1;
 
         public void GenerateMap(int terrainTC)
@@ -52,7 +45,7 @@ namespace Wing.TileUtils
             for (int x = 0; x < width; x++) {
                 for (int y = 0; y < height; y++) {
                     if (map[x, y] == 1) {
-                        map[x, y] = pseudoRandom.Next(1, terrainTypeCount + 1);
+                        map[x, y] = Database.Instance.Random(1, terrainTypeCount + 1);
                     }
                 }
             }
@@ -378,12 +371,6 @@ namespace Wing.TileUtils
 
         private void RandomFillMap()
         {
-            if (useRandomSeed) {
-                seed = System.DateTime.Now.Millisecond.ToString();
-            }
-
-            pseudoRandom = new System.Random(seed.GetStableHashCode());
-
             if (hasEmptyTile) {
                 for (int x = 0; x < width; x++) {
                     for (int y = 0; y < height; y++) {
@@ -391,7 +378,7 @@ namespace Wing.TileUtils
                             map[x, y] = 0;
                         }
                         else {
-                            map[x, y] = pseudoRandom.Next(0, 100) < randomFillPercent ? 0 : 1;
+                            map[x, y] = 100.Random() < randomFillPercent ? 0 : 1;
                         }
                     }
                 }
@@ -399,7 +386,7 @@ namespace Wing.TileUtils
             else {
                 for (int x = 0; x < width; x++) {
                     for (int y = 0; y < height; y++) {
-                        map[x, y] = pseudoRandom.Next(1, terrainTypeCount + 1);
+                        map[x, y] = Database.Instance.Random(1, terrainTypeCount + 1);
                     }
                 }
             }

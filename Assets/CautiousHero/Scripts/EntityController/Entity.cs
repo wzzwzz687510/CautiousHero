@@ -4,10 +4,39 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
-using Wing.TileUtils;
 
 namespace Wing.RPGSystem
 {
+    [System.Serializable]
+    public struct EntityAttribute
+    {
+        public int level;
+        public int maxHealth;
+        public int action;
+        public int strength;
+        public int intelligence;
+        public int agility;
+        public int moveCost;
+
+        public EntityAttribute(int lvl, int maxHp, int act, int str, int inte, int agi, int mvCost)
+        {
+            level = lvl;
+            maxHealth = maxHp;
+            action = act;
+            strength = str;
+            intelligence = inte;
+            agility = agi;
+            moveCost = mvCost;
+        }
+
+        public static EntityAttribute operator -(EntityAttribute a) =>
+            new EntityAttribute(-a.level, -a.maxHealth, -a.action, -a.strength, -a.intelligence, -a.agility, -a.moveCost);
+        public static EntityAttribute operator +(EntityAttribute a, EntityAttribute b) =>
+            new EntityAttribute(a.level + b.level, a.maxHealth + b.maxHealth, a.action + b.action,
+                a.strength + b.strength, a.intelligence + b.intelligence, a.agility + b.agility, a.moveCost + b.moveCost);
+        public static EntityAttribute operator -(EntityAttribute a, EntityAttribute b) => a + -(b);
+    }
+
     public class InstanceSkill
     {
         public BaseSkill TSkill { get; private set; }
@@ -37,14 +66,14 @@ namespace Wing.RPGSystem
         public int EntityHash { get; protected set; }
         public int HealthPoints { get; protected set; }
         public int ActionPoints { get; protected set; }
-        public bool isDeath { get; protected set; }
+        public bool IsDeath { get; protected set; }
         public BaseSkill[] Skills { get; protected set; }
         public InstanceSkill[] ActiveSkills { get; protected set; }
         public BuffManager BuffManager { get; protected set; }
 
         public TileController LocateTile { get; protected set; }
         public Location Loc { get { return LocateTile.Loc; } }
-        public Vector3[] movePath { get; protected set; }
+        public Vector3[] MovePath { get; protected set; }
 
         protected EntityAttribute m_attribute;
         public EntityAttribute Attribute {
@@ -80,7 +109,7 @@ namespace Wing.RPGSystem
             m_spriteRenderer = GetComponentInChildren<SpriteRenderer>();
             m_glowEffect = GetComponentInChildren<SpriteGlowEffect>();
             m_collider = GetComponentInChildren<BoxCollider2D>();
-            isDeath = false;
+            IsDeath = false;
             OnSortingOrderChanged += OnSortingOrderChangedEvent;
         }
 
@@ -119,7 +148,7 @@ namespace Wing.RPGSystem
                 for (int i = 0; i < sortedPath.Length; i++) {
                     sortedPath[i] = path.Pop();
                 }
-                movePath = sortedPath;
+                MovePath = sortedPath;
 
                 // AP cost and invoke event
                 ActionPoints -= sortedPath.Length * MoveCost;
@@ -139,7 +168,7 @@ namespace Wing.RPGSystem
                 AnimationManager.Instance.PlayOnce();
             }
             else {
-                AnimationManager.Instance.AddAnimClip(new MovePathAnimClip(EntityHash, movePath, 0.2f));
+                AnimationManager.Instance.AddAnimClip(new MovePathAnimClip(EntityHash, MovePath, 0.2f));
             }
                 
         }
@@ -201,7 +230,7 @@ namespace Wing.RPGSystem
         protected virtual void Death()
         {
             Debug.Log(EntityName + " dead");
-            isDeath = true;
+            IsDeath = true;
         }
 
         protected virtual void OnSortingOrderChangedEvent(int sortingOrder)

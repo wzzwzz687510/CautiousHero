@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using UnityEngine;
 using Wing.RPGSystem;
-using Wing.TileUtils;
 
 public struct CastSkillAction
 {
@@ -97,18 +96,19 @@ public class GridManager : MonoBehaviour
         return tileDic.ContainsKey(id);
     }
 
+    /// <summary>
+    /// Check whether Location is valid before call this function
+    /// </summary>
+    /// <param name="id"></param>
+    /// <returns></returns>
     public TileController GetTileController(Location id)
     {
-        TileController tc;
-        if (tileDic.TryGetValue(id, out tc)) {
-            return tc;
-        }
-        return null;
+        return tileDic[id];
     }
 
     public bool IsEmptyLocation(Location id)
     {
-        return IsValidLocation(id) && tileDic[id].isEmpty;
+        return tileDic[id].IsEmpty;
     }
 
     public bool ChangeTileState(Location id, TileState state)
@@ -159,7 +159,7 @@ public class GridManager : MonoBehaviour
 
         // Safe count for exit from while.
         int cnt = 0;
-        while (tc.isEmpty) {
+        while (tc.IsEmpty) {
             if (highlight)
                 tc.ChangeTileState(TileState.CastZone);
             yield return tc;
@@ -228,10 +228,10 @@ public class GridManager : MonoBehaviour
         return false;
     }
 
-    IEnumerable<TileController> ValidTiles()
+    public IEnumerable<TileController> ValidTiles()
     {
         foreach (var tile in tileDic.Values) {
-            if (tile.isEmpty)
+            if (tile.IsEmpty)
                 yield return tile;
         }
     }

@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
-using Wing.TileUtils;
 
 namespace Wing.RPGSystem
 {
@@ -161,7 +161,7 @@ namespace Wing.RPGSystem
                 case CastType.Trajectory:
                     foreach (var ep in GetFixedEffectPatterns(cp)) {
                         foreach (var tile in GridManager.Instance.GetTrajectoryHitTile(casterLoc + cp, ep, includingPassLocation)) {
-                            if (includingPassLocation || !tile.isEmpty)
+                            if (includingPassLocation || !tile.IsEmpty)
                                 yield return tile.Loc;
                         }
                     }
@@ -176,6 +176,16 @@ namespace Wing.RPGSystem
                 foreach (var effectLoc in GetSubEffectZone(casterLoc, cp, includingPassLocation)) {
                     yield return effectLoc;
                 }
+            }
+        }
+
+        static Dictionary<int, BaseSkill> cache;
+        public static Dictionary<int, BaseSkill> Dict {
+            get {
+                // load if not loaded yet
+                return cache ?? (cache = Resources.LoadAll<BaseSkill>("Skills").ToDictionary(
+                    item => item.skillName.GetStableHashCode(), item => item)
+                );
             }
         }
     }    

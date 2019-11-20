@@ -1,0 +1,33 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bfaf58e8e48857f42a56a557a8fe2932, type: 3}
+  m_Name: Stone
+  m_EditorClassIdentifier: 
+  abioticName: "\u77F3\u5934"
+  description: A secret abiotic
+  sprite:
+  - {fileID: 21300000, guid: 7fb616164b99abb4aad362af2e48b051, type: 3}
+  - {fileID: 21300000, guid: ef758a16597b2aa4abb83b275051766c, type: 3}
+  - {fileID: 21300000, guid: 86961ac1221a0a6479ea4b74dc3d683f, type: 3}
+  - {fileID: 21300000, guid: 86d6f521a7d24534dbb015542e58a63f, type: 3}
+  - {fileID: 21300000, guid: 156f10fa46c44244d8a82264cd694502, type: 3}
+  - {fileID: 21300000, guid: 22f10566baa072f48b122bac91274430, type: 3}
+  - {fileID: 21300000, guid: f980a9c9c180ee841a457b008f753b4c, type: 3}
+  attribute:
+    level: 1
+    maxHealth: 3000
+    action: 0
+    strength: 0
+    intelligence: 0
+    agility: 0
+    moveCost: 1
+  buffs: []

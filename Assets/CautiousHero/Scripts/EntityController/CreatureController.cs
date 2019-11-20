@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using UnityEngine;
 using DG.Tweening;
-using Wing.TileUtils;
 
 namespace Wing.RPGSystem {
     public class CreatureController : Entity
@@ -18,11 +17,6 @@ namespace Wing.RPGSystem {
         {
             OnHPChanged += OnCreatureHpChanged;
             base.Awake();
-        }
-
-        public override void MoveToTile(TileController targetTile, bool isInstant = false)
-        {
-            base.MoveToTile(targetTile, isInstant);
         }
 
         public IEnumerator InitCreature(BaseCreature creature, TileController tile)
@@ -70,12 +64,19 @@ namespace Wing.RPGSystem {
                 DOTween.To(() => mask_hpEffect.alphaCutoff, alpha => mask_hpEffect.alphaCutoff = alpha, 1 - hpRatio, 1.5f);
             }
 
-            if(isDeath) {
+            if(IsDeath) {
                 hpBar.enabled = false;
                 mask_hp.alphaCutoff = 1;
                 mask_hpEffect.alphaCutoff = 1;
                 Sprite.DOColor(Color.black, 1);
             }
+        }
+
+        protected override void Death()
+        {
+            base.Death();
+            m_glowEffect.GlowColor = Color.black;
+            LocateTile.OnEntityLeaving();
         }
     }
 }

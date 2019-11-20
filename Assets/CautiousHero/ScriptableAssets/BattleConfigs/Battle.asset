@@ -27,4 +27,9 @@ MonoBehaviour:
     location:
       x: 2
       y: 1
-  abioticEntities: []
+  abioticSets:
+  - tAbiotic: {fileID: 11400000, guid: b4517eda084877940a0b070c10fadebe, type: 2}
+    power: 1
+  - tAbiotic: {fileID: 11400000, guid: 62f95cce7372d774eae7c3d36da90f0b, type: 2}
+    power: 1
+  coverage: 0.13

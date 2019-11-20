@@ -1,7 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Wing.TileUtils;
 using DG.Tweening;
 using SpriteGlow;
 
@@ -52,6 +51,12 @@ namespace Wing.RPGSystem
             MoveToTile(lastTile, true);
             ActionPoints = lastActionPoints;
             OnAPChanged?.Invoke();
+        }
+
+        public override void DropAnimation()
+        {
+            transform.GetChild(0).localPosition = new Vector3(0, 5, 0);
+            transform.GetChild(0).DOLocalMoveY(0.3f, 0.5f);
         }
     }
 }

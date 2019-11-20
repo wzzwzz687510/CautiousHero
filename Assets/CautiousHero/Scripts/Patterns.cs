@@ -1,4 +1,4 @@
-﻿namespace Wing.TileUtils
+﻿namespace Wing.RPGSystem
 {
     public static class Patterns
     {

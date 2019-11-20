@@ -1,7 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Wing.TileUtils;
 using Wing.RPGSystem;
 using UnityEngine.Events;
 
@@ -21,7 +20,7 @@ public class BattleManager : MonoBehaviour
     public static BattleManager Instance { get; private set; }
 
     [Header("Test")]
-    public BaseSkill[] skills;
+    //public BaseSkill[] skills;
     public BattleConfig config;
     public GameObject win;
 
@@ -29,13 +28,14 @@ public class BattleManager : MonoBehaviour
     public LayerMask tileLayer;
     public LayerMask entityLayer;
     public PlayerController player;
-    public CreatureController enemy;
+    public AbioticController abioticPrefab;
 
     public BattleState State { get; private set; }
     public bool IsPlayerTurn { get { return State == BattleState.PlayerMove || State == BattleState.PlayerCast|| State == BattleState.PlayerAnim; } }
     
 
     private SpriteRenderer tmpVisualPlayer;
+    private Transform abtioticHolder;
     
     private List<Location> currentSelected = new List<Location>();
     private int selectedSkillID = 0;
@@ -53,6 +53,7 @@ public class BattleManager : MonoBehaviour
     {
         if (!Instance)
             Instance = this;
+
     }
 
     private void Start()
@@ -61,15 +62,45 @@ public class BattleManager : MonoBehaviour
         GridManager.Instance.onCompleteMapRenderEvent += PrepareBattleStart;
         AnimationManager.Instance.OnAnimCompleted.AddListener(OnAnimCompleted);
 
-        // For test
-        player.InitPlayer(new EntityAttribute(1, 150, 4, 1, 1, 1, 1), skills);
+        player.InitPlayer(Database.Instance.ActiveData.attribute, Database.Instance.GetEquippedSkills());
         GetComponent<BattleUIController>().Init();
     }
 
     public void PrepareBattleStart()
     {
         AIManager.Instance.Init(config);
+        AddAbiotics();
         PreparePlacePlayer();       
+    }
+
+    private void AddAbiotics()
+    {
+        if (abtioticHolder) {
+            Destroy(abtioticHolder);
+        }
+        abtioticHolder = new GameObject("Abiotic Holder").transform;
+
+        var sets = config.abioticSets;
+        int[] possiblities = new int[sets.Length];
+        possiblities[0] = sets[0].power;
+        for (int i = 1; i < config.abioticSets.Length; i++) {
+            possiblities[i] = possiblities[i - 1] + sets[i].power;        
+        }
+        int totalPower = possiblities[sets.Length - 1];
+        float randomFill, randomAbiotic;
+        foreach (var tile in GridManager.Instance.ValidTiles()) {
+            randomFill = 1000.Random()/1000.0f;
+            if (randomFill <= config.coverage) {
+                randomAbiotic = totalPower.Random();
+                for (int i = 0; i < sets.Length; i++) {
+                    if (randomAbiotic < possiblities[i]) {
+                        Instantiate(abioticPrefab, abtioticHolder).GetComponent<AbioticController>().
+                            InitAbioticEntity(sets[i].tAbiotic, tile);
+                        break;
+                    }
+                }
+            }
+        }        
     }
 
     private void OnAnimCompleted()
@@ -185,7 +216,7 @@ public class BattleManager : MonoBehaviour
                     SelectVisual(tile, TileState.CastZone);
 
                     if (Input.GetMouseButtonDown(0) && currentSelected.Count != 0) {
-                        if (tileZone.Contains(tile.Loc) || (tile.isBind && currentSelected[0] == tile.CastLoc.Loc))
+                        if (tileZone.Contains(tile.Loc) || (tile.IsBind && currentSelected[0] == tile.CastLoc))
                             ApplyCast();
                     }
                     break;
@@ -202,12 +233,13 @@ public class BattleManager : MonoBehaviour
 
         if (tileZone.Count == 0) {
             hit = Physics2D.Raycast(ray.origin, ray.direction, 20, entityLayer);
-            if (hit && hit.transform.CompareTag("Player")) {
-                player.ChangeOutlineColor(Color.red);
+            if (hit && hit.transform.CompareTag("Player")) {               
                 switch (State) {
                     case BattleState.PlacePlayer:
                         break;
                     case BattleState.PlayerMove:
+                        player.ChangeOutlineColor(Color.red);
+
                         if (Input.GetMouseButtonDown(0)) {
                             PrepareMove();
                         }
@@ -271,6 +303,7 @@ public class BattleManager : MonoBehaviour
         for (int x = 0; x < GridManager.Instance.MapBoundingBox.x; x++) {
             for (int y = (int)GridManager.Instance.MapBoundingBox.y - 2; y < GridManager.Instance.MapBoundingBox.y; y++) {
                 Location loc = new Location(x, y);
+                if (!loc.IsEmpty()) continue;
                 GridManager.Instance.ChangeTileState(loc, TileState.PlaceZone);
                 tileZone.Add(loc);
             }
@@ -282,7 +315,7 @@ public class BattleManager : MonoBehaviour
         if (player.ActionPoints == 0)
             return;
         player.SetActiveCollider(false);
-        SetVisualPlayer(player.transform.position+new Vector3(0,0.2f,0), player.LocateTile.SortOrder + 64);
+        SetVisualPlayer(player.transform.position + new Vector3(0, 0.3f, 0), player.LocateTile.SortOrder + 64);
 
         player.Sprite.color = new Color(1, 1, 1, 0.5f);
         foreach (var loc in GridManager.Instance.Astar.GetGivenDistancePoints(player.Loc, player.ActionPoints / player.MoveCost)) {
@@ -294,8 +327,9 @@ public class BattleManager : MonoBehaviour
     private void SetVisualPlayer(Vector3 des,int sortingOrder)
     {
         if (!tmpVisualPlayer) {
-            tmpVisualPlayer = Instantiate(player.Sprite.gameObject, player.transform.position + new Vector3(0, 0.2f, 0),
+            tmpVisualPlayer = Instantiate(player.Sprite.gameObject, player.transform.position + new Vector3(0, 0.3f, 0),
                 Quaternion.identity).GetComponent<SpriteRenderer>();
+
             tmpVisualPlayer.GetComponent<SpriteRenderer>().sortingOrder = player.Loc.x + player.Loc.y * 8 + 1;
         }
         else {
@@ -310,26 +344,27 @@ public class BattleManager : MonoBehaviour
     {
         player.SetActiveCollider(false);
 
-        switch (skills[selectedSkillID].castType) {
+        var skill = player.Skills[selectedSkillID];
+        switch (skill.castType) {
             case CastType.Instant:
-                foreach (var point in skills[selectedSkillID].CastPatterns) {
+                foreach (var point in skill.CastPatterns) {
                     var loc = player.Loc + point;
                     if (GridManager.Instance.ChangeTileState(loc, TileState.CastZone))
                         tileZone.Add(loc);
                 }
                 break;
             case CastType.Trajectory:
-                foreach (var castPattern in skills[selectedSkillID].CastPatterns) {
+                foreach (var castPattern in skill.CastPatterns) {
                     var castLoc = player.Loc + castPattern;
                     if (!GridManager.Instance.ChangeTileState(castLoc, TileState.CastZone))
                         continue;
                     tileZone.Add(castLoc);
 
-                    foreach (var pattern in skills[selectedSkillID].GetFixedEffectPatterns(castPattern)) {
+                    foreach (var pattern in skill.GetFixedEffectPatterns(castPattern)) {
 
                         var hitPath = GridManager.Instance.GetTrajectoryHitTile(castLoc, pattern, false);
                         foreach (var passTile in hitPath) {
-                            passTile.BindCastLocation(GridManager.Instance.GetTileController(castLoc));
+                            passTile.BindCastLocation(castLoc);
                         }
                     }
                 }
@@ -343,7 +378,7 @@ public class BattleManager : MonoBehaviour
     private void SelectVisual(TileController tile, TileState stateZone)
     {
         if (currentSelected.Count != 0) {
-            if (currentSelected[0] == tile.Loc || (tile.isBind && currentSelected[0] == tile.CastLoc.Loc))
+            if (currentSelected[0] == tile.Loc || (tile.IsBind && currentSelected[0] == tile.CastLoc))
                 return;
 
             foreach (var selected in currentSelected) {
@@ -376,9 +411,9 @@ public class BattleManager : MonoBehaviour
             }
         }
         else {
-            if (tile.isBind && skills[selectedSkillID].castType == CastType.Trajectory) {
-                if (currentSelected.Count == 0 || currentSelected[0] != tile.CastLoc.Loc)
-                    HighlightAffectPoints(tile.CastLoc.Loc);
+            if (tile.IsBind && player.Skills[selectedSkillID].castType == CastType.Trajectory) {
+                if (currentSelected.Count == 0 || currentSelected[0] != tile.CastLoc)
+                    HighlightAffectPoints(tile.CastLoc);
             }
             else
                 currentSelected.Add(tile.Loc);
@@ -409,7 +444,7 @@ public class BattleManager : MonoBehaviour
 
     public void HighlightAffectPoints(Location castLoc)
     {
-        var skill = skills[selectedSkillID];
+        var skill = player.Skills[selectedSkillID];
         switch (skill.castType) {
             case CastType.Instant:
                 foreach (var effectLoc in skill.GetSubEffectZone(player.Loc, castLoc-player.Loc)) {
@@ -462,7 +497,7 @@ public class BattleManager : MonoBehaviour
     public bool GameConditionCheck()
     {
         bool res = true;
-        if (player.isDeath) {
+        if (player.IsDeath) {
             Gameover();
         }
         else 

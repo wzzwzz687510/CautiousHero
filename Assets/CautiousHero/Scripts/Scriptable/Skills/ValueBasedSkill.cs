@@ -1,7 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Wing.TileUtils;
 
 namespace Wing.RPGSystem
 {
@@ -25,9 +24,8 @@ namespace Wing.RPGSystem
                         AnimationManager.Instance.PlayOnce();
                     foreach (var ep in EffectPatterns) {
                         effectLocation = castLoc + GetFixedEffectPattern(castLoc - caster.Loc, ep.pattern);
-                        if (!GridManager.Instance.IsEmptyLocation(effectLocation)) {
-                            GridManager.Instance.GetTileController(effectLocation).stayEntity.
-                                ChangeHP(CalculateValue(caster, ep.coefficient));
+                        if (effectLocation.IsValid() && !effectLocation.IsEmpty()) {
+                            effectLocation.StayEntity().ChangeHP(CalculateValue(caster, ep.coefficient));
                         }
                     }
                     break;
@@ -35,13 +33,13 @@ namespace Wing.RPGSystem
                     foreach (var ep in EffectPatterns) {
                         var dir = GetFixedEffectPattern(castLoc - caster.Loc, ep.pattern);
                         effectLocation = castLoc + dir;
-                        foreach (var loc in GridManager.Instance.GetTrajectoryHitTile(castLoc, dir)) {
-                            if (!loc.isEmpty) {
+                        foreach (var tc in GridManager.Instance.GetTrajectoryHitTile(castLoc, dir)) {
+                            if (!tc.IsEmpty) {
                                 AnimationManager.Instance.AddAnimClip(new CastAnimClip(castType,
-                                    castEffect.prefab, caster.Loc, loc.Loc, castEffect.animDuration));
+                                    castEffect.prefab, caster.Loc, tc.Loc, castEffect.animDuration));
                                 if (BattleManager.Instance.IsPlayerTurn)
                                     AnimationManager.Instance.PlayOnce();
-                                loc.stayEntity.ChangeHP(CalculateValue(caster, ep.coefficient));
+                                tc.StayEntity.ChangeHP(CalculateValue(caster, ep.coefficient));
                                 break;
                             }
                         }

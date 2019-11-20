@@ -1,7 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Wing.TileUtils;
 using DG.Tweening;
 using Wing.RPGSystem;
 
@@ -25,10 +24,10 @@ public class TileController : MonoBehaviour
 
     public Vector3 Archor { get { return m_archor.position; } }
     public Location Loc { get; private set; }
-    public TileController CastLoc { get; private set; }
-    public Entity stayEntity { get; private set; }
-    public bool isEmpty { get { return stayEntity == null; } }
-    public bool isBind { get; private set; }
+    public Location CastLoc { get; private set; }
+    public Entity StayEntity { get; private set; }
+    public bool IsEmpty { get { return StayEntity == null; } }
+    public bool IsBind { get; private set; }
 
     public int SortOrder { get { return m_spriteRenderer.sortingOrder; } }
 
@@ -83,8 +82,8 @@ public class TileController : MonoBehaviour
 
     public void SetStayEntityOutline(Color c)
     {      
-        if (!isEmpty) {
-            stayEntity.ChangeOutlineColor(c);
+        if (!IsEmpty) {
+            StayEntity.ChangeOutlineColor(c);
         }
             
     }
@@ -98,7 +97,7 @@ public class TileController : MonoBehaviour
     {
         // Do something to entity;
 
-        stayEntity = entity;
+        StayEntity = entity;
         GridManager.Instance.Astar.SetTileWeight(Loc, 0);
     }
 
@@ -106,19 +105,19 @@ public class TileController : MonoBehaviour
     {
         // Do something to entity;
 
-        stayEntity = null;
+        StayEntity = null;
         GridManager.Instance.Astar.SetTileWeight(Loc, 1);
     }
 
-    public void BindCastLocation(TileController from)
+    public void BindCastLocation(Location from)
     {
         CastLoc = from;
-        isBind = true;
+        IsBind = true;
     }
 
     public void DebindCastLocation()
     {
-        isBind = false;
+        IsBind = false;
     }
 
     private void SetCoverColor(Color c)
