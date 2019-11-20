@@ -39,11 +39,15 @@ public class BattleManager : MonoBehaviour
     
     private List<Location> currentSelected = new List<Location>();
     private int selectedSkillID = 0;
+    private int selectedCreatureID = 0;
 
     private HashSet<Location> tileZone = new HashSet<Location>();
 
     public delegate void TurnSwitchCallback(bool isPlayerTurn);
     public event TurnSwitchCallback OnTurnSwitched;
+
+    public delegate void CreatureBoard(int hash, bool isExit);
+    public CreatureBoard CreatureBoardEvent;
 
     private void Awake()
     {
@@ -70,9 +74,12 @@ public class BattleManager : MonoBehaviour
 
     private void OnAnimCompleted()
     {
+        if (State != BattleState.PlacePlayer && GameConditionCheck())
+            return;
+
         if (State == BattleState.PlayerAnim)
             State = BattleState.PlayerMove;
-        else if (State == BattleState.BotTurn && !GameConditionCheck()) {
+        else if (State == BattleState.BotTurn) {
             CompleteBotTurn();
         }
 
@@ -223,16 +230,21 @@ public class BattleManager : MonoBehaviour
         }
         else {
             hit = Physics2D.Raycast(ray.origin, ray.direction, 20, entityLayer);
-            if(hit && hit.transform.CompareTag("Creature")) {
+            if (hit && hit.transform.CompareTag("Creature")) {
+                var cc = hit.transform.parent.GetComponent<CreatureController>();
+                if (selectedCreatureID != cc.EntityHash) {
+                    selectedCreatureID = cc.EntityHash;
+                    CreatureBoardEvent?.Invoke(cc.EntityHash, false);
+                }
                 switch (State) {
                     case BattleState.PlacePlayer:
                         break;
                     case BattleState.PlayerMove:
                         break;
                     case BattleState.PlayerCast:
-                        SelectVisual(hit.transform.parent.GetComponent<CreatureController>().LocateTile, TileState.CastZone);
+                        SelectVisual(cc.LocateTile, TileState.CastZone);
 
-                        if (Input.GetMouseButtonDown(0) && currentSelected.Count != 0) {
+                        if (Input.GetMouseButtonDown(0) && currentSelected.Count != 0 && tileZone.Contains(currentSelected[0])) {
                             ApplyCast();
                         }
                         break;
@@ -245,6 +257,10 @@ public class BattleManager : MonoBehaviour
                     default:
                         break;
                 }
+            }
+            else if (selectedCreatureID != 0) {
+                selectedCreatureID = 0;
+                CreatureBoardEvent?.Invoke(-1, true);
             }
         }
 

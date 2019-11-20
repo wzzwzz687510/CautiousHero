@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace Wing.TileUtils
 {
-    public class TileNavigation:MonoBehaviour
+    public class TileNavigation
     {
         SquareGrid grid;
 
@@ -70,7 +70,7 @@ namespace Wing.TileUtils
         IEnumerable<Location> Neighbors(Location id);
     }
 
-    public class SquareGrid : MonoBehaviour, WeightedGraph<Location>
+    public class SquareGrid : WeightedGraph<Location>
     {
         public int Width  { get; }
         public int Height { get; }

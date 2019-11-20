@@ -183,7 +183,7 @@ namespace Wing.RPGSystem
             int lowestHP = Creatures[0].HealthPoints;
             int lowestID = -1;
             for (int i = 0; i < Creatures.Length; i++) {
-                if (Creatures[i].HealthPoints < playerMaxDamage && 
+                if (!Creatures[i].isDeath && Creatures[i].HealthPoints < playerMaxDamage && 
                     Creatures[i].HealthPoints!= Creatures[i].MaxHealthPoints) {
                     if (lowestID == -1 || Creatures[i].HealthPoints < lowestHP) {
                         lowestID = i;
@@ -271,9 +271,9 @@ namespace Wing.RPGSystem
         {
             var skills = Creatures[index].ActiveSkills;
             for (int i = 0; i < skills.Length; i++) {
-                if (SkillCheck(skills[i],label)) {
+                if (SkillCheck(skills[i], label) && !skills[i].TSkill.labels.Contains(Label.SuicideAttack)) {
                     if (GridManager.Instance.CalculateCastSkillTile(Creatures[index], i, target.Loc, out currentCSA)) {
-                        CastSkillActionAnimation(index,i);
+                        CastSkillActionAnimation(index, i);
                         return true;
                     }
                 }

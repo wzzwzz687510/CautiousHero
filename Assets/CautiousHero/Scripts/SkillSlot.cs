@@ -9,7 +9,7 @@ public class SkillSlot : MonoBehaviour, IPointerEnterHandler, IPointerExitHandle
 {
     public int skillID;
 
-    public delegate void SkillBoard(int id,bool isStop);
+    public delegate void SkillBoard(int id,bool isExit);
     public SkillBoard SkillBoardEvent;
 
     //private void FixedUpdate()
@@ -30,6 +30,6 @@ public class SkillSlot : MonoBehaviour, IPointerEnterHandler, IPointerExitHandle
 
     public void OnPointerExit(PointerEventData eventData)
     {
-        SkillBoardEvent?.Invoke(skillID, true);
+        SkillBoardEvent?.Invoke(-1, true);
     }
 }

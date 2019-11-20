@@ -12,7 +12,7 @@ namespace Wing.RPGSystem {
         public SpriteMask mask_hp;
         public SpriteMask mask_hpEffect;
 
-        private BaseCreature scriptableCreature;
+        public BaseCreature Template { get; protected set; }
 
         protected override void Awake()
         {
@@ -27,17 +27,17 @@ namespace Wing.RPGSystem {
 
         public IEnumerator InitCreature(BaseCreature creature, TileController tile)
         {           
-            scriptableCreature = creature;
-            EntityName = scriptableCreature.creatureName;
+            Template = creature;
+            EntityName = Template.creatureName;
             EntityHash = EntityManager.Instance.AddEntity(this);
             BuffManager = new BuffManager(EntityHash);
-            foreach (var buff in scriptableCreature.buffs) {
+            foreach (var buff in Template.buffs) {
                 BuffManager.AddBuff(new BuffHandler(this, this, buff));
             }
-            m_spriteRenderer.sprite = scriptableCreature.sprite;
-            m_attribute = scriptableCreature.attribute;
+            m_spriteRenderer.sprite = Template.sprite;
+            m_attribute = Template.attribute;
             HealthPoints = MaxHealthPoints;
-            Skills = scriptableCreature.skills;
+            Skills = Template.skills;
             ActiveSkills = new InstanceSkill[Skills.Length];
             for (int i = 0; i < Skills.Length; i++) {
                 ActiveSkills[i] = new InstanceSkill(Skills[i]);

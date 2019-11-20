@@ -182,12 +182,12 @@ namespace Wing.RPGSystem
         {
             //Debug.Log("Entity: "+EntityName+", HP: " + HealthPoints);
             HealthPoints -= CalculateFinalDamage(value);
+            HealthPoints = Mathf.Clamp(HealthPoints, 0, MaxHealthPoints);
             AnimationManager.Instance.AddAnimClip(new HPChangeAnimClip(EntityHash, Mathf.Clamp01(1.0f * HealthPoints / MaxHealthPoints)));
             if (BattleManager.Instance.IsPlayerTurn)
                 AnimationManager.Instance.PlayOnce(false);
-            if (HealthPoints > 0)
-                return true;
-
+            if (HealthPoints != 0) return true;
+                
             Death();
             return false;
         }

@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1ac45dc2f52125949bd791a87c1635f2, type: 3}
   m_Name: Test
   m_EditorClassIdentifier: 
-  creatureName: New Creature
+  creatureName: "\u708E\u7075"
   description: A secret creature
   sprite: {fileID: 21300000, guid: f095a6197d3c6834eb3a2d6d7ae24a92, type: 3}
   attribute:

@@ -41,10 +41,25 @@ public class BattleUIController : MonoBehaviour
     public Text skillElement;
     public Text skillCastType;
     public SkillSlot[] skillSlots;
+    public Color[] colors;
+    public Image skillNameBg;
     private int selectSkillID=-1;
+    private bool isSkillBoardDisplayed;
+
     private float timer;
     private bool startCount;
-    private bool isBoardDisplayed;
+
+    [Header("Creature Board")]
+    public Transform creatureBoard;
+    public Image creatureSprite;
+    public Text creatureName;
+    public Text creatureLv;
+    public Text creatureHP;
+    public Text creatureAP;
+    public Text creatureResistance;
+    public Text creatureElement;
+    private int selectCreatureID = -1;
+    private bool isCreatureBoardDisplayed;
 
     void Awake()
     {
@@ -53,13 +68,20 @@ public class BattleUIController : MonoBehaviour
 
     private void FixedUpdate()
     {
-        if (startCount && !isBoardDisplayed) {
+        if (startCount && !isSkillBoardDisplayed && !isCreatureBoardDisplayed) {
             timer += Time.deltaTime;
             if (timer > waitDuration) {
-                ShowSkillBoard();
-                isBoardDisplayed = true;
+                if (selectSkillID != -1) {
+                    ShowSkillBoard();
+                    isSkillBoardDisplayed = true;
+                }
+                else if (selectCreatureID != -1) {
+                    ShowCreatureBoard();
+                    isCreatureBoardDisplayed = true;
+                }
             }
-        }else if (!startCount&&timer>0) {
+        }
+        else if (!startCount && timer > 0) {
             timer -= Time.deltaTime;
         }
     }
@@ -84,6 +106,7 @@ public class BattleUIController : MonoBehaviour
         }
 
         BattleManager.Instance.OnTurnSwitched += OnTurnSwitched;
+        BattleManager.Instance.CreatureBoardEvent += OnCreatureBoardEvent;
         AnimationManager.Instance.OnGameoverEvent.AddListener(Gameover);
 
         for (int i = 0; i < 4; i++) {
@@ -180,21 +203,34 @@ public class BattleUIController : MonoBehaviour
         image_blackBG.raycastTarget = true;
     }
 
-    public void OnSkillBoardEvent(int id, bool isStop)
+    public void OnSkillBoardEvent(int id, bool isExit)
     {
-        if (selectSkillID == id && !isStop)
+        if (selectSkillID == id && !isExit)
             return;
         selectSkillID = id;
-        startCount = !isStop;
-        isBoardDisplayed &= false;
-        if (!isStop && timer > waitDuration) {
+        startCount = !isExit;
+        isSkillBoardDisplayed &= false;
+        if (!isExit && timer > waitDuration) {
             ShowSkillBoard();
         }
-        else if (isStop) {
-            selectSkillID = -1;
-            skillBoard.position = new Vector3(-300, -300, 0);
+        else if (isExit) {
+            skillBoard.position = new Vector3(-300, 0, 0);
         }
+    }
 
+    public void OnCreatureBoardEvent(int hash, bool isExit)
+    {
+        if (selectCreatureID == hash && !isExit)
+            return;
+        selectCreatureID = hash;
+        startCount = !isExit;
+        isCreatureBoardDisplayed &= false;
+        if (!isExit && timer > waitDuration) {
+            ShowCreatureBoard();
+        }
+        else if (isExit) {
+            creatureBoard.position = new Vector3(-300, 0, 0);
+        }
     }
 
     public void ShowSkillBoard()
@@ -204,10 +240,102 @@ public class BattleUIController : MonoBehaviour
         skillCost.text = skill.actionPointsCost.ToString();
         skillCooldown.text = skill.cooldownTime.ToString();
         skillValue.text = (skill as ValueBasedSkill).baseValue.ToString();
-        skillType.text = skill.skillType.ToString();
-        skillElement.text = skill.skillElement.ToString();
-        skillCastType.text = skill.castType.ToString();
+        switch (skill.skillType) {
+            case SkillType.Physical:
+                skillNameBg.color = colors[0];
+                skillType.text = "物理";
+                break;
+            case SkillType.Magical:
+                skillType.text = "魔法";
+                break;
+            case SkillType.Pure:
+                skillType.text = "纯粹";
+                skillNameBg.color = colors[1];
+                break;
+            default:
+                break;
+        }
+        switch (skill.skillElement) {
+            case SkillElement.None:
+                skillElement.text = "无";
+                break;
+            case SkillElement.Fire:
+                skillElement.text = "火";
+                skillNameBg.color = colors[2];
+                break;
+            case SkillElement.Water:
+                skillElement.text = "水";
+                skillNameBg.color = colors[3];
+                break;
+            case SkillElement.Earth:
+                skillElement.text = "地";
+                skillNameBg.color = colors[4];
+                break;
+            case SkillElement.Air:
+                skillElement.text = "气";
+                skillNameBg.color = colors[5];
+                break;
+            case SkillElement.Light:
+                skillElement.text = "光";
+                skillNameBg.color = colors[6];
+                break;
+            case SkillElement.Dark:
+                skillElement.text = "暗";
+                skillNameBg.color = colors[7];
+                break;
+            default:
+                break;
+        }
+        switch (skill.castType) {
+            case CastType.Instant:
+                skillCastType.text = "瞬间";
+                break;
+            case CastType.Trajectory:
+                skillCastType.text = "弹道";
+                break;
+            default:
+                break;
+        }
         skillBoard.position = skillSlots[selectSkillID].transform.position + new Vector3(0, 150, 0);
+    }
+
+    public void ShowCreatureBoard()
+    {
+        if (EntityManager.Instance.TryGetEntity(selectCreatureID, out Entity entity)) {
+            var cc = (entity as CreatureController).Template;
+            creatureSprite.sprite = cc.sprite;
+            creatureName.text = cc.creatureName;
+            creatureLv.text = cc.attribute.level.ToString();
+            creatureHP.text = cc.attribute.maxHealth.ToString();
+            creatureAP.text = cc.attribute.action.ToString();
+            switch (cc.skills[0].skillElement) {
+                case SkillElement.None:
+                    creatureResistance.text = "无";
+                    break;
+                case SkillElement.Fire:
+                    creatureResistance.text = "火";
+                    break;
+                case SkillElement.Water:
+                    creatureResistance.text = "水";
+                    break;
+                case SkillElement.Earth:
+                    creatureResistance.text = "地";
+                    break;
+                case SkillElement.Air:
+                    creatureResistance.text = "气";
+                    break;
+                case SkillElement.Light:
+                    creatureResistance.text = "光";
+                    break;
+                case SkillElement.Dark:
+                    creatureResistance.text = "暗";
+                    break;
+                default:
+                    break;
+            }
+            creatureElement.text = creatureResistance.text;
+            creatureBoard.position = new Vector3(10, 1070, 0);
+        }
     }
 
 
