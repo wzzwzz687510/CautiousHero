@@ -21,7 +21,8 @@ public class GridManager : MonoBehaviour
 
     [Range(0,0.1f)]   public float animationDuration = 0.01f;
 
-    public GameObject prefab;
+    public TileController tcPrefab;
+    public AbioticController abioticPrefab;
     public Sprite[] tileSprites;
     
     public TileNavigation Astar { get; private set; }
@@ -34,7 +35,7 @@ public class GridManager : MonoBehaviour
     private HashSet<Location> playerEffectZone = new HashSet<Location>();
 
     public delegate void OnCompleteMapRendering();
-    public event OnCompleteMapRendering onCompleteMapRenderEvent;
+    public event OnCompleteMapRendering OnCompleteMapRenderEvent;
 
     private void Awake()
     {
@@ -45,17 +46,37 @@ public class GridManager : MonoBehaviour
 
     private IEnumerator Start()
     {
-        RenderMap();
+        RenderMap();       
         Astar = new TileNavigation(m_mg.width, m_mg.height, m_mg.map);
+        AddAbiotics();
         yield return new WaitForSeconds(2);
-        onCompleteMapRenderEvent();      
+        OnCompleteMapRenderEvent();      
     }
 
-    private void Update()
+    private void AddAbiotics()
     {
-        //if (Input.GetKeyDown(KeyCode.R)) {
-        //    RenderMap();
-        //}
+        var config = BattleManager.Instance.config;
+        var sets = config.abioticSets;
+        int[] possiblities = new int[sets.Length];
+        possiblities[0] = sets[0].power;
+        for (int i = 1; i < config.abioticSets.Length; i++) {
+            possiblities[i] = possiblities[i - 1] + sets[i].power;
+        }
+        int totalPower = possiblities[sets.Length - 1];
+        float randomFill, randomAbiotic;
+        foreach (var tile in ValidTiles()) {
+            randomFill = 1000.Random() / 1000.0f;
+            if (randomFill <= config.coverage) {
+                randomAbiotic = totalPower.Random();
+                for (int i = 0; i < sets.Length; i++) {
+                    if (randomAbiotic < possiblities[i]) {
+                        Instantiate(abioticPrefab, tile.m_spriteRenderer.transform).GetComponent<AbioticController>().
+                            InitAbioticEntity(sets[i].tAbiotic, tile);
+                        break;
+                    }
+                }
+            }
+        }
     }
 
     private void RenderMap()
@@ -72,7 +93,7 @@ public class GridManager : MonoBehaviour
             for (int y = 0; y < m_mg.height; y++) {
                 if (m_mg.map[x, y] != 0) {
                     var pos = new Location(x, y);
-                    TileController tc = Instantiate(prefab, new Vector3(0.524f * (x - y), -0.262f * (x + y), 0), 
+                    TileController tc = Instantiate(tcPrefab, new Vector3(0.524f * (x - y), -0.262f * (x + y), 0), 
                         Quaternion.identity, tileHolder.transform).GetComponent<TileController>();
                     tc.Init_SpriteRenderer(pos, y * m_mg.width + x - m_mg.width * m_mg.height, 
                         m_mg.map[x, y] - 1, UnityEngine.Random.Range(0.01f, 1f));

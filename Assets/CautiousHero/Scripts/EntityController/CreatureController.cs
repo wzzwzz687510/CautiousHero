@@ -55,6 +55,15 @@ namespace Wing.RPGSystem {
 
         private void OnCreatureHpChanged(float hpRatio, float duraion)
         {
+            if (hpRatio == 0) {
+                hpBar.enabled = false;
+                mask_hp.alphaCutoff = 1;
+                mask_hpEffect.alphaCutoff = 1;
+                Sprite.DOColor(Color.black, 1);
+                m_glowEffect.GlowColor = Color.black;
+                return;
+            }
+
             if (1 - mask_hp.alphaCutoff > hpRatio) {
                 mask_hp.alphaCutoff = 1 - hpRatio;
                 DOTween.To(() => mask_hpEffect.alphaCutoff, alpha => mask_hpEffect.alphaCutoff = alpha, 1 - hpRatio, 1);
@@ -63,19 +72,12 @@ namespace Wing.RPGSystem {
                 DOTween.To(() => mask_hp.alphaCutoff, alpha => mask_hp.alphaCutoff = alpha, 1 - hpRatio, 1.5f);
                 DOTween.To(() => mask_hpEffect.alphaCutoff, alpha => mask_hpEffect.alphaCutoff = alpha, 1 - hpRatio, 1.5f);
             }
-
-            if(IsDeath) {
-                hpBar.enabled = false;
-                mask_hp.alphaCutoff = 1;
-                mask_hpEffect.alphaCutoff = 1;
-                Sprite.DOColor(Color.black, 1);
-            }
         }
 
         protected override void Death()
         {
             base.Death();
-            m_glowEffect.GlowColor = Color.black;
+            
             LocateTile.OnEntityLeaving();
         }
     }

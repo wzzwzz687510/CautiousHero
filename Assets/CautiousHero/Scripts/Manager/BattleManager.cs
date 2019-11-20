@@ -28,11 +28,9 @@ public class BattleManager : MonoBehaviour
     public LayerMask tileLayer;
     public LayerMask entityLayer;
     public PlayerController player;
-    public AbioticController abioticPrefab;
 
     public BattleState State { get; private set; }
     public bool IsPlayerTurn { get { return State == BattleState.PlayerMove || State == BattleState.PlayerCast|| State == BattleState.PlayerAnim; } }
-    
 
     private SpriteRenderer tmpVisualPlayer;
     private Transform abtioticHolder;
@@ -59,7 +57,7 @@ public class BattleManager : MonoBehaviour
     private void Start()
     {
         State = BattleState.PlacePlayer;
-        GridManager.Instance.onCompleteMapRenderEvent += PrepareBattleStart;
+        GridManager.Instance.OnCompleteMapRenderEvent += PrepareBattleStart;
         AnimationManager.Instance.OnAnimCompleted.AddListener(OnAnimCompleted);
 
         player.InitPlayer(Database.Instance.ActiveData.attribute, Database.Instance.GetEquippedSkills());
@@ -69,38 +67,7 @@ public class BattleManager : MonoBehaviour
     public void PrepareBattleStart()
     {
         AIManager.Instance.Init(config);
-        AddAbiotics();
         PreparePlacePlayer();       
-    }
-
-    private void AddAbiotics()
-    {
-        if (abtioticHolder) {
-            Destroy(abtioticHolder);
-        }
-        abtioticHolder = new GameObject("Abiotic Holder").transform;
-
-        var sets = config.abioticSets;
-        int[] possiblities = new int[sets.Length];
-        possiblities[0] = sets[0].power;
-        for (int i = 1; i < config.abioticSets.Length; i++) {
-            possiblities[i] = possiblities[i - 1] + sets[i].power;        
-        }
-        int totalPower = possiblities[sets.Length - 1];
-        float randomFill, randomAbiotic;
-        foreach (var tile in GridManager.Instance.ValidTiles()) {
-            randomFill = 1000.Random()/1000.0f;
-            if (randomFill <= config.coverage) {
-                randomAbiotic = totalPower.Random();
-                for (int i = 0; i < sets.Length; i++) {
-                    if (randomAbiotic < possiblities[i]) {
-                        Instantiate(abioticPrefab, abtioticHolder).GetComponent<AbioticController>().
-                            InitAbioticEntity(sets[i].tAbiotic, tile);
-                        break;
-                    }
-                }
-            }
-        }        
     }
 
     private void OnAnimCompleted()
@@ -228,12 +195,12 @@ public class BattleManager : MonoBehaviour
                     break;
                 default:
                     break;
-            }         
+            }
         }
 
         if (tileZone.Count == 0) {
             hit = Physics2D.Raycast(ray.origin, ray.direction, 20, entityLayer);
-            if (hit && hit.transform.CompareTag("Player")) {               
+            if (hit && hit.transform.CompareTag("Player")) {
                 switch (State) {
                     case BattleState.PlacePlayer:
                         break;
@@ -256,44 +223,44 @@ public class BattleManager : MonoBehaviour
                         break;
                 }
             }
-            else if(State!= BattleState.PlayerCast){
+            else if (State != BattleState.PlayerCast) {
                 player.ChangeOutlineColor(Color.black);
             }
         }
-        else {
-            hit = Physics2D.Raycast(ray.origin, ray.direction, 20, entityLayer);
-            if (hit && hit.transform.CompareTag("Creature")) {
-                var cc = hit.transform.parent.GetComponent<CreatureController>();
-                if (selectedCreatureID != cc.EntityHash) {
-                    selectedCreatureID = cc.EntityHash;
-                    CreatureBoardEvent?.Invoke(cc.EntityHash, false);
-                }
-                switch (State) {
-                    case BattleState.PlacePlayer:
-                        break;
-                    case BattleState.PlayerMove:
-                        break;
-                    case BattleState.PlayerCast:
-                        SelectVisual(cc.LocateTile, TileState.CastZone);
 
-                        if (Input.GetMouseButtonDown(0) && currentSelected.Count != 0 && tileZone.Contains(currentSelected[0])) {
-                            ApplyCast();
-                        }
-                        break;
-                    case BattleState.BotTurn:
-                        break;
-                    case BattleState.PlayerAnim:
-                        break;
-                    case BattleState.NonInteractable:
-                        break;
-                    default:
-                        break;
-                }
+
+        hit = Physics2D.Raycast(ray.origin, ray.direction, 20, entityLayer);
+        if (hit && hit.transform.CompareTag("Creature")) {
+            var cc = hit.transform.parent.GetComponent<CreatureController>();
+            if (selectedCreatureID != cc.EntityHash) {
+                selectedCreatureID = cc.EntityHash;
+                CreatureBoardEvent?.Invoke(cc.EntityHash, false);
             }
-            else if (selectedCreatureID != 0) {
-                selectedCreatureID = 0;
-                CreatureBoardEvent?.Invoke(-1, true);
+            switch (State) {
+                case BattleState.PlacePlayer:
+                    break;
+                case BattleState.PlayerMove:
+                    break;
+                case BattleState.PlayerCast:
+                    SelectVisual(cc.LocateTile, TileState.CastZone);
+
+                    if (Input.GetMouseButtonDown(0) && currentSelected.Count != 0 && tileZone.Contains(currentSelected[0])) {
+                        ApplyCast();
+                    }
+                    break;
+                case BattleState.BotTurn:
+                    break;
+                case BattleState.PlayerAnim:
+                    break;
+                case BattleState.NonInteractable:
+                    break;
+                default:
+                    break;
             }
+        }
+        else if (selectedCreatureID != 0) {
+            selectedCreatureID = 0;
+            CreatureBoardEvent?.Invoke(-1, true);
         }
 
     }

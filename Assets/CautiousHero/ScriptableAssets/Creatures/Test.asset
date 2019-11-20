@@ -24,6 +24,6 @@ MonoBehaviour:
     agility: 10
     moveCost: 1
   skills:
-  - {fileID: 11400000, guid: 9e12c06f5f8d891468fa7cbdc246de3c, type: 2}
-  - {fileID: 11400000, guid: 65ceb9f2e4d9adc4aae4f9d246a6711e, type: 2}
+  - {fileID: 11400000, guid: 3b587df692fdfd7448e5174ce1f5b159, type: 2}
+  - {fileID: 11400000, guid: 57dbf6589d4d697428451bceaa4cc3a2, type: 2}
   buffs: []

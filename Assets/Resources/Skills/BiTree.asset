@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp:Wing.RPGSystem:BasicAttackSkill
   skillName: "\u4E8C\u53C9\u6811\u5217"
   description: A mystical skill
-  sprite: {fileID: -6119718450461497363, guid: 95182df2e629f5c4c90c733881fc6d9c, type: 3}
+  sprite: {fileID: 5754099676014545991, guid: 95182df2e629f5c4c90c733881fc6d9c, type: 3}
   cooldownTime: 2
   actionPointsCost: 1
   skillType: 1

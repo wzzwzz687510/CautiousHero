@@ -28,8 +28,17 @@ namespace Wing.RPGSystem
 
         public override void DropAnimation()
         {
-            transform.GetChild(0).localPosition = new Vector3(0, 5, 0);
-            transform.GetChild(0).DOLocalMoveY(0.15f, 0.5f);
+            transform.GetChild(0).localPosition = new Vector3(0, 0.15f, 0);
+            Sprite.DOFade(0, 0);
+            StartCoroutine(WaitDisplay());
+        }
+
+        IEnumerator WaitDisplay()
+        {            
+            while (!LocateTile.m_animator.GetCurrentAnimatorStateInfo(0).IsName("tile_fall")) {
+                yield return null;
+            }
+            Sprite.DOFade(1, 0);
         }
     }
 }
