@@ -115,6 +115,7 @@ public class BattleUIController : MonoBehaviour
 
         OnPlayerHPChanged(0, 0);
         OnPlayerHPChanged(1, 2);
+        StartCoroutine(BattleStart());
     }
 
     private void OnPlayerHPChanged(float hpRatio, float duration)
@@ -179,6 +180,22 @@ public class BattleUIController : MonoBehaviour
         yield return new WaitForSeconds(0.5f);
 
         BattleManager.Instance.StartNewTurn(isPlayerTurn);
+    }
+
+    public IEnumerator BattleStart()
+    {
+        yield return new WaitForSeconds(1f);
+        turnText.text = "战  略  布  局";
+        turnText.color = Color.white;
+        turnBG.fillAmount = 0;
+        turnBG.color = Color.white;
+        DOTween.To(() => turnBG.fillAmount, ratio => turnBG.fillAmount = ratio, 1f, 0.5f);
+        yield return new WaitForSeconds(0.5f);
+        DOTween.ToAlpha(() => turnText.color, color => turnText.color = color, 1f, 0.5f);
+        yield return new WaitForSeconds(0.5f);
+        DOTween.ToAlpha(() => turnBG.color, color => turnBG.color = color, 0f, 0.5f);
+        DOTween.ToAlpha(() => turnText.color, color => turnText.color = color, 0f, 0.5f);
+        yield return new WaitForSeconds(0.5f);
     }
 
     public void Button_CancelMove()
@@ -305,35 +322,44 @@ public class BattleUIController : MonoBehaviour
             var cc = (entity as CreatureController).Template;
             creatureSprite.sprite = cc.sprite;
             creatureName.text = cc.creatureName;
-            creatureLv.text = cc.attribute.level.ToString();
-            creatureHP.text = cc.attribute.maxHealth.ToString();
-            creatureAP.text = cc.attribute.action.ToString();
-            switch (cc.skills[0].skillElement) {
-                case SkillElement.None:
-                    creatureResistance.text = "无";
-                    break;
-                case SkillElement.Fire:
-                    creatureResistance.text = "火";
-                    break;
-                case SkillElement.Water:
-                    creatureResistance.text = "水";
-                    break;
-                case SkillElement.Earth:
-                    creatureResistance.text = "地";
-                    break;
-                case SkillElement.Air:
-                    creatureResistance.text = "气";
-                    break;
-                case SkillElement.Light:
-                    creatureResistance.text = "光";
-                    break;
-                case SkillElement.Dark:
-                    creatureResistance.text = "暗";
-                    break;
-                default:
-                    break;
+            if (entity.Investigation <= player.Investigation) {                
+                creatureLv.text = cc.attribute.level.ToString();
+                creatureHP.text = cc.attribute.maxHealth.ToString();
+                creatureAP.text = cc.attribute.action.ToString();
+                switch (cc.skills[0].skillElement) {
+                    case SkillElement.None:
+                        creatureResistance.text = "无";
+                        break;
+                    case SkillElement.Fire:
+                        creatureResistance.text = "火";
+                        break;
+                    case SkillElement.Water:
+                        creatureResistance.text = "水";
+                        break;
+                    case SkillElement.Earth:
+                        creatureResistance.text = "地";
+                        break;
+                    case SkillElement.Air:
+                        creatureResistance.text = "气";
+                        break;
+                    case SkillElement.Light:
+                        creatureResistance.text = "光";
+                        break;
+                    case SkillElement.Dark:
+                        creatureResistance.text = "暗";
+                        break;
+                    default:
+                        break;
+                }
+                creatureElement.text = creatureResistance.text;
             }
-            creatureElement.text = creatureResistance.text;
+            else {
+                creatureLv.text = "???";
+                creatureHP.text = "???";
+                creatureAP.text = "???";
+                creatureResistance.text = "???";
+                creatureElement.text = "???";
+            }
             creatureBoard.position = new Vector3(10, 1070, 0);
         }
     }

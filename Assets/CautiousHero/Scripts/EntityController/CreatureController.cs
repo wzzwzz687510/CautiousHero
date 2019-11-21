@@ -8,6 +8,8 @@ namespace Wing.RPGSystem {
     {
         [Header("Creature Settings")]
         public SpriteRenderer hpBar;
+        public SpriteRenderer hpSR;
+        public SpriteRenderer hpESR;
         public SpriteMask mask_hp;
         public SpriteMask mask_hpEffect;
 
@@ -51,6 +53,12 @@ namespace Wing.RPGSystem {
         {
             base.OnSortingOrderChangedEvent(sortingOrder);
             hpBar.sortingOrder = sortingOrder + 1;
+            hpESR.sortingOrder = sortingOrder + 2;
+            mask_hpEffect.frontSortingOrder = sortingOrder + 2;
+            mask_hpEffect.backSortingOrder = sortingOrder + 1;
+            hpSR.sortingOrder = sortingOrder + 3;
+            mask_hp.frontSortingOrder = sortingOrder + 3;
+            mask_hp.backSortingOrder = sortingOrder + 2;
         }
 
         private void OnCreatureHpChanged(float hpRatio, float duraion)

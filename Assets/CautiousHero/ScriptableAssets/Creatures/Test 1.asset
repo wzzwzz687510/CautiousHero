@@ -18,10 +18,11 @@ MonoBehaviour:
   attribute:
     level: 1
     maxHealth: 80
-    action: 3
+    action: 4
     strength: 10
     intelligence: 10
     agility: 10
+    investigation: 0
     moveCost: 1
   skills:
   - {fileID: 11400000, guid: 3b587df692fdfd7448e5174ce1f5b159, type: 2}

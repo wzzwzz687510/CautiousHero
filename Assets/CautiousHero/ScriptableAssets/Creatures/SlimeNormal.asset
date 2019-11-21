@@ -10,21 +10,20 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 1ac45dc2f52125949bd791a87c1635f2, type: 3}
-  m_Name: Test
+  m_Name: SlimeNormal
   m_EditorClassIdentifier: 
-  creatureName: "\u708E\u7075"
+  creatureName: "\u53F2\u83B1\u59C6"
   description: A secret creature
-  sprite: {fileID: 21300000, guid: f095a6197d3c6834eb3a2d6d7ae24a92, type: 3}
+  sprite: {fileID: 21300000, guid: 8ee24435e8edcc84eb1347ff89dda0f9, type: 3}
   attribute:
     level: 1
-    maxHealth: 40
-    action: 4
-    strength: 10
-    intelligence: 10
-    agility: 10
+    maxHealth: 10
+    action: 2
+    strength: 1
+    intelligence: 0
+    agility: 0
     investigation: 0
-    moveCost: 1
+    moveCost: 2
   skills:
-  - {fileID: 11400000, guid: 3b587df692fdfd7448e5174ce1f5b159, type: 2}
-  - {fileID: 11400000, guid: 57dbf6589d4d697428451bceaa4cc3a2, type: 2}
+  - {fileID: 11400000, guid: 3102e5ad25225e94fbda68f2cd9e59e9, type: 2}
   buffs: []

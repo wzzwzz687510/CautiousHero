@@ -391,8 +391,10 @@ public class BattleManager : MonoBehaviour
     {
         ChangeState(BattleState.End);
         // To do
+        AnimationManager.Instance.Clear();
         AnimationManager.Instance.AddAnimClip(new BaseAnimClip(AnimType.Gameover, 0.5f));
         AnimationManager.Instance.PlayOnce();
+        AudioManager.Instance.Gameover();
         Debug.Log("You lost");
     }
 
@@ -446,14 +448,14 @@ public class BattleManager : MonoBehaviour
 
     public void CancelMove()
     {
-        if (!IsPlayerTurn) return;
+        if (!IsPlayerTurn || State == BattleState.PlayerAnim) return;
         player.CancelMove();
         ChangeState(BattleState.PlayerMove);
     }
 
     public void EndTurn()
     {
-        if (!IsPlayerTurn) return;
+        if (!IsPlayerTurn || State == BattleState.PlayerAnim) return;
         CompletePlayerTurn();
     }
 
@@ -463,6 +465,9 @@ public class BattleManager : MonoBehaviour
     /// <returns>True for battle end</returns>
     public bool GameConditionCheck()
     {
+        if (State == BattleState.End)
+            return false;
+
         bool res = true;
         if (player.IsDeath) {
             Gameover();

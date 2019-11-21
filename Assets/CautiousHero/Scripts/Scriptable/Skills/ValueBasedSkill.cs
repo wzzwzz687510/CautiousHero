@@ -25,7 +25,7 @@ namespace Wing.RPGSystem
                     foreach (var ep in EffectPatterns) {
                         effectLocation = castLoc + GetFixedEffectPattern(castLoc - caster.Loc, ep.pattern);
                         if (effectLocation.IsValid() && !effectLocation.IsEmpty()) {
-                            effectLocation.StayEntity().ChangeHP(CalculateValue(caster, ep.coefficient));
+                            effectLocation.GetStayEntity().ChangeHP(CalculateValue(caster, ep.coefficient));
                         }
                     }
                     break;

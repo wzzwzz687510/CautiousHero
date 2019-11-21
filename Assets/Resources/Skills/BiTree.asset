@@ -23,7 +23,7 @@ MonoBehaviour:
   labels: 06000000
   castEffect:
     prefab: {fileID: 160150, guid: 135baa54467718346b4ec3b679824e50, type: 3}
-    animDuration: 0.3
+    animDuration: 0.2
   tCastPatterns: {fileID: 11400000, guid: ad611d959b4a33344acc948e13ec3d3e, type: 2}
   tEffectPatterns: {fileID: 11400000, guid: 42d0097f6ac31e24c88b3e5353bfb689, type: 2}
   baseValue: 10

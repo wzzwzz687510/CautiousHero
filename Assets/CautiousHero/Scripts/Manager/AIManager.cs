@@ -1,9 +1,23 @@
-﻿using System.Collections;
+﻿using Priority_Queue;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 namespace Wing.RPGSystem
 {
+    public struct SkillInfo
+    {
+        public int index;
+        public int skillID;
+        public int cooldown;
+
+        public void Update()
+        {
+            if (cooldown > 0)
+                cooldown--;
+        }
+    }
+
     public class AIManager : MonoBehaviour
     {
         public static AIManager Instance { get; private set; }
@@ -16,11 +30,17 @@ namespace Wing.RPGSystem
         public CreatureController[] Creatures { get; private set; }
         public bool isCalculating { get; private set; }
 
-        private int playerMaxDamage;
+        /// player max damage
+        private int pMaxD;
+        /// player max damage skill ID
+        private int pMaxDID;
+
         private HashSet<Location> playerEffectZone;
+        private HashSet<Location> damgerousZone;
+        private HashSet<Location> healingZone;
+        private SimplePriorityQueue<int> possibleAttackedCreature;
         private CastSkillAction currentCSA;
-        //private bool isCasting;
-        //private bool isAnimating;
+
 
         private void Awake()
         {
@@ -48,7 +68,7 @@ namespace Wing.RPGSystem
         public void OnBotTurnStart()
         {
             PrepareDecisionMaking();
-            BotTurn();
+            StartCoroutine( BotTurn());
         }
 
         public bool IsAllBotsDeath()
@@ -60,34 +80,74 @@ namespace Wing.RPGSystem
             return res;
         }
 
-        public void StopBot()
+        // Avoid dangerous zone 
+        private void CalculateHealingZone()
         {
-            StopAllCoroutines();
-        }
+            healingZone = new HashSet<Location>();
 
-        private void CalculatePlayerMaxDamage()
-        {
-            playerMaxDamage = 0;
-            foreach (var skill in player.ActiveSkills) {
-                if (SkillCheck(skill,Label.Damage)) {
-                    int damage = (skill.TSkill as BasicAttackSkill).CalculateValue(player, 1);
-                    playerMaxDamage = Mathf.Max(playerMaxDamage, damage);
+            for (int i = 0; i < Creatures.Length; i++) {
+                for (int j = 0; j < Creatures[i].Skills.Length; j++) {
+                    if (SkillCheck(Creatures[i].ActiveSkills[j], Label.Healing)) {
+                        foreach (var loc in GridManager.Instance.CalculateEntityGivenSkillEffectZone(
+                            Creatures[i], false, j, damgerousZone)) {
+                            if (!healingZone.Contains(loc))
+                                healingZone.Add(loc);
+                        }
+                    }
                 }
             }
         }
 
+        private void CalculatePlayerEffectZone()
+        {
+            damgerousZone = new HashSet<Location>();
+            pMaxD = 0;
+            pMaxDID = -1;
+
+            for (int i = 0; i < player.ActiveSkills.Length; i++) {
+                if (SkillCheck(player.ActiveSkills[i], Label.Damage)) {
+                    int damage = (player.ActiveSkills[i].TSkill as BasicAttackSkill).CalculateValue(player, 1);
+                    if (damage > pMaxD) {
+                        pMaxD = damage;
+                        pMaxDID = i;
+                    }
+                }
+            }
+
+            IEnumerable<Location> coll;
+            if (pMaxDID != -1) {
+                coll = GridManager.Instance.CalculateEntityGivenSkillEffectZone(player, true, pMaxDID);
+                foreach (var loc in coll) {
+                    damgerousZone.Add(loc);
+                }
+            }
+
+            GridManager.Instance.CalculateEntityEffectZone(player, new HashSet<Label>() { Label.Damage }, true, out playerEffectZone);
+
+            // Test
+            //GridManager.Instance.ResetAllTiles();
+            //foreach (var item in damgerousZone) {
+            //    GridManager.Instance.ChangeTileState(item, TileState.PlaceSelected);
+            //}
+        }
+
         private void PrepareDecisionMaking()
         {
-            CalculatePlayerMaxDamage();
-            playerEffectZone = GridManager.Instance.CalculateEntityEffectZone(player, true);
             currentCSA = new CastSkillAction();
+            possibleAttackedCreature = new SimplePriorityQueue<int>();
+            //var timer = System.DateTime.Now;
+            CalculatePlayerEffectZone();
+            //Debug.Log((System.DateTime.Now - timer).TotalSeconds.ToString());
+            //timer = System.DateTime.Now;
+            CalculateHealingZone();
+            //Debug.Log((System.DateTime.Now - timer).TotalSeconds.ToString());
 
             foreach (var creature in Creatures) {
                 creature.OnEntityTurnStart();
             }
         }
 
-        private void BotTurn()
+        private IEnumerator BotTurn()
         {
             isCalculating = true;
             AnimationManager.Instance.PlayAll();
@@ -101,43 +161,102 @@ namespace Wing.RPGSystem
                 DecisionMaking(i);
                 if (player.IsDeath) break;
                 AnimationManager.Instance.AddAnimClip(new OutlineEntityAnimClip(Creatures[i], Color.black));
-
+                yield return null;
             }
             isCalculating = false;
         }
 
         private void DecisionMaking(int index)
         {
-            KillPlayer(index);
-
-            // if player can effect agent
-            if (playerEffectZone.Contains(Creatures[index].Loc)) {
-                AvoidPlayerEffect(index);
-            }
-            else {
-                ApplyStrategy(index,true);
+            if (!KillPlayer(index)) {
+                if (playerEffectZone.Contains(Creatures[index].Loc)) {
+                    AvoidPlayerEffect(index);
+                }
+                else {
+                    ApplyStrategy(index, true);
+                }
             }
         }
 
-        private void ApplyStrategy(int index,bool isAvoidZone)
+        // cover alley in safe location
+        private bool CoverAlley(int index)
+        {
+            if (!GridManager.Instance.TryGetTileOutsideZone(Creatures[index], player, playerEffectZone, out TileController tc))
+                return false;
+
+            var creature = Creatures[possibleAttackedCreature.Dequeue()];
+            for (int i = 0; i < player.ActiveSkills.Length; i++) {
+                if (SkillCheck(player.ActiveSkills[i], Label.Damage)) {
+                    var ppas = GridManager.Instance.CalculateCastSkillTile(player, i, creature.Loc, true);
+
+                    foreach (var pLoc in ppas) {
+                        for (int j = 0; j < Creatures[index].Skills.Length; j++) {
+                            if (SkillCheck(Creatures[index].ActiveSkills[j], Label.Damage)) {
+                                var ccsa = GridManager.Instance.CalculateCastSkillTile(Creatures[index], j, pLoc.destination.Loc);
+                                foreach (var csa in ccsa) {
+                                    if (!playerEffectZone.Contains(csa.destination.Loc)) {
+                                        Creatures[index].MoveToTile(csa.destination);
+                                        return true;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            return false;
+        }
+
+        private void ApplyStrategy(int index, bool isAvoidZone)
         {
             if (player.IsDeath) return;
-            HealAlley(index,isAvoidZone);
-            BuffAlley(index,isAvoidZone);
-            AttackPlayer(index,isAvoidZone);
+            HealAlley(index, isAvoidZone);
+            BuffAlley(index, isAvoidZone);
+
+            // Costful
+            //if (possibleAttackedCreature.Count != 0) {
+            //    if (CoverAlley(index)) return;
+            //}
+
+            if (pMaxD >= Creatures[index].HealthPoints) {
+                var coll = GridManager.Instance.TryGetLocationOutsideZone(Creatures[index], player, damgerousZone);
+                var origin = Creatures[index].Loc;
+                Location minLoc = new Location();
+                int minDistance = 99, tmp;
+
+                foreach (var loc in coll) {
+                    tmp = loc.GetDistance(origin);
+                    if (minDistance > tmp) {
+                        minLoc = loc;
+                        minDistance = tmp;
+                    }
+                }
+
+                Creatures[index].MoveToTile(minLoc.GetTileController());
+            }
+            else if (TryCastGivenLabelSkill(index, Label.DefenseBuff, Creatures[index].Loc)) {
+            }
+            else {
+                TryCastGivenLabelSkill(index, Label.Damage, player.Loc);
+            }
+            possibleAttackedCreature.Enqueue(index, Creatures[index].Loc.GetDistance(player.Loc));
         }
 
-        private void AttackPlayer(int index,bool isAvoidZone)
+        private void AttackPlayer(int index)
         {
             if (Creatures[index].ActionPoints == 0 || !HasCastableGivenLabelSkill(index, Label.Damage))
                 return;
 
-            if (isAvoidZone) {
-                TryCastGivenLabelSkill(index, Label.Damage, player, playerEffectZone);
-            }   
-            else {
-                TryCastGivenLabelSkill(index, Label.Damage, player);
-            }
+            TryCastGivenLabelSkill(index, Label.Damage, player.Loc);
+        }
+
+        private void AttackPlayer(int index, HashSet<Location> avoidZone)
+        {
+            if (Creatures[index].ActionPoints == 0 || !HasCastableGivenLabelSkill(index, Label.Damage))
+                return;
+
+            TryCastGivenLabelSkill(index, Label.Damage, player.Loc, avoidZone);
         }
 
         private void BuffAlley(int index,bool isAvoidZone)
@@ -166,10 +285,11 @@ namespace Wing.RPGSystem
 
             if (alleyID != -1) {
                 if (isAvoidZone) {
-                    TryCastGivenLabelSkill(index, Label.StrengthenBuff, Creatures[alleyID], playerEffectZone);
+                    if (!TryCastGivenLabelSkill(index, Label.StrengthenBuff, Creatures[alleyID].Loc, playerEffectZone))
+                        TryCastGivenLabelSkill(index, Label.StrengthenBuff, Creatures[alleyID].Loc, playerEffectZone);
                 }
                 else {
-                    TryCastGivenLabelSkill(index, Label.StrengthenBuff, Creatures[alleyID]);
+                    TryCastGivenLabelSkill(index, Label.StrengthenBuff, Creatures[alleyID].Loc);
                 }
             }
         }
@@ -182,7 +302,7 @@ namespace Wing.RPGSystem
             int lowestHP = Creatures[0].HealthPoints;
             int lowestID = -1;
             for (int i = 0; i < Creatures.Length; i++) {
-                if (!Creatures[i].IsDeath && Creatures[i].HealthPoints < playerMaxDamage && 
+                if (!Creatures[i].IsDeath && Creatures[i].HealthPoints < pMaxD && 
                     Creatures[i].HealthPoints!= Creatures[i].MaxHealthPoints) {
                     if (lowestID == -1 || Creatures[i].HealthPoints < lowestHP) {
                         lowestID = i;
@@ -193,42 +313,51 @@ namespace Wing.RPGSystem
             
             if (lowestID != -1) {
                 if (isAvoidZone) {
-                    TryCastGivenLabelSkill(index, Label.Healing, Creatures[lowestID], playerEffectZone);
+                    if (!TryCastGivenLabelSkill(index, Label.Healing, Creatures[lowestID].Loc, playerEffectZone))
+                        TryCastGivenLabelSkill(index, Label.Healing, Creatures[lowestID].Loc, damgerousZone);
                 }
                 else {
-                    TryCastGivenLabelSkill(index, Label.Healing, Creatures[lowestID]);
+                    TryCastGivenLabelSkill(index, Label.Healing, Creatures[lowestID].Loc);
                 }
             }               
         }
 
         private void AvoidPlayerEffect(int index)
         {
-            if (!TryCastGivenLabelSkill(index,Label.HardControl,player)) {
-                if (!TryCastGivenLabelSkill(index, Label.SoftControl, player)) {
-                    if (!TryCastGivenLabelSkill(index, Label.Obstacle, player)) {
-                        TileController tc;
-                        if (GridManager.Instance.TryGetSafeTile(Creatures[index], player, out tc)) {
-                            Creatures[index].MoveToTile(tc);
+            if (!TryCastGivenLabelSkill(index, Label.HardControl, player.Loc)) {
+                if (!TryCastGivenLabelSkill(index, Label.SoftControl, player.Loc)) {
+                    if (!TryCastGivenLabelSkill(index, Label.Obstacle, player.Loc)) {
+                        if (pMaxD >= Creatures[index].HealthPoints) {
+                            // To do try to cast highest damage
+                            if (!TryCastGivenLabelSkill(index, Label.Damage, player.Loc, damgerousZone)) {
+                                ApplyStrategy(index, false);
+                                return;
+                            }
                         }
                         else {
-                            TryCastGivenLabelSkill(index, Label.DefenseBuff, Creatures[index]);
+                            if (!TryCastGivenLabelSkill(index, Label.Damage, player.Loc)) {
+                                ApplyStrategy(index, false);
+                                return;
+                            }
                         }
                     }
                 }
             }
 
-            ApplyStrategy(index, false);
+            CalculatePlayerEffectZone();
         }
 
-        private void KillPlayer(int index)
+        private bool KillPlayer(int index)
         {
             var skills = Creatures[index].ActiveSkills;
             for (int i = 0; i < skills.Length; i++) {
                 if (SkillCheck(skills[i], Label.Damage)) {
                     if (player.CalculateFinalDamage((skills[i].TSkill as BasicAttackSkill).baseValue) > player.HealthPoints)
-                        TryCastGivenIDSkill(index, i, player);
+                        return TryCastGivenIDSkill(index, i, player.Loc);
                 }
             }
+
+            return false;
         }
 
         private bool SkillCheck(InstanceSkill skill,Label label)
@@ -248,10 +377,11 @@ namespace Wing.RPGSystem
             return hasSkill;
         }
 
-        private bool TryCastGivenIDSkill(int index,int skillID, Entity target)
+        private bool TryCastGivenIDSkill(int index,int skillID, Location targetLoc)
         {
             var skill = Creatures[index].ActiveSkills[skillID];
-            if (GridManager.Instance.CalculateCastSkillTile(Creatures[index], skillID, target.Loc, out currentCSA)) {
+            foreach (var csa in GridManager.Instance.CalculateCastSkillTile(Creatures[index], skillID, targetLoc)) {
+                currentCSA = csa;
                 CastSkillActionAnimation(index, skillID);
                 return true;
             }
@@ -264,17 +394,14 @@ namespace Wing.RPGSystem
         /// </summary>
         /// <param name="index">Cast creature ID</param>
         /// <param name="label">Cast skill label</param>
-        /// <param name="target">Skill target</param>
+        /// <param name="targetLoc">Skill target</param>
         /// <returns></returns>
-        private bool TryCastGivenLabelSkill(int index, Label label,Entity target)
+        private bool TryCastGivenLabelSkill(int index, Label label, Location targetLoc)
         {
             var skills = Creatures[index].ActiveSkills;
             for (int i = 0; i < skills.Length; i++) {
                 if (SkillCheck(skills[i], label) && !skills[i].TSkill.labels.Contains(Label.SuicideAttack)) {
-                    if (GridManager.Instance.CalculateCastSkillTile(Creatures[index], i, target.Loc, out currentCSA)) {
-                        CastSkillActionAnimation(index, i);
-                        return true;
-                    }
+                    return TryCastGivenIDSkill(index, i, targetLoc);
                 }
             }
             return false;
@@ -288,15 +415,17 @@ namespace Wing.RPGSystem
         /// <param name="target">Skill target</param>
         /// <param name="avoidZone">Avoid move into this zone to cast skill</param>
         /// <returns></returns>
-        private bool TryCastGivenLabelSkill(int index, Label label, Entity target, HashSet<Location> avoidZone)
+        private bool TryCastGivenLabelSkill(int index, Label label, Location targetLoc, HashSet<Location> avoidZone)
         {
             var skills = Creatures[index].ActiveSkills;
             for (int i = 0; i < skills.Length; i++) {
                 if (SkillCheck(skills[i], label)) {
-                    if (GridManager.Instance.CalculateCastSkillTile(Creatures[index], i, target.Loc, out currentCSA) &&
-                        !avoidZone.Contains(currentCSA.destination.Loc)) {
-                        CastSkillActionAnimation(index, i);
-                        return true;
+                    foreach (var csa in GridManager.Instance.CalculateCastSkillTile(Creatures[index], i, targetLoc)) {
+                        if (!avoidZone.Contains(csa.destination.Loc)) {
+                            currentCSA = csa;
+                            CastSkillActionAnimation(index, i);
+                            return true;
+                        }
                     }
                 }
             }

@@ -41,17 +41,20 @@ namespace Wing.RPGSystem
             return new AStarSearch(grid, from, to).cameFrom.ContainsKey(to);
         }
 
-        public IEnumerable<Location> GetGivenDistancePoints(Location origin, int distance,bool includeInside = true)
+        public IEnumerable<Location> GetGivenDistancePoints(Location origin, int steps, bool includeInside = true)
         {
             Location destination;
             int heuristic = 0;
-            for (int x = -distance; x < distance + 1; x++) {
-                for (int y = -distance; y < distance + 1; y++) {
+            for (int x = -steps; x < steps + 1; x++) {
+                for (int y = -steps; y < steps + 1; y++) {
                     heuristic = Math.Abs(x) + Math.Abs(y);
-                    if (includeInside ? heuristic <= distance : heuristic == distance) {
+                    if (heuristic <= steps) {
                         destination = new Location(origin.x + x, origin.y + y);
-                        if (HasPath(origin, destination) && GetPath(origin, destination).Count == heuristic)
-                            yield return destination;
+                        if (HasPath(origin, destination)) {
+                            int pathCnt = GetPath(origin, destination).Count;
+                            if (includeInside ? pathCnt <= steps : pathCnt == steps)
+                                yield return destination;
+                        }
                     }
                 }
             }

@@ -1,4 +1,6 @@
-﻿namespace Wing.RPGSystem
+﻿using System;
+
+namespace Wing.RPGSystem
 {
     public static class Extensions
     {
@@ -20,6 +22,11 @@
 
         public static bool IsEmpty(this Location location) => GridManager.Instance.IsEmptyLocation(location);
 
-        public static Entity StayEntity(this Location location) => GridManager.Instance.GetTileController(location).StayEntity;
+        public static TileController GetTileController(this Location location) => GridManager.Instance.GetTileController(location);
+
+        public static Entity GetStayEntity(this Location location) => location.GetTileController().StayEntity;
+
+        public static int GetDistance(this Location location, Location loc) =>Math.Abs(location.x - loc.x) + Math.Abs(location.y - loc.y);
+
     }
 }

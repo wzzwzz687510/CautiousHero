@@ -194,59 +194,135 @@ public class GridManager : MonoBehaviour
         yield return tc;
     }
 
-    public HashSet<Location> CalculateEntityEffectZone(Entity entity, bool isPrediction)
+    public void CalculateEntityEffectZone(Entity entity,HashSet< Label> labels,bool isPrediction, out HashSet<Location> EffectZone)
     {
-        HashSet<Location> EffectZone = new HashSet<Location>();
-        int entityAP = isPrediction ? entity.ActionPoints + entity.ActionPointsPerTurn : entity.ActionPoints;
+        EffectZone = new HashSet<Location>();
+
+        for (int i = 0; i < entity.Skills.Length; i++) {
+            foreach (var label in labels) {
+                if (entity.Skills[i].labels.Contains(label)){
+                    foreach (var effectLoc in CalculateEntityGivenSkillEffectZone(entity, isPrediction, i)) {
+                        EffectZone.Add(effectLoc);
+                    }
+                    break;
+                }
+            }
+        }
+    }
+
+    public void CalculateEntityEffectZone(Entity entity, HashSet<Label> labels, bool isPrediction, HashSet<Location> avoidZone, out HashSet<Location> EffectZone)
+    {
+        EffectZone = new HashSet<Location>();
+
+        for (int i = 0; i < entity.Skills.Length; i++) {
+            foreach (var label in labels) {
+                if (entity.Skills[i].labels.Contains(label)) {
+                    foreach (var effectLoc in CalculateEntityGivenSkillEffectZone(entity, isPrediction, i, avoidZone)) {
+                        EffectZone.Add(effectLoc);
+                    }
+                    break;
+                }
+            }
+        }
+    }
+
+    /// <summary>
+    /// Has Duplication checked
+    /// </summary>
+    /// <param name="entity"></param>
+    /// <param name="isPrediction"></param>
+    /// <param name="skill"></param>
+    /// <returns></returns>
+    public IEnumerable<Location> CalculateEntityGivenSkillEffectZone(Entity entity, bool isPrediction, int skillID)
+    {
+        if (!entity.ActiveSkills[skillID].Castable) yield break;
+        var skill = entity.Skills[skillID];
+        var zone = new HashSet<Location>();
+        int entityAP = isPrediction ? Mathf.Clamp(entity.ActionPoints + entity.ActionPointsPerTurn, 0, 8) : entity.ActionPoints;
         int entityMoveStep = entityAP / entity.MoveCost;
         for (int i = 0; i < entityMoveStep + 1; i++) {
-            foreach (var skill in entity.Skills) {
-                if (skill.actionPointsCost <= entityAP - i * entity.MoveCost) {
-                    foreach (var loc in Astar.GetGivenDistancePoints(entity.Loc, i, false)) {
-                        foreach (var effecLoc in skill.GetEffectZone(loc)) {
-                            if (!EffectZone.Contains(effecLoc))
-                                EffectZone.Add(effecLoc);
+            if (skill.actionPointsCost <= entityAP - i * entity.MoveCost) {
+                foreach (var loc in Astar.GetGivenDistancePoints(entity.Loc, i, false)) {
+                    foreach (var effectLoc in skill.GetEffectZone(loc)) {
+                        if (!zone.Contains(effectLoc)) {
+                            zone.Add(effectLoc);
+                            yield return effectLoc;
                         }
                     }
                 }
             }
         }
-        return EffectZone;
     }
 
-    public bool CalculateCastSkillTile(Entity entity,int skillID,Location target,out CastSkillAction action)
+    /// <summary>
+    /// Has Duplication checked
+    /// </summary>
+    /// <param name="entity"></param>
+    /// <param name="isPrediction"></param>
+    /// <param name="skill"></param>
+    /// <returns></returns>
+    public IEnumerable<Location> CalculateEntityGivenSkillEffectZone(Entity entity, bool isPrediction, int skillID, HashSet<Location> avoidZone)
     {
-        action = new CastSkillAction();
+        if (!entity.ActiveSkills[skillID].Castable) yield break;
         var skill = entity.Skills[skillID];
-        int availableAP = entity.ActionPoints - skill.actionPointsCost;
-        if (availableAP < 0) return false;
-        for (int i = 0; i < availableAP/entity.MoveCost + 1; i++) {
+
+        var zone = new HashSet<Location>();
+        int entityAP = isPrediction ? Mathf.Clamp(entity.ActionPoints + entity.ActionPointsPerTurn, 0, 8) : entity.ActionPoints;
+        int entityMoveStep = entityAP / entity.MoveCost;
+        for (int i = 0; i < entityMoveStep + 1; i++) {
+            if (skill.actionPointsCost <= entityAP - i * entity.MoveCost) {
+                foreach (var loc in Astar.GetGivenDistancePoints(entity.Loc, i, false)) {
+                    if (avoidZone.Contains(loc))
+                        continue;
+                    foreach (var effectLoc in skill.GetEffectZone(loc)) {
+                        if (!zone.Contains(effectLoc)) {
+                            zone.Add(effectLoc);
+                            yield return effectLoc;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    public IEnumerable<CastSkillAction> CalculateCastSkillTile(Entity entity, int skillID, Location target, bool isPrediction = false)
+    {
+        var skill = entity.Skills[skillID];
+        int availableAP = isPrediction ? Mathf.Clamp(entity.ActionPoints + entity.ActionPointsPerTurn, 0, 8) : entity.ActionPoints - skill.actionPointsCost;
+        if (availableAP < 0) yield break;
+        for (int i = 0; i < availableAP / entity.MoveCost + 1; i++) {
             foreach (var loc in Astar.GetGivenDistancePoints(entity.Loc, i)) {
                 foreach (var cp in skill.CastPatterns) {
-                    foreach (var el in skill.GetSubEffectZone(loc,cp)) {
+                    foreach (var el in skill.GetSubEffectZone(loc, cp)) {
                         if (el.Equals(target)) {
-                            action.destination = GetTileController(loc);
-                            action.castLocation = loc + cp;
-                            return true;
+                            yield return new CastSkillAction(GetTileController(loc), loc + cp);
                         }
                     }
                 }
             }
         }
-        return false;
     }
 
-    public bool TryGetSafeTile(Entity self, Entity caster, out TileController safeTile)
+    public bool TryGetTileOutsideZone(Entity self, Entity caster,HashSet<Location> zone,out TileController safeTile)
     {
-        var zone = CalculateEntityEffectZone(caster, true);
         foreach (var reachableLoc in Astar.GetGivenDistancePoints(self.Loc, self.ActionPoints/self.MoveCost)) {
             if (!zone.Contains(reachableLoc) && IsEmptyLocation(reachableLoc)) {
                 safeTile = GetTileController(reachableLoc);
+                return true;
             }
         }
 
         safeTile = null;
         return false;
+    }
+
+    public IEnumerable<Location> TryGetLocationOutsideZone(Entity self, Entity caster, HashSet<Location> zone)
+    {
+        foreach (var reachableLoc in Astar.GetGivenDistancePoints(self.Loc, self.ActionPoints / self.MoveCost)) {
+            if (!zone.Contains(reachableLoc) && IsEmptyLocation(reachableLoc)) {
+                yield return reachableLoc;
+            }
+        }
     }
 
     public IEnumerable<TileController> ValidTiles()

@@ -164,12 +164,8 @@ namespace Wing.RPGSystem
 
         public void Clear()
         {
-            clips.Clear();
-        }
-
-        public void Stop()
-        {
             StopAllCoroutines();
+            clips.Clear();
         }
 
         private IEnumerator WaitForPlayOnce()
@@ -262,8 +258,8 @@ namespace Wing.RPGSystem
                     outlineEntityClip.entity.ChangeOutlineColor(outlineEntityClip.color);
                     break;
                 case AnimType.Gameover:
-                    OnGameoverEvent?.Invoke();
                     yield return new WaitForSeconds(clip.duration);
+                    OnGameoverEvent?.Invoke();                   
                     break;
                 default:
                     break;

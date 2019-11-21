@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 24846ce9371c0c449b3fb7c32a4ca216, type: 3}
+  m_Name: Rimuru
+  m_EditorClassIdentifier: 
+  setName: New battle set
+  description: A standard battle set
+  creatureSets:
+  - tCreature: {fileID: 11400000, guid: 54d021e52cda17d42af6bbb1b3f83a16, type: 2}
+    location:
+      x: 5
+      y: 1
+  abioticSets:
+  - tAbiotic: {fileID: 11400000, guid: 62f95cce7372d774eae7c3d36da90f0b, type: 2}
+    power: 1
+  - tAbiotic: {fileID: 11400000, guid: b4517eda084877940a0b070c10fadebe, type: 2}
+    power: 1
+  coverage: 0.06

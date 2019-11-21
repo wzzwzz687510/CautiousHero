@@ -16,9 +16,10 @@ namespace Wing.RPGSystem
         public int strength;
         public int intelligence;
         public int agility;
+        public int investigation;
         public int moveCost;
 
-        public EntityAttribute(int lvl, int maxHp, int act, int str, int inte, int agi, int mvCost)
+        public EntityAttribute(int lvl, int maxHp, int act, int str, int inte, int agi, int inv, int mvCost)
         {
             level = lvl;
             maxHealth = maxHp;
@@ -26,14 +27,15 @@ namespace Wing.RPGSystem
             strength = str;
             intelligence = inte;
             agility = agi;
+            investigation = inv;
             moveCost = mvCost;
         }
 
         public static EntityAttribute operator -(EntityAttribute a) =>
-            new EntityAttribute(-a.level, -a.maxHealth, -a.action, -a.strength, -a.intelligence, -a.agility, -a.moveCost);
+            new EntityAttribute(-a.level, -a.maxHealth, -a.action, -a.strength, -a.intelligence, -a.agility, -a.investigation, -a.moveCost);
         public static EntityAttribute operator +(EntityAttribute a, EntityAttribute b) =>
             new EntityAttribute(a.level + b.level, a.maxHealth + b.maxHealth, a.action + b.action,
-                a.strength + b.strength, a.intelligence + b.intelligence, a.agility + b.agility, a.moveCost + b.moveCost);
+                a.strength + b.strength, a.intelligence + b.intelligence, a.agility + b.agility, a.investigation + b.investigation, a.moveCost + b.moveCost);
         public static EntityAttribute operator -(EntityAttribute a, EntityAttribute b) => a + -(b);
     }
 
@@ -87,6 +89,7 @@ namespace Wing.RPGSystem
         public int Strength { get { return Attribute.strength; } }
         public int Intelligence { get { return Attribute.intelligence; } }
         public int Agility { get { return Attribute.agility; } }
+        public int Investigation { get { return Attribute.investigation; } }
         public int MoveCost { get { return Attribute.moveCost; } }
 
         public SpriteRenderer Sprite { get { return m_spriteRenderer; } }
