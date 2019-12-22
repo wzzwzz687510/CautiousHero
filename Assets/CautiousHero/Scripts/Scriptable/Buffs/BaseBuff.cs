@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace Wing.RPGSystem
@@ -7,41 +8,27 @@ namespace Wing.RPGSystem
     public enum BuffType
     {
         Attribute,
-        Health,
-        Mana,
-        Defend,
-        Element
+        Defense
     }
 
-    public class BaseBuff : ScriptableObject
+    public abstract class BaseBuff : ScriptableObject
     {
+        public string buffName = "New buff";
+        public string description = "None";
         public BuffType buffType;
         public int lastTurn;
         public bool infinity;
+        public int Hash { get { return buffName.GetStableHashCode(); } }
 
-        public virtual void ApplyEffect(Entity castEntity, Entity targetEntity)
-        {
-
+        static Dictionary<int, BaseBuff> cache;
+        public static Dictionary<int, BaseBuff> Dict {
+            get {
+                // load if not loaded yet
+                return cache ?? (cache = Resources.LoadAll<BaseBuff>("Skills").ToDictionary(
+                    item => item.buffName.GetStableHashCode(), item => item)
+                );
+            }
         }
-    }
-
-    public class AttributeBuff : BaseBuff
-    {
-        public EntityAttribute adjustValue;
-    }
-
-    public class DicountBuff: BaseBuff
-    {
-        public float reduceCof;
-        public int reduceConst;
-    }
-
-    public class DamageBuff: DicountBuff
-    {
-    }
-
-    public class ManaBuff : DicountBuff
-    {
     }
 }
 

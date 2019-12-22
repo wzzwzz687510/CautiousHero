@@ -1,0 +1,30 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1ac45dc2f52125949bd791a87c1635f2, type: 3}
+  m_Name: goblinwarrier
+  m_EditorClassIdentifier: 
+  creatureName: "\u54E5\u5E03\u6797\u6218\u58EB"
+  description: A secret creature
+  sprite: {fileID: 21300000, guid: b58570dbad5e5034fb1190e274fdcf82, type: 3}
+  attribute:
+    level: 1
+    maxHealth: 60
+    action: 3
+    strength: 10
+    intelligence: 10
+    agility: 10
+    investigation: 10
+    moveCost: 1
+  skills:
+  - {fileID: 11400000, guid: 3102e5ad25225e94fbda68f2cd9e59e9, type: 2}
+  - {fileID: 11400000, guid: 8cca5b3a364b66b48975dda706bf5a15, type: 2}
+  buffs: []

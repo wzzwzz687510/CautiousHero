@@ -49,7 +49,7 @@ namespace Wing.RPGSystem
 
             equippedSkills = new int[4];
             for (int i = 0; i < 4; i++) {
-                equippedSkills[i] = skills[i].skillName.GetStableHashCode();
+                equippedSkills[i] = skills[i].Hash;
             }
             LoadData(worldName);
             if (resetData) CreateNewSave(worldName, playerName, spriteID, attribute, equippedSkills);

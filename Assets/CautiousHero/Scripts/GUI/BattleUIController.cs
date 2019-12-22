@@ -99,7 +99,7 @@ public class BattleUIController : MonoBehaviour
     public void Init()
     {
         player.OnSkillUpdated += OnPlayerSkillUpdated;
-        player.OnHPChanged += OnPlayerHPChanged;
+        player.HPChangeAnimation += PlayerHPChangeAnimation;
         player.OnAPChanged.AddListener(OnPlayerAPChanged);
         for (int i = 0; i < 4; i++) {
             skillSlots[i].SkillBoardEvent += OnSkillBoardEvent;
@@ -113,12 +113,12 @@ public class BattleUIController : MonoBehaviour
             skills[i].sprite = player.Skills[i].sprite;
         }
 
-        OnPlayerHPChanged(0, 0);
-        OnPlayerHPChanged(1, 2);
+        PlayerHPChangeAnimation(0, 0);
+        PlayerHPChangeAnimation(1, 2);
         StartCoroutine(BattleStart());
     }
 
-    private void OnPlayerHPChanged(float hpRatio, float duration)
+    private void PlayerHPChangeAnimation(float hpRatio, float duration)
     {
         if(hpRatio< playerHPBar.value) {
             hpFill.fillAmount = hpRatio;
@@ -322,8 +322,7 @@ public class BattleUIController : MonoBehaviour
             var cc = (entity as CreatureController).Template;
             creatureSprite.sprite = cc.sprite;
             creatureName.text = cc.creatureName;
-            if (entity.Investigation <= player.Investigation) {                
-                creatureLv.text = cc.attribute.level.ToString();
+            if (entity.Intelligence <= player.Intelligence) {
                 creatureHP.text = cc.attribute.maxHealth.ToString();
                 creatureAP.text = cc.attribute.action.ToString();
                 if(cc.skills.Length==0)

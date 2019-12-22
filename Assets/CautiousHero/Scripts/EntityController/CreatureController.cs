@@ -17,7 +17,7 @@ namespace Wing.RPGSystem {
 
         protected override void Awake()
         {
-            OnHPChanged += OnCreatureHpChanged;
+            HPChangeAnimation += CreatureHpChangeAnimation;
             base.Awake();
         }
 
@@ -28,7 +28,7 @@ namespace Wing.RPGSystem {
             EntityHash = EntityManager.Instance.AddEntity(this);
             BuffManager = new BuffManager(EntityHash);
             foreach (var buff in Template.buffs) {
-                BuffManager.AddBuff(new BuffHandler(this, this, buff));
+                BuffManager.AddBuff(new BuffHandler(this, this, buff.Hash));
             }
             m_spriteRenderer.sprite = Template.sprite;
             m_attribute = Template.attribute;
@@ -49,7 +49,7 @@ namespace Wing.RPGSystem {
             DropAnimation();
             yield return new WaitForSeconds(0.5f);
             hpBar.enabled = true;
-            OnCreatureHpChanged(1,1);
+            CreatureHpChangeAnimation(1,1);
         }
 
         protected override void OnSortingOrderChangedEvent(int sortingOrder)
@@ -64,7 +64,7 @@ namespace Wing.RPGSystem {
             mask_hp.backSortingOrder = sortingOrder + 2;
         }
 
-        private void OnCreatureHpChanged(float hpRatio, float duraion)
+        private void CreatureHpChangeAnimation(float hpRatio, float duraion)
         {
             if (hpRatio == 0) {
                 hpBar.enabled = false;

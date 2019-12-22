@@ -7,26 +7,26 @@ namespace Wing.RPGSystem
     [System.Serializable]
     public class BuffHandler
     {
-        public Entity castEntity { get; private set; }
-        public Entity targetEntity { get; private set; }
-        public BaseBuff ScriptableBuff { get; private set; }
+        public Entity CastEntity { get; private set; }
+        public Entity TargetEntity { get; private set; }
+        public BaseBuff TemplateBuff { get; private set; }
         public int LastTurn { get; private set; }
         public bool Infinity { get; private set; }
 
 
-        public BuffHandler(Entity caster, Entity target, BaseBuff buff)
+        public BuffHandler(Entity caster, Entity target, int buffhash)
         {
-            castEntity = caster;
-            targetEntity = target;
-            ScriptableBuff = buff;
-            LastTurn = buff.lastTurn;
-            Infinity = buff.infinity;
+            CastEntity = caster;
+            TargetEntity = target;
+            TemplateBuff = BaseBuff.Dict[buffhash];
+            LastTurn = TemplateBuff.lastTurn;
+            Infinity = TemplateBuff.infinity;
         }
 
         public void ResetBuff(Entity caster)
         {
-            castEntity = caster;
-            LastTurn = ScriptableBuff.lastTurn;
+            CastEntity = caster;
+            LastTurn = TemplateBuff.lastTurn;
         }
 
         /// <summary>
@@ -45,20 +45,28 @@ namespace Wing.RPGSystem
     public class BuffManager
     {
         public int entityHash;
-        public Dictionary<BaseBuff, BuffHandler> buffDic = new Dictionary<BaseBuff, BuffHandler>();
+        public Dictionary<BuffType, Dictionary<int, BuffHandler>> buffs = 
+            new Dictionary<BuffType, Dictionary<int, BuffHandler>>();
 
         public BuffManager(int entityHash)
         {
             this.entityHash = entityHash;
         }
 
-        public void AddBuff(BuffHandler buff)
+        public void AddBuff(BuffHandler bh)
         {
-            if (buffDic.ContainsKey(buff.ScriptableBuff)) {
-                buffDic[buff.ScriptableBuff].ResetBuff(buff.castEntity);
+            int buffhash = bh.TemplateBuff.Hash;
+            if (buffs.ContainsKey(bh.TemplateBuff.buffType)) {                
+                if (buffs[bh.TemplateBuff.buffType].ContainsKey(buffhash)) {
+                    buffs[bh.TemplateBuff.buffType][buffhash].ResetBuff(bh.CastEntity);
+                }
+                else {
+                    buffs[bh.TemplateBuff.buffType].Add(buffhash, bh);
+                }
             }
             else {
-                buffDic.Add(buff.ScriptableBuff, buff);
+                buffs.Add(bh.TemplateBuff.buffType,new Dictionary<int, BuffHandler>());
+                buffs[bh.TemplateBuff.buffType].Add(buffhash, bh);
             }
         }
 
@@ -66,9 +74,11 @@ namespace Wing.RPGSystem
         {
             // Do something to host
 
-            foreach (var buff in buffDic.Keys) {
-                if (!buffDic[buff].UpdateBuff()) {
-                    buffDic.Remove(buff);
+            foreach (var buffDic in buffs.Values) {
+                foreach (var buff in buffDic.Values) {
+                    if (!buff.UpdateBuff()) {
+                        buffDic.Remove(buff.TemplateBuff.Hash);
+                    }
                 }
             }
         }
@@ -76,36 +86,29 @@ namespace Wing.RPGSystem
         public EntityAttribute GetAttributeAdjustment()
         {
             EntityAttribute tmp = new EntityAttribute();
-            foreach (var buffHandler in buffDic.Values) {
-                if (buffHandler.ScriptableBuff.buffType == BuffType.Attribute)
-                    tmp += (buffHandler.ScriptableBuff as AttributeBuff).adjustValue;
+            foreach (var buffHandler in buffs?[BuffType.Attribute].Values) {
+                tmp += (buffHandler.TemplateBuff as AttributeBuff).adjustValue;
             }
 
             return tmp;
         }
 
-        public float GetReduceCof(BuffType type)
+        public float GetConstDefense()
         {
-            float tmp = 0;
-            foreach (var buffHandler in buffDic.Values) {
-                {
-                    if (buffHandler.ScriptableBuff.buffType == type)
-                        tmp = 1 - (1 - tmp) * (1 - (buffHandler.ScriptableBuff as DicountBuff).reduceCof);
-                }
+            float ret = 0;
+            foreach (var buffHandler in buffs?[BuffType.Defense].Values) {
+                ret += (buffHandler.TemplateBuff as DefenseBuff).constReduction;
             }
-            return tmp;
+            return ret;
         }
 
-        public int GetReduceConstant(BuffType type)
+        public float GetCofDefense()
         {
-            int tmp = 0;
-            foreach (var buffHandler in buffDic.Values) {
-                {
-                    if (buffHandler.ScriptableBuff.buffType == type)
-                        tmp += (buffHandler.ScriptableBuff as DicountBuff).reduceConst;
-                }
+            float ret = 0;
+            foreach (var buffHandler in buffs?[BuffType.Defense].Values) {
+                ret += (buffHandler.TemplateBuff as DefenseBuff).cofReduction;
             }
-            return tmp;
+            return ret;
         }
     }
 }

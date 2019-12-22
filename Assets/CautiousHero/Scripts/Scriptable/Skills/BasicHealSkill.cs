@@ -10,7 +10,7 @@ namespace Wing.RPGSystem
 
         public override int CalculateValue(Entity caster, float cof)
         {
-            return -Mathf.RoundToInt(cof * baseValue * (1 + levelCof * caster.Level + attributeCof * caster.Intelligence));
+            return -Mathf.RoundToInt(cof * baseValue * (1 + attributeCof * caster.Intelligence));
         }
     }
 }

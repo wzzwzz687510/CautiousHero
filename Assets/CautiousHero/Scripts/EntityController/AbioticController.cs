@@ -16,7 +16,7 @@ namespace Wing.RPGSystem
             EntityHash = EntityManager.Instance.AddEntity(this);
             BuffManager = new BuffManager(EntityHash);
             foreach (var buff in Template.buffs) {
-                BuffManager.AddBuff(new BuffHandler(this, this, buff));
+                BuffManager.AddBuff(new BuffHandler(this, this, buff.Hash));
             }
             m_spriteRenderer.sprite = Template.sprite[template.sprite.Length.Random()];
             m_attribute = Template.attribute;

@@ -9,7 +9,6 @@ namespace Wing.RPGSystem
         [Header("Value Parameters")]
         // Final number = baseValue * (1 + levelCof * level + attributeCof * attribute)
         public int baseValue;
-        public float levelCof;
         public float attributeCof;
 
         public override void ApplyEffect(Entity caster, Location castLoc)
@@ -19,7 +18,7 @@ namespace Wing.RPGSystem
                 case CastType.Instant:
                     // Sequnence is important, 
                     AnimationManager.Instance.AddAnimClip(new CastAnimClip(castType,
-                        skillName.GetStableHashCode(), caster.Loc, castLoc, castEffect.animDuration));
+                        Hash, caster.Loc, castLoc, castEffect.animDuration));
                     if (BattleManager.Instance.IsPlayerTurn)
                         AnimationManager.Instance.PlayOnce();
                     foreach (var ep in EffectPatterns) {
@@ -36,7 +35,7 @@ namespace Wing.RPGSystem
                         foreach (var tc in GridManager.Instance.GetTrajectoryHitTile(castLoc, dir)) {
                             if (!tc.IsEmpty) {
                                 AnimationManager.Instance.AddAnimClip(new CastAnimClip(castType,
-                                    skillName.GetStableHashCode(), caster.Loc, tc.Loc, castEffect.animDuration));
+                                    Hash, caster.Loc, tc.Loc, castEffect.animDuration));
                                 if (BattleManager.Instance.IsPlayerTurn)
                                     AnimationManager.Instance.PlayOnce();
                                 tc.StayEntity.ChangeHP(CalculateValue(caster, ep.coefficient));

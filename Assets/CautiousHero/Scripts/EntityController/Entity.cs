@@ -10,32 +10,28 @@ namespace Wing.RPGSystem
     [System.Serializable]
     public struct EntityAttribute
     {
-        public int level;
         public int maxHealth;
         public int action;
         public int strength;
         public int intelligence;
         public int agility;
-        public int investigation;
         public int moveCost;
 
-        public EntityAttribute(int lvl, int maxHp, int act, int str, int inte, int agi, int inv, int mvCost)
+        public EntityAttribute(int maxHp, int act, int str, int inte, int agi, int mvCost)
         {
-            level = lvl;
             maxHealth = maxHp;
             action = act;
             strength = str;
             intelligence = inte;
             agility = agi;
-            investigation = inv;
             moveCost = mvCost;
         }
 
         public static EntityAttribute operator -(EntityAttribute a) =>
-            new EntityAttribute(-a.level, -a.maxHealth, -a.action, -a.strength, -a.intelligence, -a.agility, -a.investigation, -a.moveCost);
+            new EntityAttribute(-a.maxHealth, -a.action, -a.strength, -a.intelligence, -a.agility, -a.moveCost);
         public static EntityAttribute operator +(EntityAttribute a, EntityAttribute b) =>
-            new EntityAttribute(a.level + b.level, a.maxHealth + b.maxHealth, a.action + b.action,
-                a.strength + b.strength, a.intelligence + b.intelligence, a.agility + b.agility, a.investigation + b.investigation, a.moveCost + b.moveCost);
+            new EntityAttribute(a.maxHealth + b.maxHealth, a.action + b.action,
+                a.strength + b.strength, a.intelligence + b.intelligence, a.agility + b.agility, a.moveCost + b.moveCost);
         public static EntityAttribute operator -(EntityAttribute a, EntityAttribute b) => a + -(b);
     }
 
@@ -67,6 +63,7 @@ namespace Wing.RPGSystem
         public string EntityName { get; protected set; }
         public int EntityHash { get; protected set; }
         public int HealthPoints { get; protected set; }
+        public int ArmorPoints { get; protected set; }
         public int ActionPoints { get; protected set; }
         public bool IsDeath { get; protected set; }
         public BaseSkill[] Skills { get; protected set; }
@@ -83,13 +80,11 @@ namespace Wing.RPGSystem
                 return m_attribute + BuffManager.GetAttributeAdjustment();
             }
         }
-        public int Level { get { return Attribute.level; } }
         public int MaxHealthPoints { get { return Attribute.maxHealth; } }
         public int ActionPointsPerTurn { get { return Attribute.action; } }
         public int Strength { get { return Attribute.strength; } }
         public int Intelligence { get { return Attribute.intelligence; } }
         public int Agility { get { return Attribute.agility; } }
-        public int Investigation { get { return Attribute.investigation; } }
         public int MoveCost { get { return Attribute.moveCost; } }
 
         public SpriteRenderer EntitySprite { get { return m_spriteRenderer; } }
@@ -101,9 +96,10 @@ namespace Wing.RPGSystem
         public delegate void SortingOrderChange(int sortingOrder);
         public SortingOrderChange OnSortingOrderChanged;
         public delegate void HPChange(float hpRatio, float duraion);
-        public HPChange OnHPChanged;
-        public delegate void ICallback(int index,int cooldown);
-        public event ICallback OnSkillUpdated;
+        public HPChange HPChangeAnimation;
+        public delegate void SkillUpdat(int index,int cooldown);
+        public event SkillUpdat OnSkillUpdated;
+
         [HideInInspector] public UnityEvent OnAPChanged;
         [HideInInspector] public UnityEvent OnAnimationCompleted;
 
@@ -227,8 +223,8 @@ namespace Wing.RPGSystem
 
         public virtual int CalculateFinalDamage(int value)
         {
-            return Mathf.RoundToInt((value - BuffManager.GetReduceConstant(BuffType.Defend)) *
-                (1 - BuffManager.GetReduceCof(BuffType.Defend)));
+            return Mathf.RoundToInt((value - BuffManager.GetConstDefense()) *
+                (1 - BuffManager.GetCofDefense()));
         }
 
         protected virtual void Death()

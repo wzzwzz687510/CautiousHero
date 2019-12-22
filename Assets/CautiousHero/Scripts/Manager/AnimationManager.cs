@@ -253,7 +253,7 @@ namespace Wing.RPGSystem
                     var hpChangeClip = clip as HPChangeAnimClip;
                     if (!EntityManager.Instance.TryGetEntity(hpChangeClip.entityHash, out entity))
                         break;
-                    entity.OnHPChanged?.Invoke(hpChangeClip.ratio, hpChangeClip.duration);
+                    entity.HPChangeAnimation?.Invoke(hpChangeClip.ratio, hpChangeClip.duration);
                     yield return new WaitForSeconds(hpChangeClip.duration);
                     break;
                 case AnimType.Delay:

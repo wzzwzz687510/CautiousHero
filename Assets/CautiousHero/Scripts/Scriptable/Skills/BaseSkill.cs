@@ -71,6 +71,7 @@ namespace Wing.RPGSystem
         public Sprite sprite;
         public int cooldownTime;
         public int actionPointsCost;
+        public int Hash { get { return skillName.GetStableHashCode(); } }
 
         [Header("Labels")]
         public SkillType skillType;
