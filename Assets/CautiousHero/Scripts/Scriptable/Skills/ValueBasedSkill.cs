@@ -19,7 +19,7 @@ namespace Wing.RPGSystem
                 case CastType.Instant:
                     // Sequnence is important, 
                     AnimationManager.Instance.AddAnimClip(new CastAnimClip(castType,
-                        castEffect.prefab, caster.Loc, castLoc, castEffect.animDuration));
+                        skillName.GetStableHashCode(), caster.Loc, castLoc, castEffect.animDuration));
                     if (BattleManager.Instance.IsPlayerTurn)
                         AnimationManager.Instance.PlayOnce();
                     foreach (var ep in EffectPatterns) {
@@ -36,7 +36,7 @@ namespace Wing.RPGSystem
                         foreach (var tc in GridManager.Instance.GetTrajectoryHitTile(castLoc, dir)) {
                             if (!tc.IsEmpty) {
                                 AnimationManager.Instance.AddAnimClip(new CastAnimClip(castType,
-                                    castEffect.prefab, caster.Loc, tc.Loc, castEffect.animDuration));
+                                    skillName.GetStableHashCode(), caster.Loc, tc.Loc, castEffect.animDuration));
                                 if (BattleManager.Instance.IsPlayerTurn)
                                     AnimationManager.Instance.PlayOnce();
                                 tc.StayEntity.ChangeHP(CalculateValue(caster, ep.coefficient));

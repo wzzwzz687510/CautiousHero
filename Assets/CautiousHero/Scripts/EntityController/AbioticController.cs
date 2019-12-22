@@ -22,6 +22,9 @@ namespace Wing.RPGSystem
             m_attribute = Template.attribute;
             HealthPoints = MaxHealthPoints;
 
+            //EntitySprite.transform.localScale = new Vector3(0.1f / EntitySprite.size.x, 0.2f / EntitySprite.size.y);
+            
+
             MoveToTile(tc, true);
             DropAnimation();
         }
@@ -29,7 +32,7 @@ namespace Wing.RPGSystem
         public override void DropAnimation()
         {
             transform.GetChild(0).localPosition = new Vector3(0, 0.15f, 0);
-            Sprite.DOFade(0, 0);
+            EntitySprite.DOFade(0, 0);
             StartCoroutine(WaitDisplay());
         }
 
@@ -38,7 +41,7 @@ namespace Wing.RPGSystem
             while (!LocateTile.m_animator.GetCurrentAnimatorStateInfo(0).IsName("tile_fall")) {
                 yield return null;
             }
-            Sprite.DOFade(1, 0);
+            EntitySprite.DOFade(1, 0);
         }
     }
 }

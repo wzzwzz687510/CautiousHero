@@ -62,17 +62,17 @@ namespace Wing.RPGSystem
     public class CastAnimClip : BaseAnimClip
     {
         public CastType castType;
-        public GameObject castEffect;
+        public int skillHash;
         public Location start;
         public Location end;
 
-        public CastAnimClip(CastType castType, GameObject effectPrefab,
+        public CastAnimClip(CastType castType, int skillHash,
             Location from, Location to, float duration = 0.5f)
         {
             this.type = AnimType.Cast;
             this.duration = duration;
             this.castType = castType;
-            castEffect = effectPrefab;
+            this.skillHash = skillHash;
             start = from;
             end = to;
         }
@@ -225,15 +225,21 @@ namespace Wing.RPGSystem
                 case AnimType.Cast:
                     var castClip = clip as CastAnimClip;
                     GameObject effect;
-                    Vector3 fix = new Vector3(0, 0.4f, 0);
+                    Vector3 fix = new Vector3(0, 0.5f, 0);
                     switch (castClip.castType) {
-                        case CastType.Instant:
-                            effect = Instantiate(castClip.castEffect, castClip.end + fix, Quaternion.identity, effectHolder);
+                        case CastType.Instant:                            
+                            effect = Instantiate(castClip.skillHash.GetBaseSkill().castEffect.prefab, 
+                                castClip.end + fix, Quaternion.identity, effectHolder);
+
+                            effect.TryGetComponent(out Animator anim);
+                            anim?.Play(effect.name.Replace("(Clone)",""), 0);
+
                             yield return new WaitForSeconds(castClip.duration);
                             Destroy(effect);
                             break;
                         case CastType.Trajectory:
-                            effect = Instantiate(castClip.castEffect, castClip.start + fix, Quaternion.identity, effectHolder);
+                            effect = Instantiate(castClip.skillHash.GetBaseSkill().castEffect.prefab, 
+                                castClip.start + fix, Quaternion.identity, effectHolder);
                             int distance = AStarSearch.Heuristic(castClip.start, castClip.end);
                             effect.transform.DOMove(castClip.end + fix, castClip.duration * distance).OnComplete(() => Destroy(effect));
                             yield return new WaitForSeconds(castClip.duration * distance);

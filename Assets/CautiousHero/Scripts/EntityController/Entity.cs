@@ -92,7 +92,7 @@ namespace Wing.RPGSystem
         public int Investigation { get { return Attribute.investigation; } }
         public int MoveCost { get { return Attribute.moveCost; } }
 
-        public SpriteRenderer Sprite { get { return m_spriteRenderer; } }
+        public SpriteRenderer EntitySprite { get { return m_spriteRenderer; } }
 
         protected SpriteRenderer m_spriteRenderer;
         protected SpriteGlowEffect m_glowEffect;
@@ -171,6 +171,7 @@ namespace Wing.RPGSystem
                 AnimationManager.Instance.PlayOnce();
             }
             else {
+
                 AnimationManager.Instance.AddAnimClip(new MovePathAnimClip(EntityHash, MovePath, 0.2f));
             }
                 
@@ -238,7 +239,7 @@ namespace Wing.RPGSystem
 
         protected virtual void OnSortingOrderChangedEvent(int sortingOrder)
         {
-            Sprite.sortingOrder = sortingOrder;
+            EntitySprite.sortingOrder = sortingOrder;
         }
     }
 }

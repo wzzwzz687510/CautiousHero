@@ -38,6 +38,22 @@ namespace Wing.RPGSystem
                 //}
             }
 
+            if (hasEmptyTile) {
+                Location evil = new Location(width.Random(), height.Random());
+                int r = 5;
+                for (int x = -r; x <= r; x++) {
+                    for (int y = -r; y <= r; y++) {
+                        if (x * x + y * y <= r * r) {
+                            int drawX = evil.x + x;
+                            int drawY = evil.y + y;
+                            if (IsInMapRange(drawX, drawY)) {
+                                map[drawX, drawY] = -1;
+                            }
+                        }
+                    }
+                }
+            }
+
         }
 
         private void RandomTerrainMap()

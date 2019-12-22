@@ -252,11 +252,11 @@ public class BattleUIController : MonoBehaviour
 
     public void ShowSkillBoard()
     {
-        var skill = player.Skills[selectSkillID];
+        var skill = player.Skills[selectSkillID] as ValueBasedSkill;
         skillName.text = skill.skillName;
         skillCost.text = skill.actionPointsCost.ToString();
         skillCooldown.text = skill.cooldownTime.ToString();
-        skillValue.text = (skill as ValueBasedSkill).baseValue.ToString();
+        skillValue.text = skill.baseValue.ToString() + " + <color=#ffa500ff>" + player.Intelligence * skill.attributeCof * skill.baseValue +"</color>";
         switch (skill.skillType) {
             case SkillType.Physical:
                 skillNameBg.color = colors[0];
@@ -326,6 +326,9 @@ public class BattleUIController : MonoBehaviour
                 creatureLv.text = cc.attribute.level.ToString();
                 creatureHP.text = cc.attribute.maxHealth.ToString();
                 creatureAP.text = cc.attribute.action.ToString();
+                if(cc.skills.Length==0)
+                    creatureResistance.text = "无";
+                else
                 switch (cc.skills[0].skillElement) {
                     case SkillElement.None:
                         creatureResistance.text = "无";
@@ -354,11 +357,11 @@ public class BattleUIController : MonoBehaviour
                 creatureElement.text = creatureResistance.text;
             }
             else {
-                creatureLv.text = "???";
-                creatureHP.text = "???";
-                creatureAP.text = "???";
-                creatureResistance.text = "???";
-                creatureElement.text = "???";
+                creatureLv.text = "1";
+                creatureHP.text = "1";
+                creatureAP.text = "1";
+                creatureResistance.text = "无";
+                creatureElement.text = "大贤者";
             }
             creatureBoard.position = new Vector3(10, 1070, 0);
         }

@@ -58,5 +58,10 @@ namespace Wing.RPGSystem
             transform.GetChild(0).localPosition = new Vector3(0, 5, 0);
             transform.GetChild(0).DOLocalMoveY(0.3f, 0.5f);
         }
+
+        public void SetActionPoints(int value)
+        {
+            ActionPoints = value;
+        }
     }
 }

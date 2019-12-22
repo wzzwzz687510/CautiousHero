@@ -24,7 +24,9 @@ public class GridManager : MonoBehaviour
     public TileController tcPrefab;
     public AbioticController abioticPrefab;
     public Sprite[] tileSprites;
-    
+    public Sprite[] darkArea;
+
+    public bool isRendered { get; private set; }
     public TileNavigation Astar { get; private set; }
     public Vector2 MapBoundingBox { get { return new Vector2(m_mg.width, m_mg.height); } }
 
@@ -32,7 +34,7 @@ public class GridManager : MonoBehaviour
     private GameObject tileHolder;
     private Dictionary<Location, TileController> tileDic 
         = new Dictionary<Location, TileController>();
-    private HashSet<Location> playerEffectZone = new HashSet<Location>();
+    private HashSet<Location> playerEffectZone = new HashSet<Location>();   
 
     public delegate void OnCompleteMapRendering();
     public event OnCompleteMapRendering OnCompleteMapRenderEvent;
@@ -44,18 +46,24 @@ public class GridManager : MonoBehaviour
         m_mg = GetComponent<MapGenerator>();
     }
 
-    private IEnumerator Start()
+    private void Start()
     {
-        RenderMap();       
+        m_mg.GenerateMap(tileSprites.Length);
         Astar = new TileNavigation(m_mg.width, m_mg.height, m_mg.map);
-        AddAbiotics();
-        yield return new WaitForSeconds(2);
-        OnCompleteMapRenderEvent();      
+        StartCoroutine(RenderMap());       
     }
 
-    private void AddAbiotics()
+    private void Update()
     {
-        var config = BattleManager.Instance.config;
+        if (!isRendered && Input.GetKeyDown(KeyCode.S)) {
+            StartCoroutine(RenderMap());
+            isRendered = true;
+        }
+    }
+
+    private IEnumerator AddAbiotics()
+    {
+        var config = Database.Instance.config;
         var sets = config.abioticSets;
         int[] possiblities = new int[sets.Length];
         possiblities[0] = sets[0].power;
@@ -72,6 +80,7 @@ public class GridManager : MonoBehaviour
                     if (randomAbiotic < possiblities[i]) {
                         Instantiate(abioticPrefab, tile.m_spriteRenderer.transform).GetComponent<AbioticController>().
                             InitAbioticEntity(sets[i].tAbiotic, tile);
+                        yield return null;
                         break;
                     }
                 }
@@ -79,10 +88,8 @@ public class GridManager : MonoBehaviour
         }
     }
 
-    private void RenderMap()
+    private IEnumerator RenderMap()
     {
-        m_mg.GenerateMap(tileSprites.Length);
-
         if (tileHolder)
             Destroy(tileHolder);
 
@@ -102,7 +109,11 @@ public class GridManager : MonoBehaviour
             }
         }
         //Debug.Log("tile cnt:" + tileHolder.transform.childCount);
+        yield return AddAbiotics();
+        yield return new WaitForSeconds(2);
+        OnCompleteMapRenderEvent?.Invoke();
     }
+
 
     public void ResetAllTiles()
     {

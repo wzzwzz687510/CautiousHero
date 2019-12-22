@@ -21,7 +21,7 @@ public class BattleManager : MonoBehaviour
 
     [Header("Test")]
     //public BaseSkill[] skills;
-    public BattleConfig config;
+    //public BattleConfig config;
     public GameObject win;
 
     [Header("Component References")]
@@ -61,12 +61,12 @@ public class BattleManager : MonoBehaviour
         AnimationManager.Instance.OnAnimCompleted.AddListener(OnAnimCompleted);
 
         player.InitPlayer(Database.Instance.ActiveData.attribute, Database.Instance.GetEquippedSkills());
-        GetComponent<BattleUIController>().Init();
+        GetComponent<BattleUIController>()?.Init();
     }
 
     public void PrepareBattleStart()
     {
-        AIManager.Instance.Init(config);
+        AIManager.Instance.Init(Database.Instance.config);
         PreparePlacePlayer();       
     }
 
@@ -91,7 +91,7 @@ public class BattleManager : MonoBehaviour
         currentSelected.Clear();
         tileZone.Clear();
         player.SetActiveCollider(true);
-        player.Sprite.color = Color.white;
+        player.EntitySprite.color = Color.white;
         if (tmpVisualPlayer)
             tmpVisualPlayer.gameObject.SetActive(false);
     }
@@ -284,7 +284,7 @@ public class BattleManager : MonoBehaviour
         player.SetActiveCollider(false);
         SetVisualPlayer(player.transform.position + new Vector3(0, 0.3f, 0), player.LocateTile.SortOrder + 64);
 
-        player.Sprite.color = new Color(1, 1, 1, 0.5f);
+        player.EntitySprite.color = new Color(1, 1, 1, 0.5f);
         foreach (var loc in GridManager.Instance.Astar.GetGivenDistancePoints(player.Loc, player.ActionPoints / player.MoveCost)) {
             GridManager.Instance.ChangeTileState(loc, TileState.MoveZone);
             tileZone.Add(loc);
@@ -294,7 +294,7 @@ public class BattleManager : MonoBehaviour
     private void SetVisualPlayer(Vector3 des,int sortingOrder)
     {
         if (!tmpVisualPlayer) {
-            tmpVisualPlayer = Instantiate(player.Sprite.gameObject, player.transform.position + new Vector3(0, 0.3f, 0),
+            tmpVisualPlayer = Instantiate(player.EntitySprite.gameObject, player.transform.position + new Vector3(0, 0.3f, 0),
                 Quaternion.identity).GetComponent<SpriteRenderer>();
 
             tmpVisualPlayer.GetComponent<SpriteRenderer>().sortingOrder = player.Loc.x + player.Loc.y * 8 + 1;

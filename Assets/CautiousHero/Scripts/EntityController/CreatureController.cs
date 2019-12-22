@@ -37,7 +37,10 @@ namespace Wing.RPGSystem {
             ActiveSkills = new InstanceSkill[Skills.Length];
             for (int i = 0; i < Skills.Length; i++) {
                 ActiveSkills[i] = new InstanceSkill(Skills[i]);
-            }    
+            }
+
+            var h = EntitySprite.bounds.size.y;
+            hpBar.transform.localPosition += new Vector3(0, h, 0);
 
             hpBar.enabled = false;
             mask_hpEffect.alphaCutoff = 1;
@@ -67,7 +70,7 @@ namespace Wing.RPGSystem {
                 hpBar.enabled = false;
                 mask_hp.alphaCutoff = 1;
                 mask_hpEffect.alphaCutoff = 1;
-                Sprite.DOColor(Color.black, 1);
+                EntitySprite.DOColor(Color.black, 1);
                 m_glowEffect.GlowColor = Color.black;
                 return;
             }

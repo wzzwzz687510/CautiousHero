@@ -26,11 +26,15 @@ namespace Wing.RPGSystem
         public static Database Instance { get; private set; }
 
         [Header("Test")]
+        public bool resetData;
         public string worldName;
         public string playerName;
         public int spriteID;
         public EntityAttribute attribute;
-        public int[] equippedSkills;
+        public BaseSkill[] skills;
+        public BattleConfig config;
+
+        private int[] equippedSkills;
 
         public PlayerData ActiveData { get { return m_activeData; } }
         private PlayerData m_activeData;
@@ -43,8 +47,12 @@ namespace Wing.RPGSystem
             if (!Instance)
                 Instance = this;
 
+            equippedSkills = new int[4];
+            for (int i = 0; i < 4; i++) {
+                equippedSkills[i] = skills[i].skillName.GetStableHashCode();
+            }
             LoadData(worldName);
-            //CreateNewSave(worldName, playerName, spriteID, attribute, equippedSkills);
+            if (resetData) CreateNewSave(worldName, playerName, spriteID, attribute, equippedSkills);
         }
 
         public void SaveData(string saveName)

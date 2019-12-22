@@ -12,17 +12,6 @@ public class SkillSlot : MonoBehaviour, IPointerEnterHandler, IPointerExitHandle
     public delegate void SkillBoard(int id,bool isExit);
     public SkillBoard SkillBoardEvent;
 
-    //private void FixedUpdate()
-    //{
-    //    if (startCount && !isBoardDisplayed) {
-    //        timer += Time.deltaTime;
-    //        if (timer > duration) {
-    //            OnSkillBoardShowed?.Invoke(skillID);
-    //            isBoardDisplayed = true;
-    //        }
-    //    }
-    //}
-
     public void OnPointerEnter(PointerEventData eventData)
     {
         SkillBoardEvent?.Invoke(skillID, false);

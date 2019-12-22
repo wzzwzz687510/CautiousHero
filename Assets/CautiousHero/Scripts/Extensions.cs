@@ -28,5 +28,7 @@ namespace Wing.RPGSystem
 
         public static int GetDistance(this Location location, Location loc) =>Math.Abs(location.x - loc.x) + Math.Abs(location.y - loc.y);
 
+        public static BaseSkill GetBaseSkill(this int hash) => BaseSkill.Dict[hash];
+
     }
 }

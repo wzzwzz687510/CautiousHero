@@ -37,7 +37,11 @@ public class TileController : MonoBehaviour
     {
         Loc = location;
         m_spriteRenderer.sortingOrder = sortOrder;
-        m_spriteRenderer.sprite = GridManager.Instance.tileSprites[spriteID];
+        if (spriteID >= 0)
+            m_spriteRenderer.sprite = GridManager.Instance.tileSprites[spriteID];
+        else {
+            m_spriteRenderer.sprite = GridManager.Instance.darkArea[GridManager.Instance.darkArea.Length.Random()];
+        }
 
         StartCoroutine(PlayAnimation(AnimDelayTime));
     }
