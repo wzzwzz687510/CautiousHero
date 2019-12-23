@@ -30,5 +30,9 @@ namespace Wing.RPGSystem
 
         public static BaseSkill GetBaseSkill(this int hash) => BaseSkill.Dict[hash];
 
+        public static BaseBuff GetBaseBuff(this int hash) => BaseBuff.Dict[hash];
+
+        public static Entity GetEntity(this int hash) => EntityManager.Instance.entityDic[hash];
+
     }
 }
