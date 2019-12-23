@@ -12,6 +12,7 @@ namespace Wing.RPGSystem
         MoveInstant,
         Cast,
         HPChange,
+        ArmorPointsChange,
         Delay,
         OutlineEntity,
         Gameover
@@ -86,6 +87,20 @@ namespace Wing.RPGSystem
         public HPChangeAnimClip(int entityHash, float ratio, float duration = 0.5f)
         {
             this.type = AnimType.HPChange;
+            this.duration = duration;
+            this.entityHash = entityHash;
+            this.ratio = ratio;
+        }
+    }
+
+    public class ArmorPointsChangeAnimClip : BaseAnimClip
+    {
+        public int entityHash;
+        public float ratio;
+
+        public ArmorPointsChangeAnimClip(int entityHash, float ratio, float duration = 0.5f)
+        {
+            this.type = AnimType.ArmorPointsChange;
             this.duration = duration;
             this.entityHash = entityHash;
             this.ratio = ratio;
@@ -255,6 +270,13 @@ namespace Wing.RPGSystem
                         break;
                     entity.HPChangeAnimation?.Invoke(hpChangeClip.ratio, hpChangeClip.duration);
                     yield return new WaitForSeconds(hpChangeClip.duration);
+                    break;
+                case AnimType.ArmorPointsChange:
+                    var apChangeClip = clip as ArmorPointsChangeAnimClip;
+                    if (!EntityManager.Instance.TryGetEntity(apChangeClip.entityHash, out entity))
+                        break;
+                    entity.ArmorPointChangeAnimation?.Invoke(apChangeClip.ratio, apChangeClip.duration);
+                    yield return new WaitForSeconds(apChangeClip.duration);
                     break;
                 case AnimType.Delay:
                     yield return new WaitForSeconds(clip.duration);

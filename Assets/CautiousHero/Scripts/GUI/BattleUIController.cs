@@ -356,11 +356,11 @@ public class BattleUIController : MonoBehaviour
                 creatureElement.text = creatureResistance.text;
             }
             else {
-                creatureLv.text = "1";
-                creatureHP.text = "1";
-                creatureAP.text = "1";
-                creatureResistance.text = "无";
-                creatureElement.text = "大贤者";
+                creatureLv.text = "?";
+                creatureHP.text = "?";
+                creatureAP.text = "?";
+                creatureResistance.text = "?";
+                creatureElement.text = "?";
             }
             creatureBoard.position = new Vector3(10, 1070, 0);
         }

@@ -106,7 +106,7 @@ namespace Wing.RPGSystem
 
             for (int i = 0; i < player.ActiveSkills.Length; i++) {
                 if (SkillCheck(player.ActiveSkills[i], Label.Damage)) {
-                    int damage = (player.ActiveSkills[i].TSkill as BasicAttackSkill).CalculateValue(player, 1);
+                    int damage = (player.ActiveSkills[i].TSkill as BasicAttackSkill).CalculateValue(player.Hash, 1);
                     if (damage > pMaxD) {
                         pMaxD = damage;
                         pMaxDID = i;
@@ -143,7 +143,7 @@ namespace Wing.RPGSystem
             //Debug.Log((System.DateTime.Now - timer).TotalSeconds.ToString());
 
             foreach (var creature in Creatures) {
-                creature.OnEntityTurnStart();
+                creature.OnTurnStarted();
             }
         }
 

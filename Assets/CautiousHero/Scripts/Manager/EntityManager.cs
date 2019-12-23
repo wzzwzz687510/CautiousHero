@@ -8,7 +8,7 @@ namespace Wing.RPGSystem
     {
         public static EntityManager Instance { get; private set; }
 
-        private Dictionary<int, Entity> entityDic = new Dictionary<int, Entity>();
+        public Dictionary<int, Entity> entityDic = new Dictionary<int, Entity>();
 
         private void Awake()
         {

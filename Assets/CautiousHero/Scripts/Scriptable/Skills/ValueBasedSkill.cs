@@ -11,8 +11,9 @@ namespace Wing.RPGSystem
         public int baseValue;
         public float attributeCof;
 
-        public override void ApplyEffect(Entity caster, Location castLoc)
+        public override void ApplyEffect(int casterHash, Location castLoc)
         {
+            Entity caster = casterHash.GetEntity();
             Location effectLocation;
             switch (castType) {
                 case CastType.Instant:
@@ -24,7 +25,12 @@ namespace Wing.RPGSystem
                     foreach (var ep in EffectPatterns) {
                         effectLocation = castLoc + GetFixedEffectPattern(castLoc - caster.Loc, ep.pattern);
                         if (effectLocation.IsValid() && !effectLocation.IsEmpty()) {
-                            effectLocation.GetStayEntity().ChangeHP(CalculateValue(caster, ep.coefficient));
+                            Entity target = effectLocation.GetStayEntity();
+                            target.DamageHP(CalculateValue(casterHash, ep.coefficient));
+                            for (int i = 0; i < ep.additionBuffs.Length; i++) {
+                                target.BuffManager.AddBuff(new BuffHandler(
+                                    casterHash, target.Hash, ep.additionBuffs[i].Hash));
+                            }                          
                         }
                     }
                     break;
@@ -38,7 +44,12 @@ namespace Wing.RPGSystem
                                     Hash, caster.Loc, tc.Loc, castEffect.animDuration));
                                 if (BattleManager.Instance.IsPlayerTurn)
                                     AnimationManager.Instance.PlayOnce();
-                                tc.StayEntity.ChangeHP(CalculateValue(caster, ep.coefficient));
+                                Entity target = tc.StayEntity;
+                                target.DamageHP(CalculateValue(casterHash, ep.coefficient));
+                                for (int i = 0; i < ep.additionBuffs.Length; i++) {
+                                    target.BuffManager.AddBuff(new BuffHandler(
+                                        casterHash, target.Hash, ep.additionBuffs[i].Hash));
+                                }
                                 break;
                             }
                         }
@@ -49,6 +60,6 @@ namespace Wing.RPGSystem
             }
         }
 
-        public abstract int CalculateValue(Entity caster, float cof);
+        public abstract int CalculateValue(int casterHash, float cof);
     }
 }

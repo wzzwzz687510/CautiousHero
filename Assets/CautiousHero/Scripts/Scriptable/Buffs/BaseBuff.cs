@@ -8,16 +8,32 @@ namespace Wing.RPGSystem
     public enum BuffType
     {
         Attribute,
-        Defense
+        Defense,
+        ArrowReturn
+    }
+
+    public enum BuffTrigger
+    {
+        None,
+        TurnStart,
+        TurnEnd,
+        HPChange,
+        APChange,
+        ArmorPointsChange,
+        SkillChange,
+        CasterDeath,
+        TargetDeath
     }
 
     public abstract class BaseBuff : ScriptableObject
     {
         public string buffName = "New buff";
         public string description = "None";
-        public BuffType buffType;
+        public BuffType type;
+        public BuffTrigger trigger;
         public int lastTurn;
         public bool infinity;
+        public bool stackable;
         public int Hash { get { return buffName.GetStableHashCode(); } }
 
         static Dictionary<int, BaseBuff> cache;
@@ -29,6 +45,11 @@ namespace Wing.RPGSystem
                 );
             }
         }
+    }
+
+    public interface StackableBuff
+    {
+        void OnStacked(BuffHandler bh);
     }
 }
 

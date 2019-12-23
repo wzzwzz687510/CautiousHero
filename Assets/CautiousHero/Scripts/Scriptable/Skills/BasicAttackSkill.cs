@@ -9,8 +9,9 @@ namespace Wing.RPGSystem
     {
         public AdditiveAttribute attribute;
 
-        public override int CalculateValue(Entity caster,float cof)
+        public override int CalculateValue(int casterHash,float cof)
         {
+            Entity caster = casterHash.GetEntity();
             int aa = 0;
             if (attribute == AdditiveAttribute.Agility)
                 aa = caster.Agility;

@@ -16,8 +16,8 @@ namespace Wing.RPGSystem
             
             m_attribute = attributes;           
             EntityName = "Player";
-            EntityHash = EntityManager.Instance.AddEntity(this);            
-            BuffManager = new BuffManager(EntityHash);
+            Hash = EntityManager.Instance.AddEntity(this);            
+            BuffManager = new BuffManager(Hash);
 
             HealthPoints = MaxHealthPoints;
             Skills = skills;
@@ -28,9 +28,9 @@ namespace Wing.RPGSystem
             }
         }
 
-        public override void OnEntityTurnStart()
+        public override void OnTurnStarted()
         {
-            base.OnEntityTurnStart();
+            base.OnTurnStarted();
 
             lastTile = LocateTile;
             lastActionPoints = ActionPoints;

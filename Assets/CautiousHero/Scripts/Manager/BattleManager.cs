@@ -99,7 +99,7 @@ public class BattleManager : MonoBehaviour
     private void CompletePlacement()
     {
         ChangeState(BattleState.PlayerMove);
-        player.OnEntityTurnStart();
+        player.OnTurnStarted();
     }
 
     private void CompleteMovement()
@@ -129,7 +129,7 @@ public class BattleManager : MonoBehaviour
     {
         if (isPlayerTurn) {
             ChangeState(BattleState.PlayerMove);
-            player.OnEntityTurnStart();
+            player.OnTurnStarted();
         }
         else {
             AIManager.Instance.OnBotTurnStart();
@@ -232,9 +232,9 @@ public class BattleManager : MonoBehaviour
         hit = Physics2D.Raycast(ray.origin, ray.direction, 20, entityLayer);
         if (hit && hit.transform.CompareTag("Creature")) {
             var cc = hit.transform.parent.GetComponent<CreatureController>();
-            if (selectedCreatureID != cc.EntityHash) {
-                selectedCreatureID = cc.EntityHash;
-                CreatureBoardEvent?.Invoke(cc.EntityHash, false);
+            if (selectedCreatureID != cc.Hash) {
+                selectedCreatureID = cc.Hash;
+                CreatureBoardEvent?.Invoke(cc.Hash, false);
             }
             switch (State) {
                 case BattleState.PlacePlayer:

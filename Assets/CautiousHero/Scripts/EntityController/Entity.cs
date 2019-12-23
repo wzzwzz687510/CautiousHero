@@ -61,7 +61,7 @@ namespace Wing.RPGSystem
     public class Entity : MonoBehaviour
     {
         public string EntityName { get; protected set; }
-        public int EntityHash { get; protected set; }
+        public int Hash { get; protected set; }
         public int HealthPoints { get; protected set; }
         public int ArmorPoints { get; protected set; }
         public int ActionPoints { get; protected set; }
@@ -95,12 +95,19 @@ namespace Wing.RPGSystem
 
         public delegate void SortingOrderChange(int sortingOrder);
         public SortingOrderChange OnSortingOrderChanged;
-        public delegate void HPChange(float hpRatio, float duraion);
-        public HPChange HPChangeAnimation;
+        public delegate void PointsChange(float ratio, float duraion);
+        public PointsChange HPChangeAnimation;
+        public PointsChange ArmorPointChangeAnimation;
         public delegate void SkillUpdat(int index,int cooldown);
         public event SkillUpdat OnSkillUpdated;
 
+        [HideInInspector] public UnityEvent OnTurnStartedEvent;
+        [HideInInspector] public UnityEvent OnTurnEndedEvent;
+        [HideInInspector] public UnityEvent OnHPChanged;
+        [HideInInspector] public UnityEvent OnArmorPointsChanged;
         [HideInInspector] public UnityEvent OnAPChanged;
+        [HideInInspector] public UnityEvent OnSkillChanged;
+        [HideInInspector] public UnityEvent OnDead;
         [HideInInspector] public UnityEvent OnAnimationCompleted;
 
         protected virtual void Awake()
@@ -112,8 +119,9 @@ namespace Wing.RPGSystem
             OnSortingOrderChanged += OnSortingOrderChangedEvent;
         }
 
-        public virtual void OnEntityTurnStart()
+        public virtual void OnTurnStarted()
         {
+            OnTurnStartedEvent?.Invoke();
             BuffManager.UpdateBuffs();
             for (int i = 0; i < ActiveSkills.Length; i++) {
                 ActiveSkills[i].UpdateSkill();
@@ -122,6 +130,11 @@ namespace Wing.RPGSystem
 
             ActionPoints = Mathf.Min(ActionPoints + ActionPointsPerTurn, 8);
             OnAPChanged?.Invoke();
+        }
+
+        public virtual void OnTurnEnded()
+        {
+            OnTurnEndedEvent?.Invoke();
         }
 
         /// <summary>
@@ -163,12 +176,12 @@ namespace Wing.RPGSystem
 
 
             if (isInstance) {               
-                AnimationManager.Instance.AddAnimClip(new MoveInstantAnimClip(EntityHash, targetTile.Loc, 0.2f));
+                AnimationManager.Instance.AddAnimClip(new MoveInstantAnimClip(Hash, targetTile.Loc, 0.2f));
                 AnimationManager.Instance.PlayOnce();
             }
             else {
 
-                AnimationManager.Instance.AddAnimClip(new MovePathAnimClip(EntityHash, MovePath, 0.2f));
+                AnimationManager.Instance.AddAnimClip(new MovePathAnimClip(Hash, MovePath, 0.2f));
             }
                 
         }
@@ -183,7 +196,7 @@ namespace Wing.RPGSystem
             ActiveSkills[skillID].SetCooldown(tSkill.cooldownTime);
             OnSkillUpdated?.Invoke(skillID, tSkill.cooldownTime);
 
-            tSkill.ApplyEffect(this, castLoc);
+            tSkill.ApplyEffect(Hash, castLoc);
         }
 
         public virtual void DropAnimation()
@@ -202,21 +215,47 @@ namespace Wing.RPGSystem
             m_collider.enabled = bl;
         }
 
+        public virtual bool DealDamage(int value)
+        {
+            int reducedDamage = CalculateFinalDamage(value);
+            if (ArmorPoints>=reducedDamage) {
+                DamageArmor(value);
+                return true;
+            }
+
+            reducedDamage -= ArmorPoints;
+            return DamageHP(reducedDamage, true);
+        }
+
+        public virtual void DamageArmor(int value, bool ignoreDefense = false)
+        {
+            int damage = ignoreDefense? value: CalculateFinalDamage(value);
+            ArmorPoints -= damage;
+            ArmorPoints = Mathf.Min(0, ArmorPoints);
+            AnimationManager.Instance.AddAnimClip(new ArmorPointsChangeAnimClip(Hash, 1.0f * ArmorPoints / MaxHealthPoints));
+            if (BattleManager.Instance.IsPlayerTurn)
+                AnimationManager.Instance.PlayOnce(false);
+            OnArmorPointsChanged?.Invoke();
+        }
+
         /// <summary>
-        /// HP -= adjusted value
+        /// HP -= adjusted value. Should calculate adjusted damage in function so that the direct damage to hp can be correct, such as Piercing Attack;
         /// </summary>
         /// <param name="value"></param>
         /// <returns></returns>
-        public virtual bool ChangeHP(int value)
+        public virtual bool DamageHP(int value, bool ignoreDefense = false)
         {
             //Debug.Log("Entity: "+EntityName+", HP: " + HealthPoints);
-            HealthPoints -= CalculateFinalDamage(value);
+            int damage = ignoreDefense? value: CalculateFinalDamage(value);
+            int tmpHP = HealthPoints;
+            HealthPoints -= damage;
             HealthPoints = Mathf.Clamp(HealthPoints, 0, MaxHealthPoints);
-            AnimationManager.Instance.AddAnimClip(new HPChangeAnimClip(EntityHash, Mathf.Clamp01(1.0f * HealthPoints / MaxHealthPoints)));
+            AnimationManager.Instance.AddAnimClip(new HPChangeAnimClip(Hash, 1.0f * HealthPoints / MaxHealthPoints));
             if (BattleManager.Instance.IsPlayerTurn)
                 AnimationManager.Instance.PlayOnce(false);
-            if (HealthPoints != 0) return true;
-                
+            OnHPChanged?.Invoke();
+            if (HealthPoints > 0) return true;
+
             Death();
             return false;
         }
@@ -228,9 +267,9 @@ namespace Wing.RPGSystem
         }
 
         protected virtual void Death()
-        {
-            Debug.Log(EntityName + " dead");
+        {            
             IsDeath = true;
+            OnDead?.Invoke();
         }
 
         protected virtual void OnSortingOrderChangedEvent(int sortingOrder)

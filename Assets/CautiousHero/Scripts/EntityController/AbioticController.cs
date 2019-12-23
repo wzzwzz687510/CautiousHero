@@ -13,10 +13,10 @@ namespace Wing.RPGSystem
         {
             Template = template;
             EntityName = Template.abioticName;
-            EntityHash = EntityManager.Instance.AddEntity(this);
-            BuffManager = new BuffManager(EntityHash);
+            Hash = EntityManager.Instance.AddEntity(this);
+            BuffManager = new BuffManager(Hash);
             foreach (var buff in Template.buffs) {
-                BuffManager.AddBuff(new BuffHandler(this, this, buff.Hash));
+                BuffManager.AddBuff(new BuffHandler(Hash, Hash, buff.Hash));
             }
             m_spriteRenderer.sprite = Template.sprite[template.sprite.Length.Random()];
             m_attribute = Template.attribute;

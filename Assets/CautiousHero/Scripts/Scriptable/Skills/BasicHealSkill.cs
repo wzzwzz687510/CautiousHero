@@ -8,8 +8,9 @@ namespace Wing.RPGSystem
     public class BasicHealSkill : ValueBasedSkill
     {
 
-        public override int CalculateValue(Entity caster, float cof)
+        public override int CalculateValue(int casterHash, float cof)
         {
+            Entity caster = casterHash.GetEntity();
             return -Mathf.RoundToInt(cof * baseValue * (1 + attributeCof * caster.Intelligence));
         }
     }

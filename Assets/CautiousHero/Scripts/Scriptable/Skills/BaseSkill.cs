@@ -53,7 +53,7 @@ namespace Wing.RPGSystem
     {
         public Location pattern;
         public float coefficient;
-
+        public BaseBuff[] additionBuffs;
     }
     [System.Serializable]
     public struct CastEffect
@@ -87,7 +87,7 @@ namespace Wing.RPGSystem
         public Location[] CastPatterns { get { return tCastPatterns.patterns; } }
         public EffectPattern[] EffectPatterns { get { return tEffectPatterns.effectPatterns; } }
 
-        public abstract void ApplyEffect(Entity castEntity, Location castLoc);
+        public abstract void ApplyEffect(int casterHash, Location castLoc);
 
         public virtual Location GetFixedEffectPattern(Location cp, Location ep)
         {
