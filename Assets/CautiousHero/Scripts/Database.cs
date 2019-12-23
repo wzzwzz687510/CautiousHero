@@ -17,7 +17,6 @@ namespace Wing.RPGSystem
         public long coins;
         public long gainedExp;
         public int[] learnedSkills;
-        public int[] equippedSkills;
         public Location mapLoc;
     }
 
@@ -34,7 +33,7 @@ namespace Wing.RPGSystem
         public BaseSkill[] skills;
         public BattleConfig config;
 
-        private int[] equippedSkills;
+        private int[] skillDeck;
 
         public PlayerData ActiveData { get { return m_activeData; } }
         private PlayerData m_activeData;
@@ -47,12 +46,12 @@ namespace Wing.RPGSystem
             if (!Instance)
                 Instance = this;
 
-            equippedSkills = new int[4];
-            for (int i = 0; i < 4; i++) {
-                equippedSkills[i] = skills[i].Hash;
+            skillDeck = new int[skills.Length];
+            for (int i = 0; i < skills.Length; i++) {
+                skillDeck[i] = skills[i].Hash;
             }
             LoadData(worldName);
-            if (resetData) CreateNewSave(worldName, playerName, spriteID, attribute, equippedSkills);
+            if (resetData) CreateNewSave(worldName, playerName, spriteID, attribute, skillDeck);
         }
 
         public void SaveData(string saveName)
@@ -70,7 +69,7 @@ namespace Wing.RPGSystem
         public void LoadData(string saveName)
         {
             if (!File.Exists(Application.persistentDataPath + "/"+ saveName + ".sav")){
-                CreateNewSave(worldName, playerName, spriteID, attribute, equippedSkills);
+                CreateNewSave(worldName, playerName, spriteID, attribute, skillDeck);
                 return;
             }
 
@@ -87,14 +86,15 @@ namespace Wing.RPGSystem
             Debug.Log("Game Loaded");
         }
 
-        public void CreateNewSave(string worldName,string playerName,int spriteID, EntityAttribute attribute,int[] equippedSkills)
+        public void CreateNewSave(string worldName,string playerName,int spriteID, EntityAttribute attribute,int[] skillDeck)
         {
             m_activeData = new PlayerData();
             m_activeData.worldName = worldName;
             m_activeData.playerName = playerName;
             m_activeData.spriteID = spriteID;
             m_activeData.attribute = attribute;
-            m_activeData.equippedSkills = equippedSkills;
+            m_activeData.learnedSkills = skillDeck;
+
             sr = new System.Random(ActiveData.playerName.GetStableHashCode());
             SaveData(worldName);
         }
@@ -111,9 +111,9 @@ namespace Wing.RPGSystem
             //    Debug.Log(key);
             //}
             
-            var skills = new BaseSkill[4];
-            for (int i = 0; i < 4; i++) {
-                if(!BaseSkill.Dict.TryGetValue(ActiveData.equippedSkills[i], out skills[i])) {
+            var skills = new BaseSkill[ActiveData.learnedSkills.Length];
+            for (int i = 0; i < ActiveData.learnedSkills.Length; i++) {
+                if(!BaseSkill.Dict.TryGetValue(ActiveData.learnedSkills[i], out skills[i])) {
                     Debug.LogError("Skill does not exist, please check!");
                 }
             }
