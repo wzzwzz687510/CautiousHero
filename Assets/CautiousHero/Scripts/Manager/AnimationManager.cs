@@ -124,6 +124,9 @@ namespace Wing.RPGSystem
     public class AnimationManager : MonoBehaviour
     {
         public static AnimationManager Instance { get; private set; }
+
+        public float animRate = 1.0f;
+
         public bool IsPlaying { get; private set; }
         public int Count { get { return clips.Count; } }
 
@@ -222,10 +225,10 @@ namespace Wing.RPGSystem
                         break;
 
                     //var pathLoc = (Location)movePathClip.path[movePathClip.path.Length - 1];
-                    entity.transform.DOPath(entity.MovePath, movePathClip.duration * entity.MovePath.Length);
+                    entity.transform.DOPath(entity.MovePath, movePathClip.duration * entity.MovePath.Length * animRate);
                     for (int i = 0; i < movePathClip.path.Length; i++) {
                         var pathLoc = (Location)movePathClip.path[i];
-                        yield return new WaitForSeconds(clip.duration);
+                        yield return new WaitForSeconds(clip.duration * animRate);
                         entity.OnSortingOrderChanged?.Invoke(pathLoc.x + pathLoc.y * 8);
                     }
                     break;
@@ -249,15 +252,15 @@ namespace Wing.RPGSystem
                             effect.TryGetComponent(out Animator anim);
                             anim?.Play(effect.name.Replace("(Clone)",""), 0);
 
-                            yield return new WaitForSeconds(castClip.duration);
+                            yield return new WaitForSeconds(castClip.duration * animRate);
                             Destroy(effect);
                             break;
                         case CastType.Trajectory:
                             effect = Instantiate(castClip.skillHash.GetBaseSkill().castEffect.prefab, 
                                 castClip.start + fix, Quaternion.identity, effectHolder);
                             int distance = AStarSearch.Heuristic(castClip.start, castClip.end);
-                            effect.transform.DOMove(castClip.end + fix, castClip.duration * distance).OnComplete(() => Destroy(effect));
-                            yield return new WaitForSeconds(castClip.duration * distance);
+                            effect.transform.DOMove(castClip.end + fix, castClip.duration * distance * animRate).OnComplete(() => Destroy(effect));
+                            yield return new WaitForSeconds(castClip.duration * distance * animRate);
                             break;
                         default:
                             break;
@@ -268,15 +271,15 @@ namespace Wing.RPGSystem
                     var hpChangeClip = clip as HPChangeAnimClip;
                     if (!EntityManager.Instance.TryGetEntity(hpChangeClip.entityHash, out entity))
                         break;
-                    entity.HPChangeAnimation?.Invoke(hpChangeClip.ratio, hpChangeClip.duration);
-                    yield return new WaitForSeconds(hpChangeClip.duration);
+                    entity.HPChangeAnimation?.Invoke(hpChangeClip.ratio, hpChangeClip.duration * animRate);
+                    yield return new WaitForSeconds(hpChangeClip.duration * animRate);
                     break;
                 case AnimType.ArmorPointsChange:
                     var apChangeClip = clip as ArmorPointsChangeAnimClip;
                     if (!EntityManager.Instance.TryGetEntity(apChangeClip.entityHash, out entity))
                         break;
-                    entity.ArmorPointChangeAnimation?.Invoke(apChangeClip.ratio, apChangeClip.duration);
-                    yield return new WaitForSeconds(apChangeClip.duration);
+                    entity.ArmorPointChangeAnimation?.Invoke(apChangeClip.ratio, apChangeClip.duration * animRate);
+                    yield return new WaitForSeconds(apChangeClip.duration * animRate);
                     break;
                 case AnimType.Delay:
                     yield return new WaitForSeconds(clip.duration);
