@@ -11,6 +11,9 @@ namespace Wing.RPGSystem
         private TileController lastTile;
         private int lastActionPoints;
 
+        public delegate void SkillShiftAnimation(float duration);
+        public SkillShiftAnimation ssAnimEvent;
+
         public void InitPlayer(EntityAttribute attributes, BaseSkill[] skills)
         {
             

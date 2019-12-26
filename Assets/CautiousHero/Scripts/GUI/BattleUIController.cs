@@ -1,4 +1,5 @@
 ﻿using DG.Tweening;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -100,6 +101,7 @@ public class BattleUIController : MonoBehaviour
     {
         player.OnSkillUpdated += OnPlayerSkillUpdated;
         player.HPChangeAnimation += PlayerHPChangeAnimation;
+        player.ssAnimEvent += PlayerSkillShiftAnimation;
         player.OnAPChanged.AddListener(OnPlayerAPChanged);
         for (int i = 0; i < 4; i++) {
             skillSlots[i].SkillBoardEvent += OnSkillBoardEvent;
@@ -116,6 +118,11 @@ public class BattleUIController : MonoBehaviour
         PlayerHPChangeAnimation(0, 0);
         PlayerHPChangeAnimation(1, 2);
         StartCoroutine(BattleStart());
+    }
+
+    private void PlayerSkillShiftAnimation(float duration)
+    {
+        throw new NotImplementedException();
     }
 
     private void PlayerHPChangeAnimation(float hpRatio, float duration)
@@ -257,15 +264,15 @@ public class BattleUIController : MonoBehaviour
         skillCost.text = skill.actionPointsCost.ToString();
         skillCooldown.text = skill.cooldownTime.ToString();
         skillValue.text = skill.baseValue.ToString() + " + <color=#ffa500ff>" + player.Intelligence * skill.attributeCof * skill.baseValue +"</color>";
-        switch (skill.skillType) {
-            case SkillType.Physical:
+        switch (skill.damageType) {
+            case DamageType.Physical:
                 skillNameBg.color = colors[0];
                 skillType.text = "物理";
                 break;
-            case SkillType.Magical:
+            case DamageType.Magical:
                 skillType.text = "魔法";
                 break;
-            case SkillType.Pure:
+            case DamageType.Pure:
                 skillType.text = "纯粹";
                 skillNameBg.color = colors[1];
                 break;

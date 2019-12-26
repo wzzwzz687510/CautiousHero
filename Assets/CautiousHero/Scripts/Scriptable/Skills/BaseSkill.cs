@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace Wing.RPGSystem
 {
-    public enum SkillType
+    public enum DamageType
     {
         Physical,
         Magical,
@@ -74,7 +74,7 @@ namespace Wing.RPGSystem
         public int Hash { get { return skillName.GetStableHashCode(); } }
 
         [Header("Labels")]
-        public SkillType skillType;
+        public DamageType damageType;
         public SkillElement skillElement;
         public CastType castType;
         public List<Label> labels;

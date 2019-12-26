@@ -35,6 +35,35 @@ namespace Wing.RPGSystem
         public static EntityAttribute operator -(EntityAttribute a, EntityAttribute b) => a + -(b);
     }
 
+    [System.Serializable]
+    public struct ElementResistance
+    {
+        public int fire;
+        public int water;
+        public int earth;
+        public int air;
+        public int light;
+        public int dark;
+
+        public ElementResistance(int fire = 0, int water = 0, int earth = 0, int air = 0, int light = 0, int dark = 0)
+        {
+            this.fire = fire;
+            this.water = water;
+            this.earth = earth;
+            this.air = air;
+            this.light = light;
+            this.dark = dark;
+        }
+
+        public static ElementResistance operator -(ElementResistance a) =>
+            new ElementResistance(-a.fire, -a.water, -a.earth, -a.air, -a.light, -a.dark);
+        public static ElementResistance operator +(ElementResistance a, ElementResistance b) =>
+            new ElementResistance(a.fire + b.fire, a.water + b.water, a.earth + b.earth, 
+                a.air + b.air, a.light + b.light, a.dark + b.dark);
+        public static ElementResistance operator -(ElementResistance a, ElementResistance b) => a + (-b);
+    }
+
+    // Obsolete
     public class InstanceSkill
     {
         public BaseSkill TSkill { get; private set; }
@@ -63,7 +92,8 @@ namespace Wing.RPGSystem
         public string EntityName { get; protected set; }
         public int Hash { get; protected set; }
         public int HealthPoints { get; protected set; }
-        public int ArmorPoints { get; protected set; }
+        public int PhysicalArmourPoints { get; protected set; }
+        public int MagicalArmourPoints { get; protected set; }
         public int ActionPoints { get; protected set; }
         public bool IsDeath { get; protected set; }
         public BaseSkill[] Skills { get; protected set; }
@@ -97,14 +127,16 @@ namespace Wing.RPGSystem
         public SortingOrderChange OnSortingOrderChanged;
         public delegate void PointsChange(float ratio, float duraion);
         public PointsChange HPChangeAnimation;
-        public PointsChange ArmorPointChangeAnimation;
+        public PointsChange physicalAPChangeAnimation;
+        public PointsChange magicalAPChangeAnimation;
         public delegate void SkillUpdat(int index,int cooldown);
         public event SkillUpdat OnSkillUpdated;
 
         [HideInInspector] public UnityEvent OnTurnStartedEvent;
         [HideInInspector] public UnityEvent OnTurnEndedEvent;
         [HideInInspector] public UnityEvent OnHPChanged;
-        [HideInInspector] public UnityEvent OnArmorPointsChanged;
+        [HideInInspector] public UnityEvent OnPhysicalAPChanged;
+        [HideInInspector] public UnityEvent OnMagicalAPChanged;
         [HideInInspector] public UnityEvent OnAPChanged;
         [HideInInspector] public UnityEvent OnSkillChanged;
         [HideInInspector] public UnityEvent OnDead;
@@ -215,27 +247,39 @@ namespace Wing.RPGSystem
             m_collider.enabled = bl;
         }
 
-        public virtual bool DealDamage(int value)
+        public virtual bool DealDamage(int value, DamageType damageType)
         {
-            int reducedDamage = CalculateFinalDamage(value);
-            if (ArmorPoints>=reducedDamage) {
-                DamageArmor(value);
-                return true;
-            }
+            int damage = value;
 
-            reducedDamage -= ArmorPoints;
-            return DamageHP(reducedDamage, true);
+            damage -= DamageArmour(damage, damageType == DamageType.Physical);
+            if (damage == 0) return true;
+
+            return DamageHP(damage);
         }
 
-        public virtual void DamageArmor(int value, bool ignoreDefense = false)
+        /// <summary>
+        /// Damage armour
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="isPhysical"></param>
+        /// <returns>Absorbed damage</returns>
+        public virtual int DamageArmour(int value,bool isPhysical)
         {
-            int damage = ignoreDefense? value: CalculateFinalDamage(value);
-            ArmorPoints -= damage;
-            ArmorPoints = Mathf.Min(0, ArmorPoints);
-            AnimationManager.Instance.AddAnimClip(new ArmorPointsChangeAnimClip(Hash, 1.0f * ArmorPoints / MaxHealthPoints));
+            int absorbDamage = isPhysical ? PhysicalArmourPoints : MagicalArmourPoints;
+            if (absorbDamage > value)
+                absorbDamage = value;
+
+            if(isPhysical) PhysicalArmourPoints = Mathf.Min(0, PhysicalArmourPoints - value);
+            else MagicalArmourPoints = Mathf.Min(0, MagicalArmourPoints - value);
+            AnimationManager.Instance.AddAnimClip(new ArmourPChangeAnimClip(Hash, 1.0f * 
+                (isPhysical ? PhysicalArmourPoints : MagicalArmourPoints) / MaxHealthPoints, isPhysical));
             if (BattleManager.Instance.IsPlayerTurn)
                 AnimationManager.Instance.PlayOnce(false);
-            OnArmorPointsChanged?.Invoke();
+
+            if (isPhysical) OnPhysicalAPChanged?.Invoke();
+            else OnMagicalAPChanged?.Invoke();
+
+            return absorbDamage;
         }
 
         /// <summary>
@@ -243,27 +287,20 @@ namespace Wing.RPGSystem
         /// </summary>
         /// <param name="value"></param>
         /// <returns></returns>
-        public virtual bool DamageHP(int value, bool ignoreDefense = false)
+        public virtual bool DamageHP(int value)
         {
             //Debug.Log("Entity: "+EntityName+", HP: " + HealthPoints);
-            int damage = ignoreDefense? value: CalculateFinalDamage(value);
             int tmpHP = HealthPoints;
-            HealthPoints -= damage;
-            HealthPoints = Mathf.Clamp(HealthPoints, 0, MaxHealthPoints);
+            HealthPoints = Mathf.Clamp(HealthPoints - value, 0, MaxHealthPoints);
             AnimationManager.Instance.AddAnimClip(new HPChangeAnimClip(Hash, 1.0f * HealthPoints / MaxHealthPoints));
             if (BattleManager.Instance.IsPlayerTurn)
                 AnimationManager.Instance.PlayOnce(false);
+
             OnHPChanged?.Invoke();
             if (HealthPoints > 0) return true;
 
             Death();
             return false;
-        }
-
-        public virtual int CalculateFinalDamage(int value)
-        {
-            return Mathf.RoundToInt((value - BuffManager.GetConstDefense()) *
-                (1 - BuffManager.GetCofDefense()));
         }
 
         protected virtual void Death()

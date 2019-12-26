@@ -12,7 +12,8 @@ namespace Wing.RPGSystem
         MoveInstant,
         Cast,
         HPChange,
-        ArmorPointsChange,
+        ArmourPChange,
+        SkillShift,
         Delay,
         OutlineEntity,
         Gameover
@@ -93,17 +94,28 @@ namespace Wing.RPGSystem
         }
     }
 
-    public class ArmorPointsChangeAnimClip : BaseAnimClip
+    public class ArmourPChangeAnimClip : BaseAnimClip
     {
         public int entityHash;
         public float ratio;
+        public bool isPhysical;
 
-        public ArmorPointsChangeAnimClip(int entityHash, float ratio, float duration = 0.5f)
+        public ArmourPChangeAnimClip(int entityHash, float ratio,bool isPhysical, float duration = 0.5f)
         {
-            this.type = AnimType.ArmorPointsChange;
+            this.type = AnimType.ArmourPChange;
             this.duration = duration;
             this.entityHash = entityHash;
             this.ratio = ratio;
+            this.isPhysical = isPhysical;
+        }
+    }
+
+    public class SkillShiftAnimClip : BaseAnimClip
+    {
+        public SkillShiftAnimClip(float duration = 0.2f)
+        {
+            this.type = AnimType.SkillShift;
+            this.duration = duration;
         }
     }
 
@@ -274,12 +286,19 @@ namespace Wing.RPGSystem
                     entity.HPChangeAnimation?.Invoke(hpChangeClip.ratio, hpChangeClip.duration * animRate);
                     yield return new WaitForSeconds(hpChangeClip.duration * animRate);
                     break;
-                case AnimType.ArmorPointsChange:
-                    var apChangeClip = clip as ArmorPointsChangeAnimClip;
+                case AnimType.ArmourPChange:
+                    var apChangeClip = clip as ArmourPChangeAnimClip;
                     if (!EntityManager.Instance.TryGetEntity(apChangeClip.entityHash, out entity))
                         break;
-                    entity.ArmorPointChangeAnimation?.Invoke(apChangeClip.ratio, apChangeClip.duration * animRate);
+                    if(apChangeClip.isPhysical)
+                        entity.physicalAPChangeAnimation?.Invoke(apChangeClip.ratio, apChangeClip.duration * animRate);
+                    else
+                        entity.magicalAPChangeAnimation?.Invoke(apChangeClip.ratio, apChangeClip.duration * animRate);
                     yield return new WaitForSeconds(apChangeClip.duration * animRate);
+                    break;
+                case AnimType.SkillShift:
+                    var ssClip = clip as SkillShiftAnimClip;
+
                     break;
                 case AnimType.Delay:
                     yield return new WaitForSeconds(clip.duration);

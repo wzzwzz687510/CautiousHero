@@ -42,7 +42,7 @@ namespace Wing.RPGSystem
                 case BuffTrigger.APChange:
                     target.OnAPChanged.AddListener(OnTriggered);
                     break;
-                case BuffTrigger.ArmorPointsChange:
+                case BuffTrigger.PhysicalAPChange:
                     target.OnArmorPointsChanged.AddListener(OnTriggered);
                     break;
                 case BuffTrigger.SkillChange:
@@ -89,7 +89,7 @@ namespace Wing.RPGSystem
                 case BuffTrigger.APChange:
                     target.OnAPChanged.RemoveListener(OnTriggered);
                     break;
-                case BuffTrigger.ArmorPointsChange:
+                case BuffTrigger.PhysicalAPChange:
                     target.OnArmorPointsChanged.RemoveListener(OnTriggered);
                     break;
                 case BuffTrigger.SkillChange:
@@ -171,24 +171,6 @@ namespace Wing.RPGSystem
             }
 
             return tmp;
-        }
-
-        public float GetConstDefense()
-        {
-            float ret = 0;
-            foreach (var buffHandler in buffs?[BuffType.Defense].Values) {
-                ret += (buffHandler.TemplateBuff as DefenseBuff).constReduction;
-            }
-            return ret;
-        }
-
-        public float GetCofDefense()
-        {
-            float ret = 0;
-            foreach (var buffHandler in buffs?[BuffType.Defense].Values) {
-                ret += (buffHandler.TemplateBuff as DefenseBuff).cofReduction;
-            }
-            return ret;
         }
 
         public BuffHandler GetBuffHandler(int buffhash) => buffs[buffhash.GetBaseBuff().type][buffhash];

@@ -19,7 +19,9 @@ namespace Wing.RPGSystem
         TurnEnd,
         HPChange,
         APChange,
-        ArmorPointsChange,
+        PhysicalAPChange,
+        MagicalAPChange,
+        ArmourPChange,
         SkillChange,
         CasterDeath,
         TargetDeath
