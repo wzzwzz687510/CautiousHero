@@ -43,7 +43,10 @@ namespace Wing.RPGSystem
                     target.OnAPChanged.AddListener(OnTriggered);
                     break;
                 case BuffTrigger.PhysicalAPChange:
-                    target.OnArmorPointsChanged.AddListener(OnTriggered);
+                    target.OnPhysicalAPChanged.AddListener(OnTriggered);
+                    break;
+                case BuffTrigger.MagicalAPChange:
+                    target.OnMagicalAPChanged.AddListener(OnTriggered);
                     break;
                 case BuffTrigger.SkillChange:
                     target.OnSkillChanged.AddListener(OnTriggered);
@@ -90,7 +93,10 @@ namespace Wing.RPGSystem
                     target.OnAPChanged.RemoveListener(OnTriggered);
                     break;
                 case BuffTrigger.PhysicalAPChange:
-                    target.OnArmorPointsChanged.RemoveListener(OnTriggered);
+                    target.OnPhysicalAPChanged.RemoveListener(OnTriggered);
+                    break;
+                case BuffTrigger.MagicalAPChange:
+                    target.OnMagicalAPChanged.RemoveListener(OnTriggered);
                     break;
                 case BuffTrigger.SkillChange:
                     target.OnSkillChanged.RemoveListener(OnTriggered);

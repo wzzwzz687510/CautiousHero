@@ -60,7 +60,7 @@ public class BattleManager : MonoBehaviour
         GridManager.Instance.OnCompleteMapRenderEvent += PrepareBattleStart;
         AnimationManager.Instance.OnAnimCompleted.AddListener(OnAnimCompleted);
 
-        player.InitPlayer(Database.Instance.ActiveData.attribute, Database.Instance.GetEquippedSkills());
+        player.InitPlayer(Database.Instance.ActiveData.attribute);
         GetComponent<BattleUIController>()?.Init();
     }
 
@@ -159,20 +159,20 @@ public class BattleManager : MonoBehaviour
             var tile = hit.transform.parent.GetComponent<TileController>();
             switch (State) {
                 case BattleState.PlacePlayer:
-                    SelectVisual(tile, TileState.PlaceZone);
+                    SelectVisual(tile.Loc, TileState.PlaceZone);
 
                     if (Input.GetMouseButtonDown(0) && tileZone.Contains(tile.Loc)) {
-                        player.MoveToTile(tile, true);
+                        player.MoveToTile(tile.Loc, true);
                         player.DropAnimation();
                         CompletePlacement();
                     }
                     break;
                 case BattleState.PlayerMove:
-                    SelectVisual(tile, TileState.MoveZone);
+                    SelectVisual(tile.Loc, TileState.MoveZone);
 
                     if (Input.GetMouseButtonDown(0) && tileZone.Contains(currentSelected[0])) {
-                        var tc = player.LocateTile;
-                        player.MoveToTile(tile);
+                        var tc = player.Loc.GetTileController();
+                        player.MoveToTile(tile.Loc);
                         if (tile != tc) {
                             ChangeState(BattleState.PlayerAnim);
                             AnimationManager.Instance.PlayOnce();
@@ -180,7 +180,7 @@ public class BattleManager : MonoBehaviour
                     }
                     break;
                 case BattleState.PlayerCast:
-                    SelectVisual(tile, TileState.CastZone);
+                    SelectVisual(tile.Loc, TileState.CastZone);
 
                     if (Input.GetMouseButtonDown(0) && currentSelected.Count != 0) {
                         if (tileZone.Contains(tile.Loc) || (tile.IsBind && currentSelected[0] == tile.CastLoc))
@@ -242,7 +242,7 @@ public class BattleManager : MonoBehaviour
                 case BattleState.PlayerMove:
                     break;
                 case BattleState.PlayerCast:
-                    SelectVisual(cc.LocateTile, TileState.CastZone);
+                    SelectVisual(cc.Loc, TileState.CastZone);
 
                     if (Input.GetMouseButtonDown(0) && currentSelected.Count != 0 && tileZone.Contains(currentSelected[0])) {
                         ApplyCast();
@@ -282,7 +282,7 @@ public class BattleManager : MonoBehaviour
         if (player.ActionPoints == 0)
             return;
         player.SetActiveCollider(false);
-        SetVisualPlayer(player.transform.position + new Vector3(0, 0.3f, 0), player.LocateTile.SortOrder + 64);
+        SetVisualPlayer(player.transform.position + new Vector3(0, 0.3f, 0), player.Loc.GetTileController().SortOrder + 64);
 
         player.EntitySprite.color = new Color(1, 1, 1, 0.5f);
         foreach (var loc in GridManager.Instance.Astar.GetGivenDistancePoints(player.Loc, player.ActionPoints / player.MoveCost)) {
@@ -311,17 +311,17 @@ public class BattleManager : MonoBehaviour
     {
         player.SetActiveCollider(false);
 
-        var skill = player.Skills[selectedSkillID];
+        var skill = player.SkillHashes[selectedSkillID].GetBaseSkill();
         switch (skill.castType) {
             case CastType.Instant:
-                foreach (var point in skill.CastPatterns) {
+                foreach (var point in skill.CastPattern) {
                     var loc = player.Loc + point;
                     if (GridManager.Instance.ChangeTileState(loc, TileState.CastZone))
                         tileZone.Add(loc);
                 }
                 break;
             case CastType.Trajectory:
-                foreach (var castPattern in skill.CastPatterns) {
+                foreach (var castPattern in skill.CastPattern) {
                     var castLoc = player.Loc + castPattern;
                     if (!GridManager.Instance.ChangeTileState(castLoc, TileState.CastZone))
                         continue;
@@ -342,10 +342,11 @@ public class BattleManager : MonoBehaviour
 
     }
 
-    private void SelectVisual(TileController tile, TileState stateZone)
+    private void SelectVisual(Location loc, TileState stateZone)
     {
+        TileController tile = loc.GetTileController();
         if (currentSelected.Count != 0) {
-            if (currentSelected[0] == tile.Loc || (tile.IsBind && currentSelected[0] == tile.CastLoc))
+            if (currentSelected[0] == loc || (tile.IsBind && currentSelected[0] == tile.CastLoc))
                 return;
 
             foreach (var selected in currentSelected) {
@@ -359,31 +360,31 @@ public class BattleManager : MonoBehaviour
             currentSelected.Clear();
         }
 
-        if (tileZone.Contains(tile.Loc)) {
+        if (tileZone.Contains(loc)) {
             if (stateZone == TileState.MoveZone) {
                 SetVisualPlayer(tile.Archor, tile.SortOrder + 64);
             }
 
-            currentSelected.Add(tile.Loc);
+            currentSelected.Add(loc);
             switch (stateZone) {
                 case TileState.PlaceZone:
                 case TileState.MoveZone:
                     tile.ChangeTileState(stateZone + 1);
                     break;
                 case TileState.CastZone:
-                    HighlightAffectPoints(tile.Loc);
+                    HighlightAffectPoints(loc);
                     break;
                 default:
                     break;
             }
         }
         else {
-            if (tile.IsBind && player.Skills[selectedSkillID].castType == CastType.Trajectory) {
+            if (tile.IsBind && player.SkillHashes[selectedSkillID].GetBaseSkill().castType == CastType.Trajectory) {
                 if (currentSelected.Count == 0 || currentSelected[0] != tile.CastLoc)
                     HighlightAffectPoints(tile.CastLoc);
             }
             else
-                currentSelected.Add(tile.Loc);
+                currentSelected.Add(loc);
         }
     }
 
@@ -413,7 +414,7 @@ public class BattleManager : MonoBehaviour
 
     public void HighlightAffectPoints(Location castLoc)
     {
-        var skill = player.Skills[selectedSkillID];
+        var skill = player.SkillHashes[selectedSkillID].GetBaseSkill();
         switch (skill.castType) {
             case CastType.Instant:
                 foreach (var effectLoc in skill.GetSubEffectZone(player.Loc, castLoc-player.Loc)) {
@@ -434,14 +435,14 @@ public class BattleManager : MonoBehaviour
 
     public void CastSkill(int id)
     {
-        if (!player.ActiveSkills[id].Castable || !IsPlayerTurn)
+        if (!IsPlayerTurn)
             return;
 
-        if(player.ActionPoints < player.Skills[id].actionPointsCost) {
+        if(player.ActionPoints < player.SkillHashes[id].GetBaseSkill().actionPointsCost) {
             InformLackAP();
             return;
         }
-        selectedSkillID = id;
+        selectedSkillID = id + 1;
         ChangeState(BattleState.PlayerCast);
         PrepareSkill();
     }

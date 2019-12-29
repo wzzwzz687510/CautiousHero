@@ -14,6 +14,10 @@ namespace Wing.RPGSystem {
         public SpriteMask mask_hpEffect;
 
         public BaseCreature Template { get; protected set; }
+        public int NextCastSkillID { get; protected set; }
+        public Entity NextSkillTarget { get { return nextSkillTargetHash.GetEntity(); } }        
+        public BaseSkill NextSkill { get { return SkillHashes[NextCastSkillID].GetBaseSkill(); } }
+        private int nextSkillTargetHash;
 
         protected override void Awake()
         {
@@ -21,7 +25,7 @@ namespace Wing.RPGSystem {
             base.Awake();
         }
 
-        public IEnumerator InitCreature(BaseCreature creature, TileController tile)
+        public IEnumerator InitCreature(BaseCreature creature, Location loc)
         {           
             Template = creature;
             EntityName = Template.creatureName;
@@ -33,11 +37,11 @@ namespace Wing.RPGSystem {
             m_spriteRenderer.sprite = Template.sprite;
             m_attribute = Template.attribute;
             HealthPoints = MaxHealthPoints;
-            Skills = Template.skills;
-            ActiveSkills = new InstanceSkill[Skills.Length];
-            for (int i = 0; i < Skills.Length; i++) {
-                ActiveSkills[i] = new InstanceSkill(Skills[i]);
+
+            foreach (var skill in Template.skills) {
+                SkillHashes.Add(skill.Hash);
             }
+            NextCastSkillID = 0;
 
             var h = EntitySprite.bounds.size.y;
             hpBar.transform.localPosition += new Vector3(0, h, 0);
@@ -45,11 +49,22 @@ namespace Wing.RPGSystem {
             hpBar.enabled = false;
             mask_hpEffect.alphaCutoff = 1;
             mask_hp.alphaCutoff = 1;
-            MoveToTile(tile, true);
+            MoveToTile(loc, true);
             DropAnimation();
             yield return new WaitForSeconds(0.5f);
             hpBar.enabled = true;
             CreatureHpChangeAnimation(1,1);
+        }
+
+        public void SetNextSkillTarget(int hash)
+        {
+            nextSkillTargetHash = hash;
+        }
+
+        public override void CastSkill(int skillID, Location castLoc)
+        {
+            base.CastSkill(skillID, castLoc);
+            NextCastSkillID = NextCastSkillID == SkillHashes.Count - 1 ? 0 : NextCastSkillID++;
         }
 
         protected override void OnSortingOrderChangedEvent(int sortingOrder)
@@ -89,7 +104,7 @@ namespace Wing.RPGSystem {
         {
             base.Death();
             
-            LocateTile.OnEntityLeaving();
+            Loc.GetTileController().OnEntityLeaving();
         }
     }
 }

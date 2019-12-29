@@ -3,18 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using Wing.RPGSystem;
 
-public struct CastSkillAction
-{
-    public TileController destination;
-    public Location castLocation;
-
-    public CastSkillAction(TileController moveto, Location castLoc)
-    {
-        destination = moveto;
-        castLocation = castLoc;
-    }
-}
-
 public class GridManager : MonoBehaviour
 {
     public static GridManager Instance { get; private set; }
@@ -28,12 +16,12 @@ public class GridManager : MonoBehaviour
 
     public bool isRendered { get; private set; }
     public TileNavigation Astar { get; private set; }
+    public Dictionary<Location, TileController> tileDic { get; private set; }
     public Vector2 MapBoundingBox { get { return new Vector2(m_mg.width, m_mg.height); } }
 
     private MapGenerator m_mg;    
     private GameObject tileHolder;
-    private Dictionary<Location, TileController> tileDic 
-        = new Dictionary<Location, TileController>();
+        
     private HashSet<Location> playerEffectZone = new HashSet<Location>();   
 
     public delegate void OnCompleteMapRendering();
@@ -44,6 +32,7 @@ public class GridManager : MonoBehaviour
         if (!Instance)
             Instance = this;
         m_mg = GetComponent<MapGenerator>();
+        tileDic = new Dictionary<Location, TileController>();
     }
 
     private void Start()
@@ -72,14 +61,14 @@ public class GridManager : MonoBehaviour
         }
         int totalPower = possiblities[sets.Length - 1];
         float randomFill, randomAbiotic;
-        foreach (var tile in ValidTiles()) {
+        foreach (var loc in ValidLocations()) {
             randomFill = 1000.Random() / 1000.0f;
             if (randomFill <= config.coverage) {
                 randomAbiotic = totalPower.Random();
                 for (int i = 0; i < sets.Length; i++) {
                     if (randomAbiotic < possiblities[i]) {
-                        Instantiate(abioticPrefab, tile.m_spriteRenderer.transform).GetComponent<AbioticController>().
-                            InitAbioticEntity(sets[i].tAbiotic, tile);
+                        Instantiate(abioticPrefab, loc.GetTileController().m_spriteRenderer.transform).GetComponent<AbioticController>().
+                            InitAbioticEntity(sets[i].tAbiotic, loc);
                         yield return null;
                         break;
                     }
@@ -123,21 +112,6 @@ public class GridManager : MonoBehaviour
         } 
     }
 
-    public bool IsValidLocation(Location id)
-    {
-        return tileDic.ContainsKey(id);
-    }
-
-    /// <summary>
-    /// Check whether Location is valid before call this function
-    /// </summary>
-    /// <param name="id"></param>
-    /// <returns></returns>
-    public TileController GetTileController(Location id)
-    {
-        return tileDic[id];
-    }
-
     public bool IsEmptyLocation(Location id)
     {
         return tileDic[id].IsEmpty;
@@ -145,27 +119,27 @@ public class GridManager : MonoBehaviour
 
     public bool ChangeTileState(Location id, TileState state)
     {
-        if(!IsValidLocation(id))
+        if(!tileDic.ContainsKey(id))
             return false;
 
-        GetTileController(id).ChangeTileState(state);
+        tileDic[id].ChangeTileState(state);
         return true;
     }
 
-    public TileController GetRandomTile(bool isValid = true)
+    public Location GetRandomLoc(bool isValid = true)
     {
         int cnt = 0;
         if (isValid) {
-            var tilesEnumerator = ValidTiles().GetEnumerator();
+            IEnumerator<Location> locEnumerator = ValidLocations().GetEnumerator();
             int random = Random.Range(0, tileDic.Count);
             for (int i = 0; i < random; i++) {
                 if (--random < 0)
-                    return tilesEnumerator.Current;
-                if (!tilesEnumerator.MoveNext()) {
+                    return locEnumerator.Current;
+                if (!locEnumerator.MoveNext()) {
                     random = Random.Range(0, cnt);
                     for (int j = 0; j < random; j++) {
                         if (--random < 0)
-                            return tilesEnumerator.Current;
+                            return locEnumerator.Current;
                     }
                 }
                 cnt++;
@@ -176,10 +150,10 @@ public class GridManager : MonoBehaviour
         cnt = Random.Range(0, tileDic.Count);
         foreach (var tile in tileDic.Values) {
             if (--cnt < 0)
-                return tile;
+                return tile.Loc;
         }
 
-        return null;
+        return new Location();
     }
 
     public IEnumerable<TileController> GetTrajectoryHitTile(Location id, Location dir, bool highlight = false)
@@ -209,9 +183,9 @@ public class GridManager : MonoBehaviour
     {
         EffectZone = new HashSet<Location>();
 
-        for (int i = 0; i < entity.Skills.Length; i++) {
+        for (int i = 0; i < entity.SkillHashes.Count; i++) {
             foreach (var label in labels) {
-                if (entity.Skills[i].labels.Contains(label)){
+                if (entity.SkillHashes[i].GetBaseSkill().labels.Contains(label)){
                     foreach (var effectLoc in CalculateEntityGivenSkillEffectZone(entity, isPrediction, i)) {
                         EffectZone.Add(effectLoc);
                     }
@@ -225,9 +199,9 @@ public class GridManager : MonoBehaviour
     {
         EffectZone = new HashSet<Location>();
 
-        for (int i = 0; i < entity.Skills.Length; i++) {
+        for (int i = 0; i < entity.SkillHashes.Count; i++) {
             foreach (var label in labels) {
-                if (entity.Skills[i].labels.Contains(label)) {
+                if (entity.SkillHashes[i].GetBaseSkill().labels.Contains(label)) {
                     foreach (var effectLoc in CalculateEntityGivenSkillEffectZone(entity, isPrediction, i, avoidZone)) {
                         EffectZone.Add(effectLoc);
                     }
@@ -246,8 +220,7 @@ public class GridManager : MonoBehaviour
     /// <returns></returns>
     public IEnumerable<Location> CalculateEntityGivenSkillEffectZone(Entity entity, bool isPrediction, int skillID)
     {
-        if (!entity.ActiveSkills[skillID].Castable) yield break;
-        var skill = entity.Skills[skillID];
+        var skill = entity.SkillHashes[skillID].GetBaseSkill();
         var zone = new HashSet<Location>();
         int entityAP = isPrediction ? Mathf.Clamp(entity.ActionPoints + entity.ActionPointsPerTurn, 0, 8) : entity.ActionPoints;
         int entityMoveStep = entityAP / entity.MoveCost;
@@ -274,8 +247,7 @@ public class GridManager : MonoBehaviour
     /// <returns></returns>
     public IEnumerable<Location> CalculateEntityGivenSkillEffectZone(Entity entity, bool isPrediction, int skillID, HashSet<Location> avoidZone)
     {
-        if (!entity.ActiveSkills[skillID].Castable) yield break;
-        var skill = entity.Skills[skillID];
+        var skill = entity.SkillHashes[skillID].GetBaseSkill();
 
         var zone = new HashSet<Location>();
         int entityAP = isPrediction ? Mathf.Clamp(entity.ActionPoints + entity.ActionPointsPerTurn, 0, 8) : entity.ActionPoints;
@@ -298,15 +270,15 @@ public class GridManager : MonoBehaviour
 
     public IEnumerable<CastSkillAction> CalculateCastSkillTile(Entity entity, int skillID, Location target, bool isPrediction = false)
     {
-        var skill = entity.Skills[skillID];
+        var skill = entity.SkillHashes[skillID].GetBaseSkill();
         int availableAP = isPrediction ? Mathf.Clamp(entity.ActionPoints + entity.ActionPointsPerTurn, 0, 8) : entity.ActionPoints - skill.actionPointsCost;
         if (availableAP < 0) yield break;
         for (int i = 0; i < availableAP / entity.MoveCost + 1; i++) {
             foreach (var loc in Astar.GetGivenDistancePoints(entity.Loc, i)) {
-                foreach (var cp in skill.CastPatterns) {
+                foreach (var cp in skill.CastPattern) {
                     foreach (var el in skill.GetSubEffectZone(loc, cp)) {
                         if (el.Equals(target)) {
-                            yield return new CastSkillAction(GetTileController(loc), loc + cp);
+                            yield return new CastSkillAction(loc, loc + cp);
                         }
                     }
                 }
@@ -314,11 +286,11 @@ public class GridManager : MonoBehaviour
         }
     }
 
-    public bool TryGetTileOutsideZone(Entity self, Entity caster,HashSet<Location> zone,out TileController safeTile)
+    public bool TryGetTileOutsideZone(Entity self,HashSet<Location> zone,out TileController safeTile)
     {
         foreach (var reachableLoc in Astar.GetGivenDistancePoints(self.Loc, self.ActionPoints/self.MoveCost)) {
             if (!zone.Contains(reachableLoc) && IsEmptyLocation(reachableLoc)) {
-                safeTile = GetTileController(reachableLoc);
+                safeTile = tileDic[reachableLoc];
                 return true;
             }
         }
@@ -336,11 +308,11 @@ public class GridManager : MonoBehaviour
         }
     }
 
-    public IEnumerable<TileController> ValidTiles()
+    public IEnumerable<Location> ValidLocations()
     {
         foreach (var tile in tileDic.Values) {
             if (tile.IsEmpty)
-                yield return tile;
+                yield return tile.Loc;
         }
     }
 

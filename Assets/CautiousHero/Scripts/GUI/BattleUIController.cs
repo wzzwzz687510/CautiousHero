@@ -36,7 +36,6 @@ public class BattleUIController : MonoBehaviour
     public Transform skillBoard;
     public Text skillName;
     public Text skillCost;
-    public Text skillCooldown;
     public Text skillValue;
     public Text skillType;
     public Text skillElement;
@@ -99,7 +98,6 @@ public class BattleUIController : MonoBehaviour
 
     public void Init()
     {
-        player.OnSkillUpdated += OnPlayerSkillUpdated;
         player.HPChangeAnimation += PlayerHPChangeAnimation;
         player.ssAnimEvent += PlayerSkillShiftAnimation;
         player.OnAPChanged.AddListener(OnPlayerAPChanged);
@@ -111,9 +109,7 @@ public class BattleUIController : MonoBehaviour
         BattleManager.Instance.CreatureBoardEvent += OnCreatureBoardEvent;
         AnimationManager.Instance.OnGameoverEvent.AddListener(Gameover);
 
-        for (int i = 0; i < 4; i++) {
-            skills[i].sprite = player.Skills[i].sprite;
-        }
+
 
         PlayerHPChangeAnimation(0, 0);
         PlayerHPChangeAnimation(1, 2);
@@ -122,7 +118,8 @@ public class BattleUIController : MonoBehaviour
 
     private void PlayerSkillShiftAnimation(float duration)
     {
-        throw new NotImplementedException();
+        if (player.SkillHashes.Count > player.defaultSkillCount)
+            UpdateSkillSprites();
     }
 
     private void PlayerHPChangeAnimation(float hpRatio, float duration)
@@ -145,14 +142,10 @@ public class BattleUIController : MonoBehaviour
         }
     }
 
-    private void OnPlayerSkillUpdated(int skillID, int cooldown)
+    private void UpdateSkillSprites()
     {
-        float tmp = Mathf.Clamp01(1.0f * cooldown / player.Skills[skillID].cooldownTime);
-        if (tmp == 1) {
-            skillCovers[skillID].fillAmount = tmp;
-        }
-        else {
-            DOTween.To(() => skillCovers[skillID].fillAmount, ratio => skillCovers[skillID].fillAmount = ratio, tmp, 1);
+        for (int i = 1; i < player.defaultSkillCount; i++) {
+            skills[i].sprite = player.SkillHashes[i].GetBaseSkill().sprite;
         }
     }
 
@@ -259,10 +252,9 @@ public class BattleUIController : MonoBehaviour
 
     public void ShowSkillBoard()
     {
-        var skill = player.Skills[selectSkillID] as ValueBasedSkill;
+        var skill = player.SkillHashes[selectSkillID].GetBaseSkill() as ValueBasedSkill;
         skillName.text = skill.skillName;
         skillCost.text = skill.actionPointsCost.ToString();
-        skillCooldown.text = skill.cooldownTime.ToString();
         skillValue.text = skill.baseValue.ToString() + " + <color=#ffa500ff>" + player.Intelligence * skill.attributeCof * skill.baseValue +"</color>";
         switch (skill.damageType) {
             case DamageType.Physical:
@@ -331,7 +323,7 @@ public class BattleUIController : MonoBehaviour
             creatureName.text = cc.creatureName;
             if (entity.Intelligence <= player.Intelligence) {
                 creatureHP.text = cc.attribute.maxHealth.ToString();
-                creatureAP.text = cc.attribute.action.ToString();
+                creatureAP.text = cc.attribute.actionPerTurn.ToString();
                 if(cc.skills.Length==0)
                     creatureResistance.text = "无";
                 else

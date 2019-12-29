@@ -9,7 +9,7 @@ namespace Wing.RPGSystem
     {
         public BaseAbiotic Template { get; protected set; }
 
-        public void InitAbioticEntity(BaseAbiotic template,TileController tc)
+        public void InitAbioticEntity(BaseAbiotic template,Location loc)
         {
             Template = template;
             EntityName = Template.abioticName;
@@ -25,7 +25,7 @@ namespace Wing.RPGSystem
             //EntitySprite.transform.localScale = new Vector3(0.1f / EntitySprite.size.x, 0.2f / EntitySprite.size.y);
             
 
-            MoveToTile(tc, true);
+            MoveToTile(loc, true);
             DropAnimation();
         }
 
@@ -38,7 +38,7 @@ namespace Wing.RPGSystem
 
         IEnumerator WaitDisplay()
         {            
-            while (!LocateTile.m_animator.GetCurrentAnimatorStateInfo(0).IsName("tile_fall")) {
+            while (!Loc.GetTileController().m_animator.GetCurrentAnimatorStateInfo(0).IsName("tile_fall")) {
                 yield return null;
             }
             EntitySprite.DOFade(1, 0);

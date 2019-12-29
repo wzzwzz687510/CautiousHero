@@ -25,7 +25,8 @@ public class TileController : MonoBehaviour
     public Vector3 Archor { get { return m_archor.position; } }
     public Location Loc { get; private set; }
     public Location CastLoc { get; private set; }
-    public Entity StayEntity { get; private set; }
+    public int StayEntityHash { get; private set; }
+    public Entity StayEntity { get { return StayEntityHash.GetEntity(); } }
     public bool IsEmpty { get { return StayEntity == null; } }
     public bool IsBind { get; private set; }
 
@@ -97,11 +98,11 @@ public class TileController : MonoBehaviour
         //Do something to entity;
     }
 
-    public void OnEntityEntering(Entity entity)
+    public void OnEntityEntering(int hash)
     {
         // Do something to entity;
 
-        StayEntity = entity;
+        StayEntityHash = hash;
         GridManager.Instance.Astar.SetTileWeight(Loc, 0);
     }
 
@@ -109,7 +110,7 @@ public class TileController : MonoBehaviour
     {
         // Do something to entity;
 
-        StayEntity = null;
+        StayEntityHash = 0;
         GridManager.Instance.Astar.SetTileWeight(Loc, 1);
     }
 

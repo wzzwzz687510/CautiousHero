@@ -45,13 +45,17 @@ namespace Wing.RPGSystem
         StrengthenBuff,
         Healing,
         Damage,
-        SuicideAttack
+        SuicideAttack,
+        Combo1st,
+        Combo2rd,
+        Combo3th,
+        Ally
     }
 
     [System.Serializable]
     public struct EffectPattern
     {
-        public Location pattern;
+        public Location loc;
         public float coefficient;
         public BaseBuff[] additionBuffs;
     }
@@ -69,7 +73,6 @@ namespace Wing.RPGSystem
         public string skillName = "New skill";
         public string description = "A mystical skill";
         public Sprite sprite;
-        public int cooldownTime;
         public int actionPointsCost;
         public int Hash { get { return skillName.GetStableHashCode(); } }
 
@@ -84,8 +87,8 @@ namespace Wing.RPGSystem
         public CastEffect castEffect;
         public ScriptablePattern tCastPatterns;
         public ScriptableEffectPattern tEffectPatterns;
-        public Location[] CastPatterns { get { return tCastPatterns.patterns; } }
-        public EffectPattern[] EffectPatterns { get { return tEffectPatterns.effectPatterns; } }
+        public Location[] CastPattern { get { return ScriptablePattern.Dict[Hash]; } }
+        public EffectPattern[] EffectPattern { get { return tEffectPatterns.effectPatterns; } }
 
         public abstract void ApplyEffect(int casterHash, Location castLoc);
 
@@ -142,12 +145,12 @@ namespace Wing.RPGSystem
                 yDir = -1;
             }
 
-            foreach (var skillPattern in EffectPatterns) {
+            foreach (var skillPattern in EffectPattern) {
                 if (flip) {
-                    yield return new Location(yDir * skillPattern.pattern.y, xDir * skillPattern.pattern.x);
+                    yield return new Location(yDir * skillPattern.loc.y, xDir * skillPattern.loc.x);
                 }
                 else {
-                    yield return new Location(xDir * skillPattern.pattern.x, yDir * skillPattern.pattern.y);
+                    yield return new Location(xDir * skillPattern.loc.x, yDir * skillPattern.loc.y);
                 }
             }
         }
@@ -173,7 +176,7 @@ namespace Wing.RPGSystem
         }
         public virtual IEnumerable<Location> GetEffectZone(Location casterLoc, bool includingPassLocation = false)
         {
-            foreach (var cp in CastPatterns) {
+            foreach (var cp in CastPattern) {
                 foreach (var effectLoc in GetSubEffectZone(casterLoc, cp, includingPassLocation)) {
                     yield return effectLoc;
                 }

@@ -8,13 +8,19 @@ namespace Wing.RPGSystem
 {
     public class PlayerController : Entity
     {
-        private TileController lastTile;
+        public float ssAnimDuration = 0.2f;
+        public int defaultSkillCount = 5;
+
+        public List<int> SkillDeck { get; private set; }
+        public List<int> SkillDeadwood { get; private set; }
+
+        private Location lastLoc;
         private int lastActionPoints;
 
         public delegate void SkillShiftAnimation(float duration);
         public SkillShiftAnimation ssAnimEvent;
 
-        public void InitPlayer(EntityAttribute attributes, BaseSkill[] skills)
+        public void InitPlayer(EntityAttribute attributes)
         {
             
             m_attribute = attributes;           
@@ -23,11 +29,10 @@ namespace Wing.RPGSystem
             BuffManager = new BuffManager(Hash);
 
             HealthPoints = MaxHealthPoints;
-            Skills = skills;
-            ActiveSkills = new InstanceSkill[Skills.Length];
-            for (int i = 0; i < Skills.Length; i++) {
-
-                ActiveSkills[i] = new InstanceSkill(Skills[i]);
+            SkillDeck = new List<int>(Database.Instance.ActiveData.learnedSkills);
+            SkillDeadwood = new List<int>();
+            for (int i = 0; i < defaultSkillCount; i++) {
+                ShiftASkill();
             }
         }
 
@@ -35,25 +40,15 @@ namespace Wing.RPGSystem
         {
             base.OnTurnStarted();
 
-            lastTile = LocateTile;
+            lastLoc = Loc;
             lastActionPoints = ActionPoints;
         }
 
         public override void CastSkill(int skillID, Location castLoc)
         {
             base.CastSkill(skillID, castLoc);
-            lastTile = LocateTile;
+            lastLoc = Loc;
             lastActionPoints = ActionPoints;
-        }
-
-        public void CancelMove()
-        {
-            if (!lastTile)
-                return;
-
-            MoveToTile(lastTile, true);
-            ActionPoints = lastActionPoints;
-            OnAPChanged?.Invoke();
         }
 
         public override void DropAnimation()
@@ -62,9 +57,30 @@ namespace Wing.RPGSystem
             transform.GetChild(0).DOLocalMoveY(0.3f, 0.5f);
         }
 
-        public void SetActionPoints(int value)
+        public void ShiftASkill()
         {
-            ActionPoints = value;
+            if(SkillDeck.Count==0) {
+                //SkillDeadwood.Sort();
+
+                // might be new List<int>(SkillDeadwood)
+                SkillDeck = SkillDeadwood;
+                SkillDeadwood = new List<int>();
+            }
+
+            int r = SkillDeck.Count.Random();
+            SkillHashes.Insert(0, SkillDeck[r]);
+            ssAnimEvent?.Invoke(ssAnimDuration);
+            if (SkillHashes.Count <= defaultSkillCount) return;
+
+            SkillDeadwood.Add(SkillHashes[defaultSkillCount]);
+            SkillHashes.RemoveAt(defaultSkillCount);            
+        }
+
+        public void CancelMove()
+        {
+            MoveToTile(lastLoc, true);
+            ActionPoints = lastActionPoints;
+            OnAPChanged?.Invoke();
         }
     }
 }

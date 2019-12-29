@@ -22,21 +22,20 @@ namespace Wing.RPGSystem
                         Hash, caster.Loc, castLoc, castEffect.animDuration));
                     if (BattleManager.Instance.IsPlayerTurn)
                         AnimationManager.Instance.PlayOnce();
-                    foreach (var ep in EffectPatterns) {
-                        effectLocation = castLoc + GetFixedEffectPattern(castLoc - caster.Loc, ep.pattern);
-                        if (effectLocation.IsValid() && !effectLocation.IsEmpty()) {
-                            Entity target = effectLocation.GetStayEntity();
+                    foreach (var ep in EffectPattern) {
+                        effectLocation = castLoc + GetFixedEffectPattern(castLoc - caster.Loc, ep.loc);
+                        if (effectLocation.TryGetStayEntity(out Entity target)) {
                             target.DamageHP(CalculateValue(casterHash, ep.coefficient));
                             for (int i = 0; i < ep.additionBuffs.Length; i++) {
                                 target.BuffManager.AddBuff(new BuffHandler(
                                     casterHash, target.Hash, ep.additionBuffs[i].Hash));
-                            }                          
+                            }
                         }
                     }
                     break;
                 case CastType.Trajectory:
-                    foreach (var ep in EffectPatterns) {
-                        var dir = GetFixedEffectPattern(castLoc - caster.Loc, ep.pattern);
+                    foreach (var ep in EffectPattern) {
+                        var dir = GetFixedEffectPattern(castLoc - caster.Loc, ep.loc);
                         effectLocation = castLoc + dir;
                         foreach (var tc in GridManager.Instance.GetTrajectoryHitTile(castLoc, dir)) {
                             if (!tc.IsEmpty) {

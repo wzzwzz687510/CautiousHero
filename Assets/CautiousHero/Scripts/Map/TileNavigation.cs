@@ -122,7 +122,7 @@ namespace Wing.RPGSystem
 
         public IEnumerable<Location> Neighbors(Location id)
         {
-            foreach (var dir in Patterns.Cross) {
+            foreach (var dir in ScriptablePattern.Cross) {
                 Location next = new Location(id.x + dir.x, id.y + dir.y);
                 if (InBounds(next) && Passable(next)) {
                     yield return next;

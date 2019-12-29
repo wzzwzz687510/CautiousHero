@@ -16,7 +16,7 @@ namespace Wing.RPGSystem
         public EntityAttribute attribute;
         public long coins;
         public long gainedExp;
-        public int[] learnedSkills;
+        public List<int> learnedSkills;
         public Location mapLoc;
     }
 
@@ -33,7 +33,7 @@ namespace Wing.RPGSystem
         public BaseSkill[] skills;
         public BattleConfig config;
 
-        private int[] skillDeck;
+        private List<int> skillDeck;
 
         public PlayerData ActiveData { get { return m_activeData; } }
         private PlayerData m_activeData;
@@ -46,9 +46,9 @@ namespace Wing.RPGSystem
             if (!Instance)
                 Instance = this;
 
-            skillDeck = new int[skills.Length];
+            skillDeck = new List<int>();
             for (int i = 0; i < skills.Length; i++) {
-                skillDeck[i] = skills[i].Hash;
+                skillDeck.Add(skills[i].Hash);
             }
             LoadData(worldName);
             if (resetData) CreateNewSave(worldName, playerName, spriteID, attribute, skillDeck);
@@ -86,7 +86,7 @@ namespace Wing.RPGSystem
             Debug.Log("Game Loaded");
         }
 
-        public void CreateNewSave(string worldName,string playerName,int spriteID, EntityAttribute attribute,int[] skillDeck)
+        public void CreateNewSave(string worldName,string playerName,int spriteID, EntityAttribute attribute,List<int> skillDeck)
         {
             m_activeData = new PlayerData();
             m_activeData.worldName = worldName;
@@ -105,14 +105,15 @@ namespace Wing.RPGSystem
             return sr.Next(min, max);
         }
 
+        // Obsolute
         public BaseSkill[] GetEquippedSkills()
         {
             //foreach (var key in BaseSkill.Dict.Keys) {
             //    Debug.Log(key);
             //}
             
-            var skills = new BaseSkill[ActiveData.learnedSkills.Length];
-            for (int i = 0; i < ActiveData.learnedSkills.Length; i++) {
+            var skills = new BaseSkill[ActiveData.learnedSkills.Count];
+            for (int i = 0; i < skills.Length; i++) {
                 if(!BaseSkill.Dict.TryGetValue(ActiveData.learnedSkills[i], out skills[i])) {
                     Debug.LogError("Skill does not exist, please check!");
                 }

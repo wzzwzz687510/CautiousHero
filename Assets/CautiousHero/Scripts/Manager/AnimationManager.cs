@@ -39,9 +39,8 @@ namespace Wing.RPGSystem
         public Vector3[] path;
 
         public MovePathAnimClip(int entityHash, Vector3[] path, float duration = 0.5f)
+            :base(AnimType.MovePath,duration)
         {
-            this.type = AnimType.MovePath;
-            this.duration = duration;
             this.entityHash = entityHash;
             this.path = path;
         }
@@ -53,9 +52,8 @@ namespace Wing.RPGSystem
         public Location destination;
 
         public MoveInstantAnimClip(int entityHash, Location destination, float duration = 0.5f)
+            : base(AnimType.MoveInstant, duration)
         {
-            this.type = AnimType.MoveInstant;
-            this.duration = duration;
             this.entityHash = entityHash;
             this.destination = destination;
         }
@@ -70,9 +68,8 @@ namespace Wing.RPGSystem
 
         public CastAnimClip(CastType castType, int skillHash,
             Location from, Location to, float duration = 0.5f)
+            : base(AnimType.Cast, duration)
         {
-            this.type = AnimType.Cast;
-            this.duration = duration;
             this.castType = castType;
             this.skillHash = skillHash;
             start = from;
@@ -86,9 +83,8 @@ namespace Wing.RPGSystem
         public float ratio;
 
         public HPChangeAnimClip(int entityHash, float ratio, float duration = 0.5f)
+            : base(AnimType.HPChange, duration)
         {
-            this.type = AnimType.HPChange;
-            this.duration = duration;
             this.entityHash = entityHash;
             this.ratio = ratio;
         }
@@ -101,9 +97,8 @@ namespace Wing.RPGSystem
         public bool isPhysical;
 
         public ArmourPChangeAnimClip(int entityHash, float ratio,bool isPhysical, float duration = 0.5f)
+            : base(AnimType.ArmourPChange, duration)
         {
-            this.type = AnimType.ArmourPChange;
-            this.duration = duration;
             this.entityHash = entityHash;
             this.ratio = ratio;
             this.isPhysical = isPhysical;
@@ -113,22 +108,20 @@ namespace Wing.RPGSystem
     public class SkillShiftAnimClip : BaseAnimClip
     {
         public SkillShiftAnimClip(float duration = 0.2f)
+            : base(AnimType.SkillShift, duration)
         {
-            this.type = AnimType.SkillShift;
-            this.duration = duration;
         }
     }
 
     public class OutlineEntityAnimClip : BaseAnimClip
     {
-        public Entity entity;
+        public int entityHash;
         public Color color;
 
-        public OutlineEntityAnimClip(Entity entity, Color color, float duration = 0.5f)
+        public OutlineEntityAnimClip(int entityHash, Color color, float duration = 0.5f)
+            : base(AnimType.OutlineEntity, duration)
         {
-            this.type = AnimType.OutlineEntity;
-            this.duration = duration;
-            this.entity = entity;
+            this.entityHash = entityHash;
             this.color = color;
         }
     }
@@ -305,7 +298,7 @@ namespace Wing.RPGSystem
                     break;
                 case AnimType.OutlineEntity:
                     var outlineEntityClip = clip as OutlineEntityAnimClip;
-                    outlineEntityClip.entity.ChangeOutlineColor(outlineEntityClip.color);
+                    outlineEntityClip.entityHash.GetEntity().ChangeOutlineColor(outlineEntityClip.color);
                     break;
                 case AnimType.Gameover:
                     yield return new WaitForSeconds(clip.duration);

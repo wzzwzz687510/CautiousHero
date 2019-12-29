@@ -11,16 +11,18 @@ namespace Wing.RPGSystem
     public struct EntityAttribute
     {
         public int maxHealth;
-        public int action;
+        public int maxAction;
+        public int actionPerTurn;
         public int strength;
         public int intelligence;
         public int agility;
         public int moveCost;
 
-        public EntityAttribute(int maxHp, int act, int str, int inte, int agi, int mvCost)
+        public EntityAttribute(int maxHp, int maxAct, int act, int str, int inte, int agi, int mvCost)
         {
             maxHealth = maxHp;
-            action = act;
+            maxAction = maxAct;
+            actionPerTurn = act;
             strength = str;
             intelligence = inte;
             agility = agi;
@@ -28,9 +30,9 @@ namespace Wing.RPGSystem
         }
 
         public static EntityAttribute operator -(EntityAttribute a) =>
-            new EntityAttribute(-a.maxHealth, -a.action, -a.strength, -a.intelligence, -a.agility, -a.moveCost);
+            new EntityAttribute(-a.maxHealth, -a.maxAction, -a.actionPerTurn, -a.strength, -a.intelligence, -a.agility, -a.moveCost);
         public static EntityAttribute operator +(EntityAttribute a, EntityAttribute b) =>
-            new EntityAttribute(a.maxHealth + b.maxHealth, a.action + b.action,
+            new EntityAttribute(a.maxHealth + b.maxHealth, a.maxAction + b.maxAction, a.actionPerTurn + b.actionPerTurn,
                 a.strength + b.strength, a.intelligence + b.intelligence, a.agility + b.agility, a.moveCost + b.moveCost);
         public static EntityAttribute operator -(EntityAttribute a, EntityAttribute b) => a + -(b);
     }
@@ -96,12 +98,10 @@ namespace Wing.RPGSystem
         public int MagicalArmourPoints { get; protected set; }
         public int ActionPoints { get; protected set; }
         public bool IsDeath { get; protected set; }
-        public BaseSkill[] Skills { get; protected set; }
-        public InstanceSkill[] ActiveSkills { get; protected set; }
+        public List<int> SkillHashes { get; protected set; }
         public BuffManager BuffManager { get; protected set; }
 
-        public TileController LocateTile { get; protected set; }
-        public Location Loc { get { return LocateTile.Loc; } }
+        public Location Loc { get; protected set; }
         public Vector3[] MovePath { get; protected set; }
 
         protected EntityAttribute m_attribute;
@@ -111,7 +111,8 @@ namespace Wing.RPGSystem
             }
         }
         public int MaxHealthPoints { get { return Attribute.maxHealth; } }
-        public int ActionPointsPerTurn { get { return Attribute.action; } }
+        public int MaxActionPoints { get { return Attribute.maxAction; } }
+        public int ActionPointsPerTurn { get { return Attribute.actionPerTurn; } }
         public int Strength { get { return Attribute.strength; } }
         public int Intelligence { get { return Attribute.intelligence; } }
         public int Agility { get { return Attribute.agility; } }
@@ -129,8 +130,6 @@ namespace Wing.RPGSystem
         public PointsChange HPChangeAnimation;
         public PointsChange physicalAPChangeAnimation;
         public PointsChange magicalAPChangeAnimation;
-        public delegate void SkillUpdat(int index,int cooldown);
-        public event SkillUpdat OnSkillUpdated;
 
         [HideInInspector] public UnityEvent OnTurnStartedEvent;
         [HideInInspector] public UnityEvent OnTurnEndedEvent;
@@ -155,10 +154,6 @@ namespace Wing.RPGSystem
         {
             OnTurnStartedEvent?.Invoke();
             BuffManager.UpdateBuffs();
-            for (int i = 0; i < ActiveSkills.Length; i++) {
-                ActiveSkills[i].UpdateSkill();
-                OnSkillUpdated?.Invoke(i, ActiveSkills[i].Cooldown);
-            }
 
             ActionPoints = Mathf.Min(ActionPoints + ActionPointsPerTurn, 8);
             OnAPChanged?.Invoke();
@@ -172,16 +167,16 @@ namespace Wing.RPGSystem
         /// <summary>
         /// set anim false generally means move entity to one place instantly without move cost (e.g. by skill effect).
         /// </summary>
-        /// <param name="targetTile"></param>
+        /// <param name="targetLoc"></param>
         /// <param name="isInstance"></param>
-        public virtual void MoveToTile(TileController targetTile, bool isInstance = false)
+        public virtual void MoveToTile(Location targetLoc, bool isInstance = false)
         {
-            if (targetTile == LocateTile) {
+            if (targetLoc == Loc) {
                 return;
             }
 
             if (!isInstance) {
-                Stack<Location> path = GridManager.Instance.Astar.GetPath(Loc, targetTile.Loc);
+                Stack<Location> path = GridManager.Instance.Astar.GetPath(Loc, targetLoc);
 
                 if (path.Count * MoveCost > ActionPoints) {
 
@@ -200,33 +195,29 @@ namespace Wing.RPGSystem
                 // Animation move
             }
 
-            if (LocateTile) {
-                LocateTile.OnEntityLeaving();
+            if (Loc.TryGetTileController(out TileController leaveTile)) {
+                leaveTile.OnEntityLeaving();
             }
-            LocateTile = targetTile;
-            targetTile.OnEntityEntering(this);
-
+            Loc = targetLoc;
+            Loc.GetTileController().OnEntityEntering(Hash);
 
             if (isInstance) {               
-                AnimationManager.Instance.AddAnimClip(new MoveInstantAnimClip(Hash, targetTile.Loc, 0.2f));
+                AnimationManager.Instance.AddAnimClip(new MoveInstantAnimClip(Hash, targetLoc, 0.2f));
                 AnimationManager.Instance.PlayOnce();
             }
             else {
 
                 AnimationManager.Instance.AddAnimClip(new MovePathAnimClip(Hash, MovePath, 0.2f));
             }
-                
         }
 
         public virtual void CastSkill(int skillID, Location castLoc)
         {
-            var tSkill = Skills[skillID];
+            BaseSkill tSkill = SkillHashes[skillID].GetBaseSkill();
             if (ActionPoints < tSkill.actionPointsCost)
                 return;
             ActionPoints -= tSkill.actionPointsCost;
             OnAPChanged?.Invoke();
-            ActiveSkills[skillID].SetCooldown(tSkill.cooldownTime);
-            OnSkillUpdated?.Invoke(skillID, tSkill.cooldownTime);
 
             tSkill.ApplyEffect(Hash, castLoc);
         }

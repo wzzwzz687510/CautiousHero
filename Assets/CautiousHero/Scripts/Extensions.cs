@@ -18,15 +18,25 @@ namespace Wing.RPGSystem
 
         public static int Random(this int max) => Database.Instance.Random(0, max);
 
-        public static bool IsValid(this Location location) => GridManager.Instance.IsValidLocation(location);
+        public static bool IsValid(this Location location) => GridManager.Instance.tileDic.ContainsKey(location);
 
         public static bool IsEmpty(this Location location) => GridManager.Instance.IsEmptyLocation(location);
 
-        public static TileController GetTileController(this Location location) => GridManager.Instance.GetTileController(location);
+        public static bool TryGetTileController(this Location location, out TileController tc) => GridManager.Instance.tileDic.TryGetValue(location, out tc);
 
-        public static Entity GetStayEntity(this Location location) => location.GetTileController().StayEntity;
+        public static TileController GetTileController(this Location location) => GridManager.Instance.tileDic[location];
 
-        public static int GetDistance(this Location location, Location loc) =>Math.Abs(location.x - loc.x) + Math.Abs(location.y - loc.y);
+        public static bool TryGetStayEntity(this Location location, out Entity entity) {
+            if(location.TryGetTileController(out TileController tc)) {
+                entity = tc.StayEntity;
+                return true;
+            }
+            entity = null;
+            return false;
+        }
+
+        public static int Distance(this Location location, Location loc) =>Math.Abs(location.x - loc.x) + Math.Abs(location.y - loc.y);
+        public static bool HasPath(this Location from, Location to) => GridManager.Instance.Astar.HasPath(from, to);
 
         public static BaseSkill GetBaseSkill(this int hash) => BaseSkill.Dict[hash];
 

@@ -9002,7 +9002,6 @@ MonoBehaviour:
   skillBoard: {fileID: 538232924}
   skillName: {fileID: 1418600674}
   skillCost: {fileID: 1015305809}
-  skillCooldown: {fileID: 32785467}
   skillValue: {fileID: 113095686}
   skillType: {fileID: 1562456199}
   skillElement: {fileID: 759181801}
@@ -9406,7 +9405,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 1.691, y: 0}
+  m_AnchoredPosition: {x: 1.6910019, y: 0}
   m_SizeDelta: {x: -3.373, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1384316319
@@ -10884,6 +10883,53 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1642371244}
   m_CullTransparentMesh: 0
+--- !u!1 &1659014866
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1659014868}
+  - component: {fileID: 1659014867}
+  m_Layer: 0
+  m_Name: GameObject
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1659014867
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1659014866}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fc7b9deac56f3fd46bc1acafd32e3c4a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  code: 4-3-Fill
+  type: 1
+  size: 4
+  emptySize: 2
+--- !u!4 &1659014868
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1659014866}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 818.3423, y: 599.6952, z: 1368.4246}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 8
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1720650556
 GameObject:
   m_ObjectHideFlags: 0

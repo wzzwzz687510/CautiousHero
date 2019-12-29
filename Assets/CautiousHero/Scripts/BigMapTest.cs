@@ -46,8 +46,7 @@ public class BigMapTest : MonoBehaviour
             }
             else {
                 if (!isMoving && Input.GetMouseButtonDown(0)) {
-                    player.SetActionPoints(9999);
-                    player.MoveToTile(selectTile);
+                    player.MoveToTile(selectTile.Loc);
                     AnimationManager.Instance.PlayOnce();
                     selectTile.ChangeTileState(TileState.Normal);
                     selectTile = null;
@@ -65,8 +64,8 @@ public class BigMapTest : MonoBehaviour
     private void OnCompleteMapRenderEvent()
     {
         
-        player.InitPlayer(Database.Instance.ActiveData.attribute, Database.Instance.GetEquippedSkills());
-        player.MoveToTile(GridManager.Instance.GetRandomTile(true), true);
+        player.InitPlayer(Database.Instance.ActiveData.attribute);
+        player.MoveToTile(GridManager.Instance.GetRandomLoc(true), true);
         player.EntitySprite.color = Color.white;
         mainCamera.enabled = true;
         DOTween.To(() => mainCamera.m_Lens.OrthographicSize, value => mainCamera.m_Lens.OrthographicSize = value,1.5f, 1);
