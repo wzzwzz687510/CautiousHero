@@ -59,9 +59,14 @@ public class GridManager : MonoBehaviour
         for (int i = 1; i < config.abioticSets.Length; i++) {
             possiblities[i] = possiblities[i - 1] + sets[i].power;
         }
+        HashSet<Location> entityLocs = new HashSet<Location>();
+        foreach (var set in Database.Instance.config.creatureSets) {
+            entityLocs.Add(set.location);
+        }
         int totalPower = possiblities[sets.Length - 1];
         float randomFill, randomAbiotic;
         foreach (var loc in ValidLocations()) {
+            if (entityLocs.Contains(loc)) continue;
             randomFill = 1000.Random() / 1000.0f;
             if (randomFill <= config.coverage) {
                 randomAbiotic = totalPower.Random();
@@ -97,6 +102,7 @@ public class GridManager : MonoBehaviour
                 }
             }
         }
+
         //Debug.Log("tile cnt:" + tileHolder.transform.childCount);
         yield return AddAbiotics();
         yield return new WaitForSeconds(2);
