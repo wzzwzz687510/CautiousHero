@@ -147,6 +147,7 @@ namespace Wing.RPGSystem
             m_glowEffect = GetComponentInChildren<SpriteGlowEffect>();
             m_collider = GetComponentInChildren<BoxCollider2D>();
             IsDeath = false;
+            SkillHashes = new List<int>();
             OnSortingOrderChanged += OnSortingOrderChangedEvent;
         }
 

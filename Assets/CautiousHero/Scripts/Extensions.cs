@@ -36,13 +36,17 @@ namespace Wing.RPGSystem
         }
 
         public static int Distance(this Location location, Location loc) =>Math.Abs(location.x - loc.x) + Math.Abs(location.y - loc.y);
+
         public static bool HasPath(this Location from, Location to) => GridManager.Instance.Astar.HasPath(from, to);
 
         public static BaseSkill GetBaseSkill(this int hash) => BaseSkill.Dict[hash];
 
         public static BaseBuff GetBaseBuff(this int hash) => BaseBuff.Dict[hash];
 
-        public static Entity GetEntity(this int hash) => EntityManager.Instance.entityDic[hash];
+        public static Entity GetEntity(this int hash) {
+            EntityManager.Instance.entityDic.TryGetValue(hash, out Entity entity);
+            return entity;
+        }
 
     }
 }

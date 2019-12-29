@@ -172,9 +172,10 @@ namespace Wing.RPGSystem
         public EntityAttribute GetAttributeAdjustment()
         {
             EntityAttribute tmp = new EntityAttribute();
-            foreach (var buffHandler in buffs?[BuffType.Attribute].Values) {
-                tmp += (buffHandler.TemplateBuff as AttributeBuff).adjustValue;
-            }
+            if (buffs.ContainsKey(BuffType.Attribute))
+                foreach (var buffHandler in buffs[BuffType.Attribute].Values) {
+                    tmp += (buffHandler.TemplateBuff as AttributeBuff).adjustValue;
+                }
 
             return tmp;
         }

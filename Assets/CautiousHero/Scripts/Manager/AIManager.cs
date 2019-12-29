@@ -75,6 +75,8 @@ namespace Wing.RPGSystem
                 Creatures.Add(Instantiate(creaturePrefab, creatureHolder.transform).GetComponent<CreatureController>());
                 StartCoroutine(Creatures[i].InitCreature(config.creatureSets[i].tCreature,config.creatureSets[i].location));
             }
+
+            castableSkills = new List<CastableSkill>();
         }
 
         public void OnBotTurnStart()
