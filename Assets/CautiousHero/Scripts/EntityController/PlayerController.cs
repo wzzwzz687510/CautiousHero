@@ -116,9 +116,9 @@ namespace Wing.RPGSystem
         private void SaveStatus()
         {
             lastLoc = Loc;
-            lastSkills = new List<int>(SkillHashes);
-            lastSkillDeck = new List<int>(SkillDeck);
-            lastSkillDiscardPile = new List<int>(SkillDiscardPile);
+            //lastSkills = new List<int>(SkillHashes);
+            //lastSkillDeck = new List<int>(SkillDeck);
+            //lastSkillDiscardPile = new List<int>(SkillDiscardPile);
             lastActionPoints = ActionPoints;
         }
     }
