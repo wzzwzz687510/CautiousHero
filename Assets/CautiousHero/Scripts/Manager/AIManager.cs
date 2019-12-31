@@ -267,47 +267,44 @@ namespace Wing.RPGSystem
             HashSet<Location> destinations = new HashSet<Location>();
             for (int creatureID = 0; creatureID < Creatures.Count; creatureID++) {
                 CreatureController bot = Creatures[creatureID];
-                withoutMove = false;
                 int moveSteps = (bot.ActionPoints - bot.NextSkill.actionPointsCost) / bot.MoveCost;
                 if (moveSteps < 0) continue;
 
                 // Ally skill cast to next bot to simplify the AI complexity. Increase the skill design and config set complexity.
                 Location targetLoc = bot.NextSkillTarget.Loc;
 
-                Location nearestCP = new Location(bot.Loc);
-                Location nearestEL = new Location(bot.Loc);
-                int minDistance = bot.MaxActionPoints + 1;
+                bool shouldMove = true;
                 foreach (var cp in bot.NextSkill.CastPattern) {
-                    foreach (var el in bot.NextSkill.GetSubEffectZone(bot.Loc, cp)) {
-                        int distance = el.Distance(targetLoc);
-                        if (distance == 0) {
-                            //Debug.Log("creatureID: " + creatureID+", cast loc: "+ (bot.Loc + cp).ToString());
+                    foreach (var el in bot.NextSkill.GetSubEffectZone(bot.Loc,cp)) {
+                        if (el == bot.NextSkillTarget.Loc) {
+                            shouldMove = false;
                             castableSkills.Add(new CastableSkill(creatureID, new CastSkillAction(bot.Loc, bot.Loc + cp)));
-                            withoutMove = true;
                             break;
                         }
-                        else if (distance < minDistance) {
-                            Location moveto = bot.Loc + targetLoc - el;
-                            if (destinations.Contains(moveto)) continue;
-                            if (bot.Loc.HasPath(moveto)) {
-                                minDistance = distance;
-                                nearestCP = cp;
-                                nearestEL = el;
+                    }
+                }
+                if (shouldMove) {
+                    bool finished = false;
+                    foreach (var cp in bot.NextSkill.CastPattern) {
+                        foreach (var ep in bot.NextSkill.EffectPattern) {
+                            Location destination = bot.NextSkillTarget.Loc - ep.loc - cp;
+                            if (destination.IsEmpty() && !destinations.Contains(destination)) {
+                                Location tmp = bot.Loc.GetLocationWithGivenStep(destination, moveSteps);
+                                if (tmp == destination) {
+                                    castableSkills.Add(new CastableSkill(creatureID, new CastSkillAction(destination, destination + cp)));
+                                    destinations.Add(destination);
+                                    // Set map temporary
+                                    GridManager.Instance.Astar.SetTileWeight(bot.Loc, 1);
+                                    GridManager.Instance.Astar.SetTileWeight(destination, 0);
+                                    finished = true;
+                                    break;
+                                }
                             }
                         }
+                        if (finished) break;
                     }
-                    if (withoutMove) break;
                 }
 
-                if (!withoutMove && minDistance <= moveSteps) {
-                    Location moveto = bot.Loc + targetLoc - nearestEL;
-                    Debug.Log("creatureID: " + creatureID + ", cast loc: " + (moveto + nearestCP).ToString() + ", movesteps: " + moveSteps);
-                    castableSkills.Add(new CastableSkill(creatureID, new CastSkillAction(moveto, moveto + nearestCP)));
-                    destinations.Add(moveto);
-                    // Set map temporary
-                    GridManager.Instance.Astar.SetTileWeight(bot.Loc, 1);
-                    GridManager.Instance.Astar.SetTileWeight(moveto, 0);
-                }
             }
             // Resume map status
             foreach (var bot in Creatures) {

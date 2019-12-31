@@ -154,6 +154,13 @@ namespace Wing.RPGSystem
                 }
             }
         }
+        /// <summary>
+        /// Return effect location
+        /// </summary>
+        /// <param name="casterLoc"></param>
+        /// <param name="cp"></param>
+        /// <param name="includingPassLocation"></param>
+        /// <returns></returns>
         public virtual IEnumerable<Location> GetSubEffectZone(Location casterLoc, Location cp, bool includingPassLocation = false)
         {
             switch (castType) {
@@ -174,6 +181,12 @@ namespace Wing.RPGSystem
                     break;
             }
         }
+        /// <summary>
+        /// Return effect location
+        /// </summary>
+        /// <param name="casterLoc"></param>
+        /// <param name="includingPassLocation"></param>
+        /// <returns></returns>
         public virtual IEnumerable<Location> GetEffectZone(Location casterLoc, bool includingPassLocation = false)
         {
             foreach (var cp in CastPattern) {
