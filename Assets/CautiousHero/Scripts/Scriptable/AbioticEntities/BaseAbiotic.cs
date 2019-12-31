@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Wing.RPGSystem
 {
-    [CreateAssetMenu(fileName = "Abiotic", menuName = "Wing/Scriptable Abiotic/BaseAbiotic", order = 2)]
+    [CreateAssetMenu(fileName = "Abiotic", menuName = "Wing/Scriptable Abiotic/BaseAbiotic", order = 30)]
     public class BaseAbiotic : ScriptableObject
     {
         public string abioticName = "New Abiotic";

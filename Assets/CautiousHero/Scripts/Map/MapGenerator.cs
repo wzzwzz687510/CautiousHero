@@ -413,6 +413,13 @@ namespace Wing.RPGSystem
     public struct Location
     {
         public int x, y;
+
+        public Location(Location loc)
+        {
+            x = loc.x;
+            y = loc.y;
+        }
+
         public Location(int x, int y)
         {
             this.x = x;

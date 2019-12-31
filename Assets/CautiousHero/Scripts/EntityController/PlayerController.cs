@@ -12,7 +12,7 @@ namespace Wing.RPGSystem
         public int defaultSkillCount = 5;
 
         public List<int> SkillDeck { get; private set; }
-        public List<int> SkillDeadwood { get; private set; }
+        public List<int> SkillDiscardPile { get; private set; }
 
         private Location lastLoc;
         private int lastActionPoints;
@@ -30,7 +30,7 @@ namespace Wing.RPGSystem
 
             HealthPoints = MaxHealthPoints;
             SkillDeck = new List<int>(Database.Instance.ActiveData.learnedSkills);
-            SkillDeadwood = new List<int>();
+            SkillDiscardPile = new List<int>();
             for (int i = 0; i < defaultSkillCount; i++) {
                 ShiftASkill();
             }
@@ -63,16 +63,17 @@ namespace Wing.RPGSystem
                 //SkillDeadwood.Sort();
 
                 // might be new List<int>(SkillDeadwood)
-                SkillDeck = SkillDeadwood;
-                SkillDeadwood = new List<int>();
+                SkillDeck = SkillDiscardPile;
+                SkillDiscardPile = new List<int>();
             }
 
             int r = SkillDeck.Count.Random();
             SkillHashes.Insert(0, SkillDeck[r]);
             ssAnimEvent?.Invoke(ssAnimDuration);
+            SkillDeck.RemoveAt(r);
             if (SkillHashes.Count <= defaultSkillCount) return;
 
-            SkillDeadwood.Add(SkillHashes[defaultSkillCount]);
+            SkillDiscardPile.Add(SkillHashes[defaultSkillCount]);
             SkillHashes.RemoveAt(defaultSkillCount);            
         }
 

@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Wing.RPGSystem
 {
-    [CreateAssetMenu(fileName = "Skill", menuName = "Wing/Scriptable Skills/BasicHealSkill", order = 3)]
+    [CreateAssetMenu(fileName = "Skill", menuName = "Wing/Scriptable Skills/BasicHealSkill", order = 999)]
     public class BasicHealSkill : ValueBasedSkill
     {
 

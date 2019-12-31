@@ -22,8 +22,7 @@ namespace Wing.RPGSystem
             m_attribute = Template.attribute;
             HealthPoints = MaxHealthPoints;
 
-            //EntitySprite.transform.localScale = new Vector3(0.1f / EntitySprite.size.x, 0.2f / EntitySprite.size.y);
-            
+            //EntitySprite.transform.localScale = new Vector3(0.1f / EntitySprite.size.x, 0.2f / EntitySprite.size.y);       
 
             MoveToTile(loc, true);
             DropAnimation();

@@ -45,6 +45,23 @@ namespace Wing.RPGSystem
             return new AStarSearch(grid, from, to).cameFrom.ContainsKey(to);
         }
 
+        public Location GetLocationWithGivenStep(Location from, Location to, int step)
+        {
+            Location destination = to;
+            var astar = new AStarSearch(grid, from, to);
+            if (!astar.cameFrom.ContainsKey(to)) return destination;
+            int cnt = 0;
+            while (!destination.Equals(from)) {
+                cnt++;
+                destination = astar.cameFrom[destination];
+            }
+            destination = to;
+            for (int i = 0; i < cnt - step; i++) {
+                destination = astar.cameFrom[destination];
+            }
+            return destination;
+        }
+
         public IEnumerable<Location> GetGivenDistancePoints(Location origin, int steps, bool includeInside = true)
         {
             Location destination;

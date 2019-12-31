@@ -120,7 +120,7 @@ public class GridManager : MonoBehaviour
 
     public bool IsEmptyLocation(Location id)
     {
-        return tileDic[id].IsEmpty;
+        return tileDic.ContainsKey(id) && tileDic[id].IsEmpty;
     }
 
     public bool ChangeTileState(Location id, TileState state)

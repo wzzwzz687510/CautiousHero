@@ -105,6 +105,7 @@ namespace Wing.RPGSystem {
             base.Death();
             
             Loc.GetTileController().OnEntityLeaving();
+            AIManager.Instance.OnBotDeath(this);
         }
     }
 }

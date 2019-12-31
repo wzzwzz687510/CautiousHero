@@ -93,14 +93,12 @@ namespace Wing.RPGSystem
     public class ArmourPChangeAnimClip : BaseAnimClip
     {
         public int entityHash;
-        public float ratio;
         public bool isPhysical;
 
-        public ArmourPChangeAnimClip(int entityHash, float ratio,bool isPhysical, float duration = 0.5f)
+        public ArmourPChangeAnimClip(int entityHash,bool isPhysical, float duration = 0.5f)
             : base(AnimType.ArmourPChange, duration)
         {
             this.entityHash = entityHash;
-            this.ratio = ratio;
             this.isPhysical = isPhysical;
         }
     }
@@ -283,10 +281,10 @@ namespace Wing.RPGSystem
                     var apChangeClip = clip as ArmourPChangeAnimClip;
                     if (!EntityManager.Instance.TryGetEntity(apChangeClip.entityHash, out entity))
                         break;
-                    if(apChangeClip.isPhysical)
-                        entity.physicalAPChangeAnimation?.Invoke(apChangeClip.ratio, apChangeClip.duration * animRate);
+                    if (apChangeClip.isPhysical)
+                        entity.ArmourPointsChangeAnimation?.Invoke(true,entity.PhysicalArmourPoints != 0);
                     else
-                        entity.magicalAPChangeAnimation?.Invoke(apChangeClip.ratio, apChangeClip.duration * animRate);
+                        entity.ArmourPointsChangeAnimation?.Invoke(false,entity.MagicalArmourPoints != 0);
                     yield return new WaitForSeconds(apChangeClip.duration * animRate);
                     break;
                 case AnimType.SkillShift:

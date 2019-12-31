@@ -24,8 +24,8 @@ namespace Wing.RPGSystem
                         AnimationManager.Instance.PlayOnce();
                     foreach (var ep in EffectPattern) {
                         effectLocation = castLoc + GetFixedEffectPattern(castLoc - caster.Loc, ep.loc);
-                        if (effectLocation.TryGetStayEntity(out Entity target)) {
-                            target.DamageHP(CalculateValue(casterHash, ep.coefficient));
+                        if (effectLocation.TryGetStayEntity(out Entity target) && target != null) {
+                            target.ImpactHP(CalculateValue(casterHash, ep.coefficient), true);
                             for (int i = 0; i < ep.additionBuffs.Length; i++) {
                                 target.BuffManager.AddBuff(new BuffHandler(
                                     casterHash, target.Hash, ep.additionBuffs[i].Hash));
@@ -44,7 +44,7 @@ namespace Wing.RPGSystem
                                 if (BattleManager.Instance.IsPlayerTurn)
                                     AnimationManager.Instance.PlayOnce();
                                 Entity target = tc.StayEntity;
-                                target.DamageHP(CalculateValue(casterHash, ep.coefficient));
+                                target.ImpactHP(CalculateValue(casterHash, ep.coefficient), true);
                                 for (int i = 0; i < ep.additionBuffs.Length; i++) {
                                     target.BuffManager.AddBuff(new BuffHandler(
                                         casterHash, target.Hash, ep.additionBuffs[i].Hash));

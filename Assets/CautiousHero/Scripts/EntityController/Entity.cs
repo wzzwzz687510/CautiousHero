@@ -128,8 +128,8 @@ namespace Wing.RPGSystem
         public SortingOrderChange OnSortingOrderChanged;
         public delegate void PointsChange(float ratio, float duraion);
         public PointsChange HPChangeAnimation;
-        public PointsChange physicalAPChangeAnimation;
-        public PointsChange magicalAPChangeAnimation;
+        public delegate void ArmourChange(bool isPhysical,bool show);
+        public ArmourChange ArmourPointsChangeAnimation;
 
         [HideInInspector] public UnityEvent OnTurnStartedEvent;
         [HideInInspector] public UnityEvent OnTurnEndedEvent;
@@ -156,8 +156,7 @@ namespace Wing.RPGSystem
             OnTurnStartedEvent?.Invoke();
             BuffManager.UpdateBuffs();
 
-            ActionPoints = Mathf.Min(ActionPoints + ActionPointsPerTurn, 8);
-            OnAPChanged?.Invoke();
+            ImpactActionPoints(ActionPointsPerTurn,false);
         }
 
         public virtual void OnTurnEnded()
@@ -191,8 +190,7 @@ namespace Wing.RPGSystem
                 MovePath = sortedPath;
 
                 // AP cost and invoke event
-                ActionPoints -= sortedPath.Length * MoveCost;
-                OnAPChanged?.Invoke();
+                ImpactActionPoints(sortedPath.Length * MoveCost,true);
                 // Animation move
             }
 
@@ -202,7 +200,7 @@ namespace Wing.RPGSystem
             Loc = targetLoc;
             Loc.GetTileController().OnEntityEntering(Hash);
 
-            if (isInstance) {               
+            if (isInstance) {
                 AnimationManager.Instance.AddAnimClip(new MoveInstantAnimClip(Hash, targetLoc, 0.2f));
                 AnimationManager.Instance.PlayOnce();
             }
@@ -217,8 +215,7 @@ namespace Wing.RPGSystem
             BaseSkill tSkill = SkillHashes[skillID].GetBaseSkill();
             if (ActionPoints < tSkill.actionPointsCost)
                 return;
-            ActionPoints -= tSkill.actionPointsCost;
-            OnAPChanged?.Invoke();
+            ImpactActionPoints(tSkill.actionPointsCost,true);
 
             tSkill.ApplyEffect(Hash, castLoc);
         }
@@ -243,10 +240,17 @@ namespace Wing.RPGSystem
         {
             int damage = value;
 
-            damage -= DamageArmour(damage, damageType == DamageType.Physical);
+            damage -= ImpactArmour(damage, damageType == DamageType.Physical,true);
             if (damage == 0) return true;
 
-            return DamageHP(damage);
+            return ImpactHP(damage,true);
+        }
+
+        public virtual void ImpactActionPoints(int value, bool reduce)
+        {
+            ActionPoints += (reduce ? -1 : 1) * value;
+            ActionPoints = Mathf.Clamp(ActionPoints, 0, MaxActionPoints);
+            OnAPChanged?.Invoke();
         }
 
         /// <summary>
@@ -255,16 +259,15 @@ namespace Wing.RPGSystem
         /// <param name="value"></param>
         /// <param name="isPhysical"></param>
         /// <returns>Absorbed damage</returns>
-        public virtual int DamageArmour(int value,bool isPhysical)
+        public virtual int ImpactArmour(int value, bool isPhysical, bool damage)
         {
             int absorbDamage = isPhysical ? PhysicalArmourPoints : MagicalArmourPoints;
             if (absorbDamage > value)
                 absorbDamage = value;
 
-            if(isPhysical) PhysicalArmourPoints = Mathf.Min(0, PhysicalArmourPoints - value);
-            else MagicalArmourPoints = Mathf.Min(0, MagicalArmourPoints - value);
-            AnimationManager.Instance.AddAnimClip(new ArmourPChangeAnimClip(Hash, 1.0f * 
-                (isPhysical ? PhysicalArmourPoints : MagicalArmourPoints) / MaxHealthPoints, isPhysical));
+            if (isPhysical) PhysicalArmourPoints = Mathf.Max(0, PhysicalArmourPoints + (damage ? -1 : 1) * value);
+            else MagicalArmourPoints = Mathf.Max(0, MagicalArmourPoints + (damage ? -1 : 1) * value);
+            AnimationManager.Instance.AddAnimClip(new ArmourPChangeAnimClip(Hash, isPhysical));
             if (BattleManager.Instance.IsPlayerTurn)
                 AnimationManager.Instance.PlayOnce(false);
 
@@ -279,11 +282,11 @@ namespace Wing.RPGSystem
         /// </summary>
         /// <param name="value"></param>
         /// <returns></returns>
-        public virtual bool DamageHP(int value)
+        public virtual bool ImpactHP(int value, bool damage)
         {
             //Debug.Log("Entity: "+EntityName+", HP: " + HealthPoints);
             int tmpHP = HealthPoints;
-            HealthPoints = Mathf.Clamp(HealthPoints - value, 0, MaxHealthPoints);
+            HealthPoints = Mathf.Clamp(HealthPoints + (damage ? -1 : 1) * value, 0, MaxHealthPoints);
             AnimationManager.Instance.AddAnimClip(new HPChangeAnimClip(Hash, 1.0f * HealthPoints / MaxHealthPoints));
             if (BattleManager.Instance.IsPlayerTurn)
                 AnimationManager.Instance.PlayOnce(false);
@@ -296,7 +299,7 @@ namespace Wing.RPGSystem
         }
 
         protected virtual void Death()
-        {            
+        {
             IsDeath = true;
             OnDead?.Invoke();
         }

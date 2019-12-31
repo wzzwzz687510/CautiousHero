@@ -16,6 +16,12 @@ public class BattleUIController : MonoBehaviour
     public Text playerHpText;
     public Image hpFill;
 
+    [Header("Armour Visual")]
+    public Image physicalArmourFill;
+    public Image magicalArmourFill;
+    public Text physicalArmourText;
+    public Text magicalArmourText;
+
     [Header("Skill Visual")]
     public Image[] skills;
     public Image[] skillCovers;
@@ -96,30 +102,45 @@ public class BattleUIController : MonoBehaviour
         player.OnAPChanged.RemoveListener(OnPlayerAPChanged);
     }
 
+    // Init after player init.
     public void Init()
     {
         player.HPChangeAnimation += PlayerHPChangeAnimation;
+        player.ArmourPointsChangeAnimation += PlayerArmourPointsChangeAnimation;
+
         player.ssAnimEvent += PlayerSkillShiftAnimation;
         player.OnAPChanged.AddListener(OnPlayerAPChanged);
         for (int i = 0; i < 4; i++) {
             skillSlots[i].SkillBoardEvent += OnSkillBoardEvent;
         }
+        UpdateSkillSprites();
 
         BattleManager.Instance.OnTurnSwitched += OnTurnSwitched;
         BattleManager.Instance.CreatureBoardEvent += OnCreatureBoardEvent;
         AnimationManager.Instance.OnGameoverEvent.AddListener(Gameover);
 
-
-
         PlayerHPChangeAnimation(0, 0);
         PlayerHPChangeAnimation(1, 2);
+        PlayerArmourPointsChangeAnimation(true, player.PhysicalArmourPoints != 0);
+        PlayerArmourPointsChangeAnimation(false, player.MagicalArmourPoints != 0);
         StartCoroutine(BattleStart());
     }
 
     private void PlayerSkillShiftAnimation(float duration)
     {
-        if (player.SkillHashes.Count > player.defaultSkillCount)
-            UpdateSkillSprites();
+        UpdateSkillSprites();
+    }
+
+    private void PlayerArmourPointsChangeAnimation(bool isPhysical,bool show)
+    {
+        if (isPhysical) {
+            physicalArmourFill.enabled = show;
+            physicalArmourText.text = player.PhysicalArmourPoints.ToString();
+        }
+        else {
+            magicalArmourFill.enabled = show;
+            magicalArmourText.text = player.MagicalArmourPoints.ToString();
+        }
     }
 
     private void PlayerHPChangeAnimation(float hpRatio, float duration)
@@ -252,10 +273,10 @@ public class BattleUIController : MonoBehaviour
 
     public void ShowSkillBoard()
     {
-        var skill = player.SkillHashes[selectSkillID].GetBaseSkill() as ValueBasedSkill;
+        var skill = player.SkillHashes[selectSkillID].GetBaseSkill() as BaseSkill;
         skillName.text = skill.skillName;
         skillCost.text = skill.actionPointsCost.ToString();
-        skillValue.text = skill.baseValue.ToString() + " + <color=#ffa500ff>" + player.Intelligence * skill.attributeCof * skill.baseValue +"</color>";
+        //skillValue.text = skill.baseValue.ToString() + " + <color=#ffa500ff>" + player.Intelligence * skill.attributeCof * skill.baseValue +"</color>";
         switch (skill.damageType) {
             case DamageType.Physical:
                 skillNameBg.color = colors[0];
@@ -312,7 +333,7 @@ public class BattleUIController : MonoBehaviour
             default:
                 break;
         }
-        skillBoard.position = skillSlots[selectSkillID].transform.position + new Vector3(0, 150, 0);
+        skillBoard.position = skillSlots[selectSkillID-1].transform.position + new Vector3(0, 150, 0);
     }
 
     public void ShowCreatureBoard()

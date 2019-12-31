@@ -12,19 +12,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1ac45dc2f52125949bd791a87c1635f2, type: 3}
   m_Name: Test
   m_EditorClassIdentifier: 
-  creatureName: "\u708E\u7075"
+  creatureName: New Creature
   description: A secret creature
-  sprite: {fileID: 21300000, guid: f095a6197d3c6834eb3a2d6d7ae24a92, type: 3}
+  sprite: {fileID: 21300000, guid: dce58e0240db5c34c83c79de7cbcb8e3, type: 3}
   attribute:
-    level: 1
-    maxHealth: 40
-    action: 4
+    maxHealth: 20
+    maxAction: 6
+    actionPerTurn: 4
     strength: 10
     intelligence: 10
     agility: 10
-    investigation: 0
     moveCost: 1
   skills:
-  - {fileID: 11400000, guid: 3b587df692fdfd7448e5174ce1f5b159, type: 2}
-  - {fileID: 11400000, guid: 57dbf6589d4d697428451bceaa4cc3a2, type: 2}
+  - {fileID: 11400000, guid: fa65afbb161c7c644b5a119dec9dcf43, type: 2}
   buffs: []

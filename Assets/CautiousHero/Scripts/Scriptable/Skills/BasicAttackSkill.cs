@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Wing.RPGSystem
 {
-    [CreateAssetMenu(fileName = "Skill", menuName = "Wing/Scriptable Skills/BasicAttackSkill", order = 2)]
+    [CreateAssetMenu(fileName = "Skill", menuName = "Wing/Scriptable Skills/BasicAttackSkill", order = 10)]
     public class BasicAttackSkill : ValueBasedSkill
     {
         public AdditiveAttribute attribute;

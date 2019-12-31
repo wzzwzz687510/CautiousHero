@@ -303,7 +303,28 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0cb8d30e7a8d578499cb786563195a83, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  OnTurnStartedEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  OnTurnEndedEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  OnHPChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  OnPhysicalAPChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  OnMagicalAPChanged:
+    m_PersistentCalls:
+      m_Calls: []
   OnAPChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  OnSkillChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  OnDead:
     m_PersistentCalls:
       m_Calls: []
   OnAnimationCompleted:

@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Wing.RPGSystem
 {
-    [CreateAssetMenu(fileName = "Buff", menuName = "Wing/Scriptable Buffs/DefenseBuff", order = 1)]
+    [CreateAssetMenu(fileName = "Buff", menuName = "Wing/Scriptable Buffs/DefenseBuff", order = 21)]
     public class DefenseBuff : BaseBuff
     {
         public float cofReduction;
