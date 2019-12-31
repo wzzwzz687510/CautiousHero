@@ -25,6 +25,7 @@ namespace Wing.RPGSystem
             //EntitySprite.transform.localScale = new Vector3(0.1f / EntitySprite.size.x, 0.2f / EntitySprite.size.y);       
 
             MoveToTile(loc, true);
+            transform.localPosition = Vector3.zero;
             DropAnimation();
         }
 

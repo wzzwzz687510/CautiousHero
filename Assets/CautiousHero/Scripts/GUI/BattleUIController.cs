@@ -3,7 +3,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using Wing.RPGSystem;
 
@@ -25,6 +24,7 @@ public class BattleUIController : MonoBehaviour
     [Header("Skill Visual")]
     public Image[] skills;
     public Image[] skillCovers;
+    public Sprite unknownSkill;
 
     [Header("AP Visual")]
     public Toggle[] aps;
@@ -107,22 +107,24 @@ public class BattleUIController : MonoBehaviour
     {
         player.HPChangeAnimation += PlayerHPChangeAnimation;
         player.ArmourPointsChangeAnimation += PlayerArmourPointsChangeAnimation;
+        player.OnCancelArmourEvent.AddListener(PlayerOnCancelArmourEvent);
 
         player.ssAnimEvent += PlayerSkillShiftAnimation;
         player.OnAPChanged.AddListener(OnPlayerAPChanged);
-        for (int i = 0; i < 4; i++) {
+        for (int i = 0; i < skillSlots.Length; i++) {
             skillSlots[i].SkillBoardEvent += OnSkillBoardEvent;
         }
         UpdateSkillSprites();
 
         BattleManager.Instance.OnTurnSwitched += OnTurnSwitched;
         BattleManager.Instance.CreatureBoardEvent += OnCreatureBoardEvent;
+        BattleManager.Instance.MovePreviewEvent += MovePreviewEvent;
         AnimationManager.Instance.OnGameoverEvent.AddListener(Gameover);
 
         PlayerHPChangeAnimation(0, 0);
         PlayerHPChangeAnimation(1, 2);
-        PlayerArmourPointsChangeAnimation(true, player.PhysicalArmourPoints != 0);
-        PlayerArmourPointsChangeAnimation(false, player.MagicalArmourPoints != 0);
+        PlayerArmourPointsChangeAnimation(true, player.PhysicalArmourPoints);
+        PlayerArmourPointsChangeAnimation(false, player.MagicalArmourPoints);
         StartCoroutine(BattleStart());
     }
 
@@ -131,15 +133,23 @@ public class BattleUIController : MonoBehaviour
         UpdateSkillSprites();
     }
 
-    private void PlayerArmourPointsChangeAnimation(bool isPhysical,bool show)
+    private void PlayerOnCancelArmourEvent()
+    {
+        physicalArmourFill.DOFade(0, 0.5f);
+        magicalArmourFill.DOFade(0, 0.5f);
+        physicalArmourText.text = "0";
+        magicalArmourText.text = "0";
+    }
+
+    private void PlayerArmourPointsChangeAnimation(bool isPhysical, int remainedNumber)
     {
         if (isPhysical) {
-            physicalArmourFill.enabled = show;
-            physicalArmourText.text = player.PhysicalArmourPoints.ToString();
+            physicalArmourFill.DOFade(remainedNumber != 0 ? 1 : 0, 0.5f);
+            physicalArmourText.text = remainedNumber.ToString();
         }
         else {
-            magicalArmourFill.enabled = show;
-            magicalArmourText.text = player.MagicalArmourPoints.ToString();
+            magicalArmourFill.DOFade(remainedNumber != 0 ? 1 : 0, 0.5f);
+            magicalArmourText.text = remainedNumber.ToString();
         }
     }
 
@@ -165,8 +175,20 @@ public class BattleUIController : MonoBehaviour
 
     private void UpdateSkillSprites()
     {
-        for (int i = 1; i < player.defaultSkillCount; i++) {
+        for (int i = 0; i < player.defaultSkillCount; i++) {
             skills[i].sprite = player.SkillHashes[i].GetBaseSkill().sprite;
+        }
+    }
+
+    private void MovePreviewEvent(int steps)
+    {
+        for (int i = 0; i < steps; i++) {
+            if (i > skills.Length) return;
+            skills[i].sprite = unknownSkill;
+        }
+
+        for (int i = steps; i < skills.Length; i++) {
+            skills[i].sprite = player.SkillHashes[i- steps].GetBaseSkill().sprite;
         }
     }
 
@@ -333,7 +355,7 @@ public class BattleUIController : MonoBehaviour
             default:
                 break;
         }
-        skillBoard.position = skillSlots[selectSkillID-1].transform.position + new Vector3(0, 150, 0);
+        skillBoard.position = skillSlots[selectSkillID].transform.position + new Vector3(0, 150, 0);
     }
 
     public void ShowCreatureBoard()

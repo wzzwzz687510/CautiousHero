@@ -128,7 +128,7 @@ namespace Wing.RPGSystem
         public SortingOrderChange OnSortingOrderChanged;
         public delegate void PointsChange(float ratio, float duraion);
         public PointsChange HPChangeAnimation;
-        public delegate void ArmourChange(bool isPhysical,bool show);
+        public delegate void ArmourChange(bool isPhysical,int remainedNumber);
         public ArmourChange ArmourPointsChangeAnimation;
 
         [HideInInspector] public UnityEvent OnTurnStartedEvent;
@@ -136,6 +136,7 @@ namespace Wing.RPGSystem
         [HideInInspector] public UnityEvent OnHPChanged;
         [HideInInspector] public UnityEvent OnPhysicalAPChanged;
         [HideInInspector] public UnityEvent OnMagicalAPChanged;
+        [HideInInspector] public UnityEvent OnCancelArmourEvent;
         [HideInInspector] public UnityEvent OnAPChanged;
         [HideInInspector] public UnityEvent OnSkillChanged;
         [HideInInspector] public UnityEvent OnDead;
@@ -155,7 +156,7 @@ namespace Wing.RPGSystem
         {
             OnTurnStartedEvent?.Invoke();
             BuffManager.UpdateBuffs();
-
+            CancelArmour();
             ImpactActionPoints(ActionPointsPerTurn,false);
         }
 
@@ -169,18 +170,17 @@ namespace Wing.RPGSystem
         /// </summary>
         /// <param name="targetLoc"></param>
         /// <param name="isInstance"></param>
-        public virtual void MoveToTile(Location targetLoc, bool isInstance = false)
+        public virtual int MoveToTile(Location targetLoc, bool isInstance = false)
         {
             if (targetLoc == Loc) {
-                return;
+                return 0;
             }
 
             if (!isInstance) {
                 Stack<Location> path = GridManager.Instance.Astar.GetPath(Loc, targetLoc);
 
                 if (path.Count * MoveCost > ActionPoints) {
-
-                    return;
+                    return 0;
                 }
 
                 Vector3[] sortedPath = new Vector3[path.Count];
@@ -205,9 +205,10 @@ namespace Wing.RPGSystem
                 AnimationManager.Instance.PlayOnce();
             }
             else {
-
                 AnimationManager.Instance.AddAnimClip(new MovePathAnimClip(Hash, MovePath, 0.2f));
             }
+
+            return isInstance ? 1 : MovePath.Length;
         }
 
         public virtual void CastSkill(int skillID, Location castLoc)
@@ -236,11 +237,23 @@ namespace Wing.RPGSystem
             m_collider.enabled = bl;
         }
 
+        public virtual void CancelArmour()
+        {
+            PhysicalArmourPoints = 0;
+            MagicalArmourPoints = 0;
+            OnCancelArmourEvent?.Invoke();
+        }
+
         public virtual bool DealDamage(int value, DamageType damageType)
         {
             int damage = value;
 
-            damage -= ImpactArmour(damage, damageType == DamageType.Physical,true);
+            if(damageType == DamageType.Physical && PhysicalArmourPoints!=0) {
+                damage -= ImpactArmour(damage, true, true);
+            }
+            else if(damageType == DamageType.Magical && MagicalArmourPoints != 0) {
+                damage -= ImpactArmour(damage, false, true);
+            }
             if (damage == 0) return true;
 
             return ImpactHP(damage,true);
@@ -267,7 +280,8 @@ namespace Wing.RPGSystem
 
             if (isPhysical) PhysicalArmourPoints = Mathf.Max(0, PhysicalArmourPoints + (damage ? -1 : 1) * value);
             else MagicalArmourPoints = Mathf.Max(0, MagicalArmourPoints + (damage ? -1 : 1) * value);
-            AnimationManager.Instance.AddAnimClip(new ArmourPChangeAnimClip(Hash, isPhysical));
+            AnimationManager.Instance.AddAnimClip(
+                new ArmourPChangeAnimClip(Hash, isPhysical, isPhysical? PhysicalArmourPoints : MagicalArmourPoints));
             if (BattleManager.Instance.IsPlayerTurn)
                 AnimationManager.Instance.PlayOnce(false);
 

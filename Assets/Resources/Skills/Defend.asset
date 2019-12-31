@@ -1,0 +1,34 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6d4d68a25d7944640a781e48d993ffbf, type: 3}
+  m_Name: Defend
+  m_EditorClassIdentifier: 
+  skillName: Defend
+  description: Prevent incoming attacks
+  sprite: {fileID: -889756172247904114, guid: 95182df2e629f5c4c90c733881fc6d9c, type: 3}
+  actionPointsCost: 1
+  damageType: 0
+  skillElement: 0
+  castType: 0
+  labels: 
+  castEffect:
+    prefab: {fileID: 0}
+    animDuration: 0
+  tCastPatterns:
+    type: 0
+    size: 1
+    emptySize: -1
+  tEffectPatterns: {fileID: 11400000, guid: 6ea384fd33e47c44baaf0ab2bc8eb637, type: 2}
+  healthPoints: 0
+  physicalArmourPoints: 6
+  magicalArmourPoints: 0
+  actionPoints: 0

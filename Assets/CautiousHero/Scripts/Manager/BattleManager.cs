@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Wing.RPGSystem;
 using UnityEngine.Events;
+using System;
 
 public enum BattleState
 {
@@ -40,12 +41,16 @@ public class BattleManager : MonoBehaviour
     private int selectedCreatureID = 0;
 
     private HashSet<Location> tileZone = new HashSet<Location>();
+    private bool endTurn;
 
     public delegate void TurnSwitchCallback(bool isPlayerTurn);
     public event TurnSwitchCallback OnTurnSwitched;
 
     public delegate void CreatureBoard(int hash, bool isExit);
     public CreatureBoard CreatureBoardEvent;
+
+    public delegate void MovePreview(int steps);
+    public MovePreview MovePreviewEvent;
 
     private void Awake()
     {
@@ -75,8 +80,14 @@ public class BattleManager : MonoBehaviour
         if (State != BattleState.PlacePlayer && GameConditionCheck())
             return;
 
-        if (State == BattleState.PlayerAnim)
+        if (State == BattleState.PlayerAnim) {
             State = BattleState.PlayerMove;
+            if (endTurn) {
+                endTurn = false;
+                CompletePlayerTurn();
+                return;
+            }
+        }            
         else if (State == BattleState.BotTurn) {
             CompleteBotTurn();
         }
@@ -149,6 +160,7 @@ public class BattleManager : MonoBehaviour
 
         if (Input.GetMouseButtonDown(1) && (State == BattleState.PlayerMove || State == BattleState.PlayerCast)) {
             ChangeState(BattleState.PlayerMove);
+            MovePreviewEvent?.Invoke(0);
         }
 
         var ray = Camera.main.ViewportPointToRay(new Vector3(Input.mousePosition.x / Screen.width,
@@ -362,7 +374,7 @@ public class BattleManager : MonoBehaviour
 
         if (tileZone.Contains(loc)) {
             if (stateZone == TileState.MoveZone) {
-                SetVisualPlayer(tile.Archor, tile.SortOrder + 64);
+                PreviewMovement(tile);               
             }
 
             currentSelected.Add(loc);
@@ -386,6 +398,12 @@ public class BattleManager : MonoBehaviour
             else
                 currentSelected.Add(loc);
         }
+    }
+
+    private void PreviewMovement(TileController tile)
+    {
+        SetVisualPlayer(tile.Archor, tile.SortOrder + 64);
+        MovePreviewEvent?.Invoke(player.Loc.Distance(tile.Loc));
     }
 
     private void Gameover()
@@ -456,7 +474,10 @@ public class BattleManager : MonoBehaviour
 
     public void EndTurn()
     {
-        if (!IsPlayerTurn || State == BattleState.PlayerAnim) return;
+        if (!IsPlayerTurn || State == BattleState.PlayerAnim) {
+            endTurn = true;
+            return;
+        }
         CompletePlayerTurn();
     }
 

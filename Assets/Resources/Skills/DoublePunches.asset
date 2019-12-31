@@ -10,23 +10,24 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 47a8051cd7d92b941bb1c646c112d213, type: 3}
-  m_Name: Dash
+  m_Name: DoublePunches
   m_EditorClassIdentifier: 
-  skillName: "\u51B2\u649E"
-  description: A mystical skill
-  sprite: {fileID: 5164363214654579731, guid: 95182df2e629f5c4c90c733881fc6d9c, type: 3}
-  cooldownTime: 1
+  skillName: Double Punch
+  description: Fast punch twice
+  sprite: {fileID: -36115053092343016, guid: 95182df2e629f5c4c90c733881fc6d9c, type: 3}
   actionPointsCost: 2
-  skillType: 0
+  damageType: 0
   skillElement: 0
   castType: 0
   labels: 06000000
   castEffect:
-    prefab: {fileID: 112336, guid: e50c699406fc10a4783f72816b25468f, type: 3}
-    animDuration: 0.2
-  tCastPatterns: {fileID: 11400000, guid: 2b48fd6da7fedd546a8665e134c92242, type: 2}
+    prefab: {fileID: 0}
+    animDuration: 0
+  tCastPatterns:
+    type: 0
+    size: 2
+    emptySize: 0
   tEffectPatterns: {fileID: 11400000, guid: 6ea384fd33e47c44baaf0ab2bc8eb637, type: 2}
-  baseValue: 5
-  levelCof: 5
+  baseValue: 16
   attributeCof: 0
   attribute: 0

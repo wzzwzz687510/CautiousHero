@@ -94,12 +94,14 @@ namespace Wing.RPGSystem
     {
         public int entityHash;
         public bool isPhysical;
+        public int remainedNumber;
 
-        public ArmourPChangeAnimClip(int entityHash,bool isPhysical, float duration = 0.5f)
+        public ArmourPChangeAnimClip(int entityHash,bool isPhysical,int remainedNumber, float duration = 0.5f)
             : base(AnimType.ArmourPChange, duration)
         {
             this.entityHash = entityHash;
             this.isPhysical = isPhysical;
+            this.remainedNumber = remainedNumber;
         }
     }
 
@@ -245,6 +247,7 @@ namespace Wing.RPGSystem
                     break;
                 case AnimType.Cast:
                     var castClip = clip as CastAnimClip;
+                    if (castClip.skillHash.GetBaseSkill().castEffect.prefab == null) break;
                     GameObject effect;
                     Vector3 fix = new Vector3(0, 0.5f, 0);
                     switch (castClip.castType) {
@@ -255,14 +258,15 @@ namespace Wing.RPGSystem
                             effect.TryGetComponent(out Animator anim);
                             anim?.Play(effect.name.Replace("(Clone)",""), 0);
 
-                            yield return new WaitForSeconds(castClip.duration * animRate);
-                            Destroy(effect);
+                            //yield return StartCoroutine(PlayAnimation(clips.Dequeue()));
+                            StartCoroutine(DelayDestory(effect, castClip.duration * animRate));
                             break;
                         case CastType.Trajectory:
                             effect = Instantiate(castClip.skillHash.GetBaseSkill().castEffect.prefab, 
                                 castClip.start + fix, Quaternion.identity, effectHolder);
                             int distance = AStarSearch.Heuristic(castClip.start, castClip.end);
-                            effect.transform.DOMove(castClip.end + fix, castClip.duration * distance * animRate).OnComplete(() => Destroy(effect));
+                            effect.transform.DOMove(castClip.end + fix, castClip.duration * distance * animRate)
+                                  .OnComplete(() => Destroy(effect));
                             yield return new WaitForSeconds(castClip.duration * distance * animRate);
                             break;
                         default:
@@ -282,9 +286,9 @@ namespace Wing.RPGSystem
                     if (!EntityManager.Instance.TryGetEntity(apChangeClip.entityHash, out entity))
                         break;
                     if (apChangeClip.isPhysical)
-                        entity.ArmourPointsChangeAnimation?.Invoke(true,entity.PhysicalArmourPoints != 0);
+                        entity.ArmourPointsChangeAnimation?.Invoke(true, apChangeClip.remainedNumber);
                     else
-                        entity.ArmourPointsChangeAnimation?.Invoke(false,entity.MagicalArmourPoints != 0);
+                        entity.ArmourPointsChangeAnimation?.Invoke(false, apChangeClip.remainedNumber);
                     yield return new WaitForSeconds(apChangeClip.duration * animRate);
                     break;
                 case AnimType.SkillShift:
@@ -312,6 +316,11 @@ namespace Wing.RPGSystem
             }
         }
 
+        private IEnumerator DelayDestory(GameObject go, float delay)
+        {
+            yield return new WaitForSeconds(delay);
+            Destroy(go);
+        }
     }
 }
 

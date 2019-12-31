@@ -263,7 +263,6 @@ namespace Wing.RPGSystem
         private void CalculateCastableSkills()
         {
             castableSkills.Clear();
-            bool withoutMove;
             HashSet<Location> destinations = new HashSet<Location>();
             for (int creatureID = 0; creatureID < Creatures.Count; creatureID++) {
                 CreatureController bot = Creatures[creatureID];

@@ -44,7 +44,31 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6345089d684bba84da93b952644a25f5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  OnTurnStartedEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  OnTurnEndedEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  OnHPChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  OnPhysicalAPChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  OnMagicalAPChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  OnCancelArmourEvent:
+    m_PersistentCalls:
+      m_Calls: []
   OnAPChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  OnSkillChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  OnDead:
     m_PersistentCalls:
       m_Calls: []
   OnAnimationCompleted:
