@@ -4,8 +4,8 @@ using UnityEngine;
 
 namespace Wing.RPGSystem
 {
-    [CreateAssetMenu(fileName = "Skill", menuName = "Wing/Scriptable Skills/CombineSkill", order = 13)]
-    public class CombineSkill : BaseSkill
+    [CreateAssetMenu(fileName = "Skill", menuName = "Wing/Scriptable Skills/CombinedSkill", order = 13)]
+    public class CombinedSkill : BaseSkill
     {
         public BaseSkill[] skillSequence;
 

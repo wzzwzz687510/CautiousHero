@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Wing.RPGSystem
 { 
-    [CreateAssetMenu(fileName = "Creature", menuName = "Wing/Scriptable Creatures/BaseCreature", order = 1)]
+    [CreateAssetMenu(fileName = "Creature", menuName = "Wing/Scriptable Creatures/BaseCreature", order = 40)]
     public class BaseCreature : ScriptableObject
     {
         public string creatureName = "New Creature";

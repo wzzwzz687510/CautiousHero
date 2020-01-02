@@ -82,11 +82,7 @@ namespace Wing.RPGSystem {
         private void CreatureHpChangeAnimation(float hpRatio, float duraion)
         {
             if (hpRatio == 0) {
-                hpBar.enabled = false;
-                mask_hp.alphaCutoff = 1;
-                mask_hpEffect.alphaCutoff = 1;
-                EntitySprite.DOColor(Color.black, 1);
-                m_glowEffect.GlowColor = Color.black;
+                DeathAnim();
                 return;
             }
 
@@ -98,6 +94,18 @@ namespace Wing.RPGSystem {
                 DOTween.To(() => mask_hp.alphaCutoff, alpha => mask_hp.alphaCutoff = alpha, 1 - hpRatio, 1.5f);
                 DOTween.To(() => mask_hpEffect.alphaCutoff, alpha => mask_hpEffect.alphaCutoff = alpha, 1 - hpRatio, 1.5f);
             }
+        }
+
+        private void DeathAnim()
+        {
+            hpBar.enabled = false;
+            mask_hp.alphaCutoff = 1;
+            DOTween.To(() => mask_hpEffect.alphaCutoff, alpha => mask_hpEffect.alphaCutoff = alpha, 1, 0.3f).OnComplete(()=> {
+                hpBar.DOFade(0, 0.5f);
+                EntitySprite.DOColor(Color.black, 0.5f);
+                EntitySprite.DOFade(0, 0.5f).OnComplete(() => Destroy(gameObject));
+                m_glowEffect.GlowColor = Color.black;
+            });                      
         }
 
         protected override void Death()

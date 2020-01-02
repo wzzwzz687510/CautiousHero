@@ -31,7 +31,9 @@ public class BattleManager : MonoBehaviour
     public PlayerController player;
 
     public BattleState State { get; private set; }
-    public bool IsPlayerTurn { get { return State == BattleState.PlayerMove || State == BattleState.PlayerCast|| State == BattleState.PlayerAnim; } }
+    public bool IsPlayerTurn => State == BattleState.PlayerMove 
+        || State == BattleState.PlayerCast
+        || State == BattleState.PlayerAnim;
 
     private SpriteRenderer tmpVisualPlayer;
     private Transform abtioticHolder;
@@ -61,17 +63,18 @@ public class BattleManager : MonoBehaviour
 
     private void Start()
     {
-        State = BattleState.PlacePlayer;
-        GridManager.Instance.OnCompleteMapRenderEvent += PrepareBattleStart;
+        // Agility decides player first or creature first
+        //State = BattleState.PlayerMove;
+        //GridManager.Instance.OnCompleteMapRenderEvent += PrepareBattleStart;
         AnimationManager.Instance.OnAnimCompleted.AddListener(OnAnimCompleted);
 
         player.InitPlayer(Database.Instance.ActiveData.attribute);
         GetComponent<BattleUIController>()?.Init();
     }
 
-    public void PrepareBattleStart()
+    public void PrepareBattleStart(List<int> battleSet)
     {
-        AIManager.Instance.Init(Database.Instance.config);
+        AIManager.Instance.Init(battleSet);
         PreparePlacePlayer();       
     }
 

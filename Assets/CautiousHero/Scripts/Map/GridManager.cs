@@ -7,17 +7,17 @@ public class GridManager : MonoBehaviour
 {
     public static GridManager Instance { get; private set; }
 
-    [Range(0,0.1f)]   public float animationDuration = 0.01f;
+    [Range(0, 0.1f)] public float animationDuration = 0.01f;
 
     public TileController tcPrefab;
     public AbioticController abioticPrefab;
     public Sprite[] tileSprites;
     public Sprite[] darkArea;
 
-    public bool isRendered { get; private set; }
+    public bool IsRendered { get; private set; }
     public TileNavigation Astar { get; private set; }
-    public Dictionary<Location, TileController> tileDic { get; private set; }
-    public Vector2 MapBoundingBox { get { return new Vector2(m_mg.width, m_mg.height); } }
+    public Dictionary<Location, TileController> TileDic { get; private set; }
+    public Vector2 MapBoundingBox => new Vector2(m_mg.width, m_mg.height);
 
     private MapGenerator m_mg;    
     private GameObject tileHolder;
@@ -32,7 +32,7 @@ public class GridManager : MonoBehaviour
         if (!Instance)
             Instance = this;
         m_mg = GetComponent<MapGenerator>();
-        tileDic = new Dictionary<Location, TileController>();
+        TileDic = new Dictionary<Location, TileController>();
     }
 
     private void Start()
@@ -44,42 +44,43 @@ public class GridManager : MonoBehaviour
 
     private void Update()
     {
-        if (!isRendered && Input.GetKeyDown(KeyCode.S)) {
+        if (!IsRendered && Input.GetKeyDown(KeyCode.S)) {
             StartCoroutine(RenderMap());
-            isRendered = true;
+            IsRendered = true;
         }
     }
 
     private IEnumerator AddAbiotics()
     {
-        var config = Database.Instance.config;
-        var sets = config.abioticSets;
-        int[] possiblities = new int[sets.Length];
-        possiblities[0] = sets[0].power;
-        for (int i = 1; i < config.abioticSets.Length; i++) {
-            possiblities[i] = possiblities[i - 1] + sets[i].power;
-        }
-        HashSet<Location> entityLocs = new HashSet<Location>();
-        foreach (var set in Database.Instance.config.creatureSets) {
-            entityLocs.Add(set.location);
-        }
-        int totalPower = possiblities[sets.Length - 1];
-        float randomFill, randomAbiotic;
-        foreach (var loc in ValidLocations()) {
-            if (entityLocs.Contains(loc)) continue;
-            randomFill = 1000.Random() / 1000.0f;
-            if (randomFill <= config.coverage) {
-                randomAbiotic = totalPower.Random();
-                for (int i = 0; i < sets.Length; i++) {
-                    if (randomAbiotic < possiblities[i]) {
-                        Instantiate(abioticPrefab, loc.GetTileController().m_spriteRenderer.transform).GetComponent<AbioticController>().
-                            InitAbioticEntity(sets[i].tAbiotic, loc);
-                        yield return null;
-                        break;
-                    }
-                }
-            }
-        }
+        //var config = Database.Instance.config;
+        //var sets = config.abioticSets;
+        //int[] possiblities = new int[sets.Length];
+        //possiblities[0] = sets[0].power;
+        //for (int i = 1; i < config.abioticSets.Length; i++) {
+        //    possiblities[i] = possiblities[i - 1] + sets[i].power;
+        //}
+        //HashSet<Location> entityLocs = new HashSet<Location>();
+        //foreach (var set in Database.Instance.config.creatureSets) {
+        //    entityLocs.Add(set.location);
+        //}
+        //int totalPower = possiblities[sets.Length - 1];
+        //float randomFill, randomAbiotic;
+        //foreach (var loc in ValidLocations()) {
+        //    if (entityLocs.Contains(loc)) continue;
+        //    randomFill = 1000.Random() / 1000.0f;
+        //    if (randomFill <= config.coverage) {
+        //        randomAbiotic = totalPower.Random();
+        //        for (int i = 0; i < sets.Length; i++) {
+        //            if (randomAbiotic < possiblities[i]) {
+        //                Instantiate(abioticPrefab, loc.GetTileController().m_spriteRenderer.transform).GetComponent<AbioticController>().
+        //                    InitAbioticEntity(sets[i].tAbiotic, loc);
+        //                yield return null;
+        //                break;
+        //            }
+        //        }
+        //    }
+        //}
+        yield return null;
     }
 
     private IEnumerator RenderMap()
@@ -88,7 +89,7 @@ public class GridManager : MonoBehaviour
             Destroy(tileHolder);
 
         tileHolder = new GameObject("Tile Holder");
-        tileDic = new Dictionary<Location, TileController>();
+        TileDic = new Dictionary<Location, TileController>();
 
         for (int x = 0; x < m_mg.width; x++) {
             for (int y = 0; y < m_mg.height; y++) {
@@ -98,13 +99,13 @@ public class GridManager : MonoBehaviour
                         Quaternion.identity, tileHolder.transform).GetComponent<TileController>();
                     tc.Init_SpriteRenderer(pos, y * m_mg.width + x - m_mg.width * m_mg.height, 
                         m_mg.map[x, y] - 1, UnityEngine.Random.Range(0.01f, 1f));
-                    tileDic.Add(pos, tc);
+                    TileDic.Add(pos, tc);
                 }
             }
         }
 
         //Debug.Log("tile cnt:" + tileHolder.transform.childCount);
-        yield return AddAbiotics();
+        //yield return AddAbiotics();
         yield return new WaitForSeconds(2);
         OnCompleteMapRenderEvent?.Invoke();
     }
@@ -112,7 +113,7 @@ public class GridManager : MonoBehaviour
 
     public void ResetAllTiles()
     {
-        foreach (var tile in tileDic.Values) {
+        foreach (var tile in TileDic.Values) {
             tile.ChangeTileState(TileState.Normal);
             tile.DebindCastLocation();
         } 
@@ -120,15 +121,15 @@ public class GridManager : MonoBehaviour
 
     public bool IsEmptyLocation(Location id)
     {
-        return tileDic.ContainsKey(id) && tileDic[id].IsEmpty;
+        return TileDic.ContainsKey(id) && TileDic[id].IsEmpty;
     }
 
     public bool ChangeTileState(Location id, TileState state)
     {
-        if(!tileDic.ContainsKey(id))
+        if(!TileDic.ContainsKey(id))
             return false;
 
-        tileDic[id].ChangeTileState(state);
+        TileDic[id].ChangeTileState(state);
         return true;
     }
 
@@ -137,7 +138,7 @@ public class GridManager : MonoBehaviour
         int cnt = 0;
         if (isValid) {
             IEnumerator<Location> locEnumerator = ValidLocations().GetEnumerator();
-            int random = Random.Range(0, tileDic.Count);
+            int random = Random.Range(0, TileDic.Count);
             for (int i = 0; i < random; i++) {
                 if (--random < 0)
                     return locEnumerator.Current;
@@ -153,8 +154,8 @@ public class GridManager : MonoBehaviour
 
         }
 
-        cnt = Random.Range(0, tileDic.Count);
-        foreach (var tile in tileDic.Values) {
+        cnt = Random.Range(0, TileDic.Count);
+        foreach (var tile in TileDic.Values) {
             if (--cnt < 0)
                 return tile.Loc;
         }
@@ -165,7 +166,7 @@ public class GridManager : MonoBehaviour
     public IEnumerable<TileController> GetTrajectoryHitTile(Location id, Location dir, bool highlight = false)
     {
         TileController tc;
-        if (!tileDic.TryGetValue(id, out tc))
+        if (!TileDic.TryGetValue(id, out tc))
             yield break;
         Location tmp = id;
 
@@ -176,7 +177,7 @@ public class GridManager : MonoBehaviour
                 tc.ChangeTileState(TileState.CastZone);
             yield return tc;
             tmp += dir;
-            if (!tileDic.TryGetValue(tmp, out tc) || cnt++ > 8)
+            if (!TileDic.TryGetValue(tmp, out tc) || cnt++ > 8)
                 yield break;
         }
 
@@ -296,7 +297,7 @@ public class GridManager : MonoBehaviour
     {
         foreach (var reachableLoc in Astar.GetGivenDistancePoints(self.Loc, self.ActionPoints/self.MoveCost)) {
             if (!zone.Contains(reachableLoc) && IsEmptyLocation(reachableLoc)) {
-                safeTile = tileDic[reachableLoc];
+                safeTile = TileDic[reachableLoc];
                 return true;
             }
         }
@@ -316,7 +317,7 @@ public class GridManager : MonoBehaviour
 
     public IEnumerable<Location> ValidLocations()
     {
-        foreach (var tile in tileDic.Values) {
+        foreach (var tile in TileDic.Values) {
             if (tile.IsEmpty)
                 yield return tile.Loc;
         }

@@ -36,7 +36,7 @@ namespace Wing.RPGSystem
         public int lastTurn;
         public bool infinity;
         public bool stackable;
-        public int Hash { get { return buffName.GetStableHashCode(); } }
+        public int Hash => buffName.GetStableHashCode(); 
 
         static Dictionary<int, BaseBuff> cache;
         public static Dictionary<int, BaseBuff> Dict {
@@ -49,7 +49,7 @@ namespace Wing.RPGSystem
         }
     }
 
-    public interface StackableBuff
+    public interface IStackableBuff
     {
         void OnStacked(BuffHandler bh);
     }

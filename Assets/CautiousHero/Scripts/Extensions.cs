@@ -5,8 +5,7 @@ namespace Wing.RPGSystem
 {
     public static class Extensions
     {
-        // string.GetHashCode is not quaranteed to be the same on all machines, but
-        // we need one that is the same on all machines. simple and stupid:
+        
         public static int GetStableHashCode(this string text)
         {
             unchecked {
@@ -19,13 +18,13 @@ namespace Wing.RPGSystem
 
         public static int Random(this int max) => Database.Instance.Random(0, max);
 
-        public static bool IsValid(this Location location) => GridManager.Instance.tileDic.ContainsKey(location);
+        public static bool IsValid(this Location location) => GridManager.Instance.TileDic.ContainsKey(location);
 
         public static bool IsEmpty(this Location location) => GridManager.Instance.IsEmptyLocation(location);
 
-        public static bool TryGetTileController(this Location location, out TileController tc) => GridManager.Instance.tileDic.TryGetValue(location, out tc);
+        public static bool TryGetTileController(this Location location, out TileController tc) => GridManager.Instance.TileDic.TryGetValue(location, out tc);
 
-        public static TileController GetTileController(this Location location) => GridManager.Instance.tileDic[location];
+        public static TileController GetTileController(this Location location) => GridManager.Instance.TileDic[location];
 
         public static bool TryGetStayEntity(this Location location, out Entity entity) {
             if(location.TryGetTileController(out TileController tc)) {
@@ -36,7 +35,7 @@ namespace Wing.RPGSystem
             return false;
         }
 
-        public static int Distance(this Location location, Location loc) =>Math.Abs(location.x - loc.x) + Math.Abs(location.y - loc.y);
+        public static int Distance(this Location location, Location loc) => Math.Abs(location.x - loc.x) + Math.Abs(location.y - loc.y);
 
         public static bool HasPath(this Location from, Location to) => GridManager.Instance.Astar.HasPath(from, to);
 

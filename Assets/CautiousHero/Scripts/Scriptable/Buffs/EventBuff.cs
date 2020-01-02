@@ -9,7 +9,7 @@ namespace Wing.RPGSystem
         public abstract void ApplyEffect(BuffHandler bh);
     }
 
-    public abstract class StackableEventBuff : EventBuff, StackableBuff
+    public abstract class StackableEventBuff : EventBuff, IStackableBuff
     {
         public int triggerNumber;
         public bool triggerEachTime;

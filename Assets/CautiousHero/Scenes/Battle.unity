@@ -9162,7 +9162,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2dd3ee84c1fd87d48b8e0e76177f1ed5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  mapChunkSize: 16
   resetData: 1
+  seed: 
   worldName: Super Hard
   playerName: kirito
   spriteID: 0

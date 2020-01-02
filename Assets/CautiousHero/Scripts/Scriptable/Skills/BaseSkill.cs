@@ -74,7 +74,7 @@ namespace Wing.RPGSystem
         public string description = "A mystical skill";
         public Sprite sprite;
         public int actionPointsCost;
-        public int Hash { get { return skillName.GetStableHashCode(); } }
+        public int Hash => skillName.GetStableHashCode(); 
 
         [Header("Labels")]
         public DamageType damageType;
@@ -87,8 +87,8 @@ namespace Wing.RPGSystem
         public CastEffect castEffect;
         public ScriptablePattern tCastPatterns;
         public ScriptableEffectPattern tEffectPatterns;
-        public Location[] CastPattern { get { return ScriptablePattern.Dict[Hash]; } }
-        public EffectPattern[] EffectPattern { get { return tEffectPatterns.effectPatterns; } }
+        public Location[] CastPattern => ScriptablePattern.Dict[Hash];
+        public EffectPattern[] EffectPattern => tEffectPatterns.effectPatterns;
 
         public abstract void ApplyEffect(int casterHash, Location castLoc);
 

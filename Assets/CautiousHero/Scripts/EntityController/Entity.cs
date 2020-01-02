@@ -40,6 +40,74 @@ namespace Wing.RPGSystem
     [System.Serializable]
     public struct ElementResistance
     {
+        public MagicalElement resist;
+        public int Fire { get { return resist.fire; } }
+        public int Water { get { return resist.water; } }
+        public int Earth { get { return resist.earth; } }
+        public int Air { get { return resist.air; } }
+        public int Light { get { return resist.light; } }
+        public int Dark { get { return resist.dark; } }
+
+        public ElementResistance(MagicalElement me)
+        {
+            resist = me;
+        }
+
+        public ElementResistance(int fire = 0, int water = 0, int earth = 0, int air = 0, int light = 0, int dark = 0)
+        {
+            resist.fire = fire;
+            resist.water = water;
+            resist.earth = earth;
+            resist.air = air;
+            resist.light = light;
+            resist.dark = dark;
+        }
+
+        public static ElementResistance operator -(ElementResistance a) =>
+            new ElementResistance(-a.Fire, -a.Water, -a.Earth, -a.Air, -a.Light, -a.Dark);
+        public static ElementResistance operator +(ElementResistance a, ElementResistance b) =>
+            new ElementResistance(a.Fire + b.Fire, a.Water + b.Water, a.Earth + b.Earth, 
+                a.Air + b.Air, a.Light + b.Light, a.Dark + b.Dark);
+        public static ElementResistance operator -(ElementResistance a, ElementResistance b) => a + (-b);
+    }
+
+    [System.Serializable]
+    public struct ElementMana
+    {
+        public MagicalElement mana;
+        public int Fire { get { return mana.fire; } }
+        public int Water { get { return mana.water; } }
+        public int Earth { get { return mana.earth; } }
+        public int Air { get { return mana.air; } }
+        public int Light { get { return mana.light; } }
+        public int Dark { get { return mana.dark; } }
+
+        public ElementMana(MagicalElement me)
+        {
+            mana = me;
+        }
+
+        public ElementMana(int fire = 0, int water = 0, int earth = 0, int air = 0, int light = 0, int dark = 0)
+        {
+            mana.fire = fire;
+            mana.water = water;
+            mana.earth = earth;
+            mana.air = air;
+            mana.light = light;
+            mana.dark = dark;
+        }
+
+        public static ElementMana operator -(ElementMana a) =>
+            new ElementMana(-a.Fire, -a.Water, -a.Earth, -a.Air, -a.Light, -a.Dark);
+        public static ElementMana operator +(ElementMana a, ElementMana b) =>
+            new ElementMana(a.Fire + b.Fire, a.Water + b.Water, a.Earth + b.Earth,
+                a.Air + b.Air, a.Light + b.Light, a.Dark + b.Dark);
+        public static ElementMana operator -(ElementMana a, ElementMana b) => a + (-b);
+    }
+
+    [System.Serializable]
+    public struct MagicalElement
+    {
         public int fire;
         public int water;
         public int earth;
@@ -47,7 +115,7 @@ namespace Wing.RPGSystem
         public int light;
         public int dark;
 
-        public ElementResistance(int fire = 0, int water = 0, int earth = 0, int air = 0, int light = 0, int dark = 0)
+        public MagicalElement(int fire = 0, int water = 0, int earth = 0, int air = 0, int light = 0, int dark = 0)
         {
             this.fire = fire;
             this.water = water;
@@ -56,13 +124,6 @@ namespace Wing.RPGSystem
             this.light = light;
             this.dark = dark;
         }
-
-        public static ElementResistance operator -(ElementResistance a) =>
-            new ElementResistance(-a.fire, -a.water, -a.earth, -a.air, -a.light, -a.dark);
-        public static ElementResistance operator +(ElementResistance a, ElementResistance b) =>
-            new ElementResistance(a.fire + b.fire, a.water + b.water, a.earth + b.earth, 
-                a.air + b.air, a.light + b.light, a.dark + b.dark);
-        public static ElementResistance operator -(ElementResistance a, ElementResistance b) => a + (-b);
     }
 
     // Obsolete
@@ -70,7 +131,7 @@ namespace Wing.RPGSystem
     {
         public BaseSkill TSkill { get; private set; }
         public int Cooldown { get; private set; }
-        public bool Castable { get { return Cooldown <= 0; } }
+        public bool Castable => Cooldown <= 0;
 
         public InstanceSkill(BaseSkill skill)
         {
@@ -110,15 +171,15 @@ namespace Wing.RPGSystem
                 return m_attribute + BuffManager.GetAttributeAdjustment();
             }
         }
-        public int MaxHealthPoints { get { return Attribute.maxHealth; } }
-        public int MaxActionPoints { get { return Attribute.maxAction; } }
-        public int ActionPointsPerTurn { get { return Attribute.actionPerTurn; } }
-        public int Strength { get { return Attribute.strength; } }
-        public int Intelligence { get { return Attribute.intelligence; } }
-        public int Agility { get { return Attribute.agility; } }
-        public int MoveCost { get { return Attribute.moveCost; } }
+        public int MaxHealthPoints       => Attribute.maxHealth;
+        public int MaxActionPoints       => Attribute.maxAction; 
+        public int ActionPointsPerTurn   => Attribute.actionPerTurn;
+        public int Strength              => Attribute.strength;
+        public int Intelligence          => Attribute.intelligence; 
+        public int Agility               => Attribute.agility; 
+        public int MoveCost              => Attribute.moveCost; 
 
-        public SpriteRenderer EntitySprite { get { return m_spriteRenderer; } }
+        public SpriteRenderer EntitySprite => m_spriteRenderer; 
 
         protected SpriteRenderer m_spriteRenderer;
         protected SpriteGlowEffect m_glowEffect;

@@ -413,6 +413,12 @@ namespace Wing.RPGSystem
     public struct Location
     {
         public int x, y;
+        public static Location Up    => new Location(0, 1);
+        public static Location Down  => new Location(0, -1);
+        public static Location Left  => new Location(-1, 0);
+        public static Location Right => new Location(1, 0);
+        public static Location Zero  => new Location(0, 0);
+        public static Location One   => new Location(1, 1);
 
         public Location(Location loc)
         {
@@ -452,7 +458,6 @@ namespace Wing.RPGSystem
         public static bool operator !=(Location a, Location b) => !a.Equals(b);
         public static implicit operator Vector3(Location a) => MapGenerator.LocationToWorldPoint(a);
         public static explicit operator Location(Vector3 a) => MapGenerator.WorldPointToLocation(a);
-
     }
 
     class LandBlock : IComparable<LandBlock>

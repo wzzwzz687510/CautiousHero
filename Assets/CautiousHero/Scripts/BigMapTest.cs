@@ -73,7 +73,7 @@ public class BigMapTest : MonoBehaviour
 
     public IEnumerator BattleStart()
     {
-        while (!GridManager.Instance.isRendered) {
+        while (!GridManager.Instance.IsRendered) {
             yield return null;
         }
         //yield return new WaitForSeconds(1f);
