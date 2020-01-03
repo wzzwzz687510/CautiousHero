@@ -15,9 +15,6 @@ namespace Wing.RPGSystem
         public List<int> SkillDiscardPile { get; private set; }
 
         private Location lastLoc;
-        private List<int> lastSkills;
-        private List<int> lastSkillDeck;
-        private List<int> lastSkillDiscardPile;
         private int lastActionPoints;
 
         public delegate void SkillShiftAnimation(float duration);
@@ -103,22 +100,9 @@ namespace Wing.RPGSystem
             SkillHashes.RemoveAt(defaultSkillCount);            
         }
 
-        public void CancelMove()
-        {
-            MoveToTile(lastLoc, true);
-            SkillHashes = lastSkills;
-            SkillDeck = lastSkillDeck;
-            SkillDiscardPile = lastSkillDiscardPile;
-            ActionPoints = lastActionPoints;
-            OnAPChanged?.Invoke();
-        }
-
         private void SaveStatus()
         {
             lastLoc = Loc;
-            //lastSkills = new List<int>(SkillHashes);
-            //lastSkillDeck = new List<int>(SkillDeck);
-            //lastSkillDiscardPile = new List<int>(SkillDiscardPile);
             lastActionPoints = ActionPoints;
         }
     }

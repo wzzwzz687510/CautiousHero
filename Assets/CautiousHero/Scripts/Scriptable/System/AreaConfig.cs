@@ -27,6 +27,7 @@ namespace Wing.RPGSystem
         public string configName = "New config set";
         public string description = "A standard area set";
         public AreaType type;
+        public Sprite sprite;
         public int Hash => configName.GetStableHashCode();
         public SubArea[] cornerAreas;
         public SubArea[] vEdgeAreas;

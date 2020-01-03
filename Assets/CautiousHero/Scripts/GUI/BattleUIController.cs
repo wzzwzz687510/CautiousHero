@@ -241,11 +241,6 @@ public class BattleUIController : MonoBehaviour
         yield return new WaitForSeconds(0.5f);
     }
 
-    public void Button_CancelMove()
-    {
-        BattleManager.Instance.CancelMove();
-    }
-
     public void Button_EndTurn()
     {
         BattleManager.Instance.EndTurn();

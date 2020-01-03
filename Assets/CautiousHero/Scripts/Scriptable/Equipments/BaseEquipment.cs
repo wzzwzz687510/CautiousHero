@@ -16,7 +16,7 @@ namespace Wing.RPGSystem
     }
 
     [CreateAssetMenu(fileName = "Equipment", menuName = "Wing/BaseEquipment", order = 50)]
-    public class BaseEquipment : MonoBehaviour
+    public class BaseEquipment : ScriptableObject
     {
         [Header("Basic Parameters")]
         public string equipmentName = "New skill";

@@ -45,6 +45,8 @@ namespace Wing.RPGSystem
         public static Location GetLocationWithGivenStep(this Location from, Location to, int step)
             => GridManager.Instance.Astar.GetLocationWithGivenStep(from, to, step);
 
+        public static AreaConfig GetAreaConfig(this int hash) => AreaConfig.Dict[hash];
+
         public static BaseSkill GetBaseSkill(this int hash) => BaseSkill.Dict[hash];
 
         public static BaseBuff GetBaseBuff(this int hash) => BaseBuff.Dict[hash];

@@ -44,6 +44,7 @@ public class BattleManager : MonoBehaviour
 
     private HashSet<Location> tileZone = new HashSet<Location>();
     private bool endTurn;
+    private bool isActive;
 
     public delegate void TurnSwitchCallback(bool isPlayerTurn);
     public event TurnSwitchCallback OnTurnSwitched;
@@ -68,12 +69,18 @@ public class BattleManager : MonoBehaviour
         //GridManager.Instance.OnCompleteMapRenderEvent += PrepareBattleStart;
         AnimationManager.Instance.OnAnimCompleted.AddListener(OnAnimCompleted);
 
-        player.InitPlayer(Database.Instance.ActiveData.attribute);
-        GetComponent<BattleUIController>()?.Init();
+        //player.InitPlayer(Database.Instance.ActiveData.attribute);
+        //GetComponent<BattleUIController>()?.Init();
+    }
+
+    public void Deactivate()
+    {
+        isActive = false;
     }
 
     public void PrepareBattleStart(List<int> battleSet)
     {
+        isActive = true;
         AIManager.Instance.Init(battleSet);
         PreparePlacePlayer();       
     }
@@ -152,6 +159,8 @@ public class BattleManager : MonoBehaviour
 
     private void Update()
     {
+        if (!isActive) return;
+
         if (Input.GetKeyDown(KeyCode.Q))
             CastSkill(0);
         if (Input.GetKeyDown(KeyCode.W))
@@ -466,13 +475,6 @@ public class BattleManager : MonoBehaviour
         selectedSkillID = id + 1;
         ChangeState(BattleState.PlayerCast);
         PrepareSkill();
-    }
-
-    public void CancelMove()
-    {
-        if (!IsPlayerTurn || State == BattleState.PlayerAnim) return;
-        player.CancelMove();
-        ChangeState(BattleState.PlayerMove);
     }
 
     public void EndTurn()

@@ -5,13 +5,18 @@ using UnityEngine;
 namespace Wing.RPGSystem
 {
     [System.Serializable]
+    public struct PreAreaInfo
+    {
+        public Location loc;
+        public int typeID;
+        public List<Location> connectionDP;// Connection direction pattern
+    }
+
+    [System.Serializable]
     public struct AreaInfo
     {
-        public bool isInit;
-        public int typeID;
+        public int templateHash;
         public Location loc;
-        public List<Location> connectionDP; // first location is direction pattern
-
         // Generate map after area generation
         public TileInfo[,] map;
     }
@@ -31,17 +36,14 @@ namespace Wing.RPGSystem
         public int SortOrder { get { return m_spriteRenderer.sortingOrder; } }
 
         // para sort order, sprite ID and animation delay time
-        public void Init_SpriteRenderer(Location location, int sortOrder, int spriteID, float AnimDelayTime)
+        public void Init_SpriteRenderer(Location location)
         {
             Loc = location;
-            m_spriteRenderer.sortingOrder = sortOrder;
-            if (spriteID >= 0)
-                m_spriteRenderer.sprite = GridManager.Instance.tileSprites[spriteID];
-            else {
-                m_spriteRenderer.sprite = GridManager.Instance.darkArea[GridManager.Instance.darkArea.Length.Random()];
-            }
+            m_spriteRenderer.sortingOrder = Loc.x + Loc.y * 8;
 
-            StartCoroutine(PlayAnimation(AnimDelayTime));
+                m_spriteRenderer.sprite = AreaInfo.templateHash.GetAreaConfig().sprite;
+
+            StartCoroutine(PlayAnimation(Random.Range(0.01f, 1f)));
         }
 
         IEnumerator PlayAnimation(float delayTime)

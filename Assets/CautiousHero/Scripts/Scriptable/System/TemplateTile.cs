@@ -9,14 +9,15 @@ namespace Wing.RPGSystem
     public class TemplateTile : ScriptableObject
     {
         public TileType type;
+        public Sprite sprite;
         public ElementMana mana;
 
-        static Dictionary<TileType, ElementMana> cache;
-        public static Dictionary<TileType, ElementMana> Dict {
+        static Dictionary<TileType, TemplateTile> cache;
+        public static Dictionary<TileType, TemplateTile> Dict {
             get {
                 // load if not loaded yet
                 return cache ?? (cache = Resources.LoadAll<TemplateTile>("Tiles").ToDictionary(
-                    item => item.type, item => item.mana)
+                    item => item.type, item => item)
                 );
             }
         }

@@ -9,7 +9,10 @@ namespace Wing.RPGSystem
     {
         public static AreaManager Instance { get; private set; }
 
-        public AreaConfig Config { get; private set; }
+        public Location CurrentAreaLoc { get; private set; }
+        public int CurrentAreaIndex { get; private set; }
+        public int ChunkIndex { get; private set; }
+        public AreaInfo ActiveData => Database.Instance.AreaChunks[ChunkIndex].areaInfo[CurrentAreaLoc];
 
         private void Awake()
         {

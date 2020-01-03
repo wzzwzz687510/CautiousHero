@@ -10,18 +10,9 @@ namespace Wing.RPGSystem
 
         public TileNavigation() { }
 
-        public TileNavigation(int width,int height,int[,] map)
+        public TileNavigation(int width,int height)
         {
             grid = new SquareGrid(width, height);
-            for (int x = 0; x < width; x++) {
-                for (int y = 0; y < height; y++) {
-                    if (map[x, y] > 0)
-                        grid.SetWeight(new Location(x, y), 1);
-                    else {
-                        grid.SetWeight(new Location(x, y), 0);
-                    }
-                }
-            }
         }
 
         public Stack<Location> GetPath(Location from, Location to)

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace Wing.RPGSystem
 {
@@ -39,7 +40,7 @@ namespace Wing.RPGSystem
 
         [Header("Test")]
         public bool resetData;
-        public string seed;
+        public string seed = "";
         public string worldName;
         public string playerName;
         public int spriteID;
@@ -47,11 +48,12 @@ namespace Wing.RPGSystem
         public BaseSkill[] skills;
         public AreaConfig config;
 
-        private List<int> skillDeck;
+        private List<int> defaultSkillDeck;
 
         public PlayerData ActiveData { get { return m_activeData; } }
         private PlayerData m_activeData;
         public AreaData[] AreaChunks { get; private set; }
+        public string saveName;
         private System.Random sr;
 
         private string nameKey = "LastSaveName";
@@ -61,12 +63,28 @@ namespace Wing.RPGSystem
             if (!Instance)
                 Instance = this;
 
-            skillDeck = new List<int>();
+            DontDestroyOnLoad(gameObject);
+
+            defaultSkillDeck = new List<int>();
             for (int i = 0; i < skills.Length; i++) {
-                skillDeck.Add(skills[i].Hash);
+                defaultSkillDeck.Add(skills[i].Hash);
             }
-            LoadData(worldName);
-            if (resetData) CreateNewSave(seed, worldName, playerName, spriteID, attribute, skillDeck);
+            if (resetData) CreateNewSave(seed, worldName, playerName, spriteID, attribute, defaultSkillDeck);
+            saveName = PlayerPrefs.GetString(nameKey);
+            LoadData(saveName);
+        }
+
+        private void Start()
+        {
+            StartCoroutine(LoadScene());
+        }
+
+        private IEnumerator LoadScene()
+        {
+            AsyncOperation ao = SceneManager.LoadSceneAsync("Main");
+            while (!ao.isDone) {
+                yield return null;
+            }
         }
 
         public void SaveData(string saveName)
@@ -92,8 +110,8 @@ namespace Wing.RPGSystem
 
         public void LoadData(string saveName)
         {
-            if (!File.Exists(Application.persistentDataPath + "/" + saveName + ".sav")) {
-                CreateNewSave(seed, worldName, playerName, spriteID, attribute, skillDeck);
+            if (saveName == "" || !File.Exists(Application.persistentDataPath + "/" + saveName + ".sav")) {
+                CreateNewSave(seed, worldName, playerName, spriteID, attribute, defaultSkillDeck);
                 return;
             }
 
@@ -128,6 +146,10 @@ namespace Wing.RPGSystem
                 attribute = attribute,
                 learnedSkills = skillDeck
             };
+            if (seed == "") {
+                m_activeData.seed = System.DateTime.Now.ToString();
+            }
+            AreaChunks = new AreaData[0];
 
             sr = new System.Random(ActiveData.seed.GetStableHashCode());
             SaveData(worldName);

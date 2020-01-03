@@ -24,9 +24,6 @@ public class GridManager : MonoBehaviour
         
     private HashSet<Location> playerEffectZone = new HashSet<Location>();   
 
-    public delegate void OnCompleteMapRendering();
-    public event OnCompleteMapRendering OnCompleteMapRenderEvent;
-
     private void Awake()
     {
         if (!Instance)
@@ -37,17 +34,9 @@ public class GridManager : MonoBehaviour
 
     private void Start()
     {
-        m_mg.GenerateMap(tileSprites.Length);
-        Astar = new TileNavigation(m_mg.width, m_mg.height, m_mg.map);
-        StartCoroutine(RenderMap());       
-    }
-
-    private void Update()
-    {
-        if (!IsRendered && Input.GetKeyDown(KeyCode.S)) {
-            StartCoroutine(RenderMap());
-            IsRendered = true;
-        }
+        //m_mg.GenerateMap(tileSprites.Length);
+        Astar = new TileNavigation(32, 32);
+        //RenderMap();       
     }
 
     private IEnumerator AddAbiotics()
@@ -83,7 +72,7 @@ public class GridManager : MonoBehaviour
         yield return null;
     }
 
-    private IEnumerator RenderMap()
+    private void RenderMap()
     {
         if (tileHolder)
             Destroy(tileHolder);
@@ -91,23 +80,14 @@ public class GridManager : MonoBehaviour
         tileHolder = new GameObject("Tile Holder");
         TileDic = new Dictionary<Location, TileController>();
 
-        for (int x = 0; x < m_mg.width; x++) {
-            for (int y = 0; y < m_mg.height; y++) {
-                if (m_mg.map[x, y] != 0) {
-                    var pos = new Location(x, y);
-                    TileController tc = Instantiate(tcPrefab, new Vector3(0.524f * (x - y), -0.262f * (x + y), 0), 
-                        Quaternion.identity, tileHolder.transform).GetComponent<TileController>();
-                    tc.Init_SpriteRenderer(pos, y * m_mg.width + x - m_mg.width * m_mg.height, 
-                        m_mg.map[x, y] - 1, UnityEngine.Random.Range(0.01f, 1f));
-                    TileDic.Add(pos, tc);
-                }
+        for (int x = 0; x < 32; x++) {
+            for (int y = 0; y < 32; y++) {
+                var pos = new Location(x, y);
+                TileController tc = Instantiate(tcPrefab, new Vector3(x, y, 0),
+                    Quaternion.identity, tileHolder.transform).GetComponent<TileController>();
+                TileDic.Add(pos, tc);
             }
         }
-
-        //Debug.Log("tile cnt:" + tileHolder.transform.childCount);
-        //yield return AddAbiotics();
-        yield return new WaitForSeconds(2);
-        OnCompleteMapRenderEvent?.Invoke();
     }
 
 

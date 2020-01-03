@@ -28,18 +28,16 @@ namespace Wing.RPGSystem
     [System.Serializable]
     public struct TileInfo
     {
-        public TileType type;
+        public TemplateTile template;
         public ElementMana mana;
-        public Location dirPattern; // if not (0,0) means this is a passage
         public bool isExplored;
         public bool isEmpty;
         public int stayEntityHash;
 
-        public TileInfo(TileType type, ElementMana mana)
+        public TileInfo(TemplateTile template)
         {
-            this.type = type;
-            this.mana = mana;
-            dirPattern = new Location(0, 0);
+            this.template = template;
+            mana = template.mana;
             isExplored = false;
             isEmpty = true;
             stayEntityHash = 0;
@@ -70,8 +68,8 @@ namespace Wing.RPGSystem
         
         public Vector3 Archor { get { return m_archor.position; } }
 
-        public TileInfo Info { get => _info; private set => _info = value; }
-        private TileInfo _info;
+        public TileInfo Info => AreaManager.Instance.ActiveData.map[Loc.x,Loc.y];
+        
         public Location Loc { get; private set; }
         public Location CastLoc { get; private set; }
         public int StayEntityHash { get { return Info.stayEntityHash; } }
@@ -81,19 +79,14 @@ namespace Wing.RPGSystem
 
         public int SortOrder { get { return m_spriteRenderer.sortingOrder; } }
 
-
         // para sort order, sprite ID and animation delay time
-        public void Init_SpriteRenderer(Location location, int sortOrder, int spriteID, float AnimDelayTime)
+        public void Init_SpriteRenderer(Location location)
         {
             Loc = location;
-            m_spriteRenderer.sortingOrder = sortOrder;
-            if (spriteID >= 0)
-                m_spriteRenderer.sprite = GridManager.Instance.tileSprites[spriteID];
-            else {
-                m_spriteRenderer.sprite = GridManager.Instance.darkArea[GridManager.Instance.darkArea.Length.Random()];
-            }
+            m_spriteRenderer.sortingOrder = Loc.x + Loc.y * 32 - 32 * 32;
+            m_spriteRenderer.sprite = Info.template.sprite;
 
-            StartCoroutine(PlayAnimation(AnimDelayTime));
+            StartCoroutine(PlayAnimation(Random.Range(0.01f, 1f)));
         }
 
         IEnumerator PlayAnimation(float delayTime)

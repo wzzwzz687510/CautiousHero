@@ -20,7 +20,6 @@ public class BigMapTest : MonoBehaviour
 
     private void Start()
     {
-        GridManager.Instance.OnCompleteMapRenderEvent += OnCompleteMapRenderEvent;
         AnimationManager.Instance.OnAnimCompleted.AddListener(OnAnimComplete);
         StartCoroutine(BattleStart());
     }
