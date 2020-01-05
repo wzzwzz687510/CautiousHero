@@ -46,6 +46,31 @@ namespace Wing.RPGSystem
             return movesteps;
         }
 
+        public void MoveToArea(Location targetLoc,bool isInstance = false)
+        {
+            if (targetLoc == Loc)  return;
+
+            if (!isInstance) {
+                Stack<Location> path = WorldMapManager.Instance.Nav.GetPath(Loc, targetLoc);
+
+                Vector3[] sortedPath = new Vector3[path.Count];
+                for (int i = 0; i < sortedPath.Length; i++) {
+                    sortedPath[i] = path.Pop();
+                }
+                MovePath = sortedPath;
+            }
+
+            Loc = targetLoc;
+            if (isInstance) {
+                AnimationManager.Instance.AddAnimClip(new MoveInstantAnimClip(Hash, targetLoc, 0.2f));                
+            }
+            else {
+                AnimationManager.Instance.AddAnimClip(new MovePathAnimClip(Hash, MovePath, 0.2f));
+            }
+
+            AnimationManager.Instance.PlayOnce();
+        }
+
         public override void OnTurnStarted()
         {
             base.OnTurnStarted();

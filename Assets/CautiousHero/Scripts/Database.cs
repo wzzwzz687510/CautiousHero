@@ -72,6 +72,7 @@ namespace Wing.RPGSystem
         [Header("Test")]
         public TRace defaultRace;
         public TClass defaultClass;
+        public WorldConfig defaultWorldConfig;
         public EntityAttribute attribute;
 
         public WorldData ActiveGameData { get { return m_activeGameData; } }
@@ -192,16 +193,19 @@ namespace Wing.RPGSystem
             SavePlayerData();
         }
 
-        public void CreateNewGame(int raceHash, int classHash)
+        public void CreateNewGame(int raceID, int classID)
         {
+            m_playerData[SelectSlot].isNewGame = false;
+            TRace tRace = ActivePlayerData.unlockedRaces[raceID].GetTRace();
+            TClass tClass = ActivePlayerData.unlockedClasses[classID].GetTClass();
             List<int> skillDeck = new List<int>();
             for (int i = 0; i < 5; i++) {
-                skillDeck.Add(classHash.GetTClass().skillSet[0].Hash);
+                skillDeck.Add(tClass.skillSet[0].Hash);
             }
             for (int i = 0; i < 4; i++) {
-                skillDeck.Add(classHash.GetTClass().skillSet[1].Hash);
+                skillDeck.Add(tClass.skillSet[1].Hash);
             }
-            skillDeck.Add(classHash.GetTClass().skillSet[2].Hash);
+            skillDeck.Add(tClass.skillSet[2].Hash);
             m_activeGameData = new WorldData() {
                 seed = System.DateTime.Now.ToString(),
                 attribute = attribute,

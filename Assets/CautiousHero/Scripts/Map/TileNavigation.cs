@@ -10,9 +10,9 @@ namespace Wing.RPGSystem
 
         public TileNavigation() { }
 
-        public TileNavigation(int width,int height)
+        public TileNavigation(int width,int height, int defaultWeight)
         {
-            grid = new SquareGrid(width, height);
+            grid = new SquareGrid(width, height, defaultWeight);
         }
 
         public Stack<Location> GetPath(Location from, Location to)
@@ -93,7 +93,7 @@ namespace Wing.RPGSystem
             = new Dictionary<Location, int>();
         private int defaultWeight;
 
-        public SquareGrid(int width, int height, int defaultWeight = 1)
+        public SquareGrid(int width, int height, int defaultWeight)
         {
             this.Width = width;
             this.Height = height;

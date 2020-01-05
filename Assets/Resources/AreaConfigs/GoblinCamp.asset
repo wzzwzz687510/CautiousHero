@@ -1,0 +1,21 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 24846ce9371c0c449b3fb7c32a4ca216, type: 3}
+  m_Name: GoblinCamp
+  m_EditorClassIdentifier: 
+  configName: Goblin Camp
+  description: 
+  type: 4
+  sprite: {fileID: 21300000, guid: 4a40a5d6062d3994eb89546484780c26, type: 3}
+  subAreaSets: {fileID: 11400000, guid: cfb9e97098179094a86b9361ffda8ae7, type: 2}
+  creatureSets: {fileID: 11400000, guid: 90d4f7a6c66e70344bc2bb664bdcd045, type: 2}
+  abioticSets: []

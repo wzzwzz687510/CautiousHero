@@ -11,17 +11,24 @@ namespace Wing.RPGSystem
         public LayerMask areaLayer;
         public AreaController areaPrefab;
         public Transform areaHolder;
+        public WorldMapUIController m_worldUIController;
+        public TitleUIController titleUIController;
+        public PlayerController player;
 
         public Dictionary<Location, AreaController> AreaDic { get; private set; }
+        public TileNavigation Nav { get; private set; }
         private Location selectedArea;
+        private Location currentLoc;
 
         private Dictionary<Location, PreAreaInfo> preDic;
         private List<Location> stageAreaLocs;
+
 
         private void Awake()
         {
             if (!Instance)
                 Instance = this;
+            AreaDic = new Dictionary<Location, AreaController>();
         }
 
         private void Update()
@@ -40,8 +47,30 @@ namespace Wing.RPGSystem
 
         public void ContinueGame()
         {
-            RelocateAreaPosition();
+            if (!m_worldUIController.gameObject.activeSelf) m_worldUIController.gameObject.SetActive(true);
 
+            // Init map visual
+            RelocateAreaPosition();
+            currentLoc = Location.Zero;
+            AreaDic[currentLoc].Init(currentLoc);
+            ExploreArea(currentLoc);
+
+            // Init player
+            player.transform.position = Vector3.zero;
+        }
+
+        private void ExploreArea(Location loc)
+        {
+            foreach (var dp in AreaDic[loc].AreaInfo.passageDic.Keys) {
+                AreaDic[dp + loc].Init(dp + loc);
+            }
+        }
+
+        private void MoveToArea(Location loc)
+        {
+            if (!AreaDic.ContainsKey(loc) || !AreaDic[loc].IsExplored) return;
+
+            player.MoveToArea(loc);
         }
 
         private void RelocateAreaPosition()
@@ -54,9 +83,11 @@ namespace Wing.RPGSystem
             }
             for (int i = 0; i < areaHolder.childCount; i++) {
                 Location loc = Database.Instance.ActiveGameData.worldMap[i];
+                Nav.SetTileWeight(loc, 1);
                 AreaController ac = areaHolder.GetChild(i).GetComponent<AreaController>();
                 ac.transform.position = new Vector3(0.524f * (loc.x - loc.y), -0.262f * (loc.x + loc.y), 0);
-                ac.Init_SpriteRenderer(loc);
+                //ac.Init_SpriteRenderer(loc);
+                AreaDic.Add(loc, ac);
             }
         }
 
@@ -64,13 +95,14 @@ namespace Wing.RPGSystem
         #region Generate New World
         public void StartNewGame()
         {
+            m_worldUIController.gameObject.SetActive(true);
             StartCoroutine(GenerateNewWorld());
         }
 
         private IEnumerator GenerateNewWorld()
         {
             WorldMapUIController.Instance.SetLoadingPage(true);
-            var worldConfig = WorldConfig.Dict[Database.Instance.ActiveGameData.worldConfigHash];
+            var worldConfig = Database.Instance.defaultWorldConfig;
             int areaNumber = 0;
             for (int i = 0; i < worldConfig.stages.Length; i++) {
                 areaNumber += worldConfig.stages[i].stageLength;
@@ -80,6 +112,8 @@ namespace Wing.RPGSystem
                 yield return StartCoroutine(GenerateStage(worldConfig.stages[i]));
             }
             WorldMapUIController.Instance.SetLoadingPage(false);
+
+            ContinueGame();
         }
 
         private IEnumerator GenerateStage(AdventureStage stage)
@@ -91,7 +125,8 @@ namespace Wing.RPGSystem
             stageAreaLocs = new List<Location> {
                 loc
             };
-            preDic.Add(loc, new PreAreaInfo() { loc = loc });
+
+            preDic.Add(loc, new PreAreaInfo() { loc = loc, connectionDP = new List<Location>(), typeID = -1 });
             // Generate main path
             for (int i = 0; i < stage.stageLength; i++) {
                 if (100.Random() < stage.complexity) {
@@ -104,7 +139,14 @@ namespace Wing.RPGSystem
                         dir = Location.Up;
                     }
                 }
-                AddAreaInfo(i, dir, loc, (i == stage.stageLength - 1) ? -3 : -1);
+                if(i == stage.stageLength - 1) {
+                    AddAreaInfo(i, dir, loc, -3);
+                    Nav = new TileNavigation(8, loc.y + 1,0);
+                }
+                else {
+                    AddAreaInfo(i, dir, loc, -1);
+                }
+                
                 loc += dir;
                 yield return null;
             }
@@ -114,7 +156,7 @@ namespace Wing.RPGSystem
             for (int i = 0, j = 0; i < stageAreaLocs.Count; i++) {
                 PreAreaInfo info = preDic[stageAreaLocs[i]];
                 while (info.connectionDP.Count != 4 && 100.Random() < stage.complexity) {
-                    if (j > spareMainAreaNumber) break;
+                    if (j >= spareMainAreaNumber) break;
                     List<Location> dirs = new List<Location>() { Location.Up, Location.Down, Location.Left, Location.Right };
                     foreach (var dp in info.connectionDP) {
                         dirs.Remove(dp);
@@ -134,7 +176,7 @@ namespace Wing.RPGSystem
                 int areaIndex = stageAreaLocs.Count - i;
                 PreAreaInfo info = preDic[stageAreaLocs[areaIndex]];
                 while (info.connectionDP.Count != 4 && 100.Random() < stage.complexity) {
-                    if (j > stage.specialConfigs.Length) break;
+                    if (j >= stage.specialConfigs.Length) break;
                     List<Location> dirs = new List<Location>() { Location.Up, Location.Down, Location.Left, Location.Right };
                     foreach (var dp in info.connectionDP) {
                         dirs.Remove(dp);
@@ -165,38 +207,49 @@ namespace Wing.RPGSystem
 
         private void SaveToDatabase(PreAreaInfo preInfo,AreaConfig config)
         {
+            SubAreaSet sets = config.subAreaSets;           
             SubArea[,] subArea = new SubArea[4, 4];
             for (int x = 0; x < 4; x++) {
                 for (int y = 0; y < 4; y++) {
+                    subArea[x, y] = new SubArea();
                     if (x == 0 || x == 3) {
                         if (y == 0 || y == 3) {
-                            subArea[x, y].coordinateValues = config.cornerAreas[config.cornerAreas.Length.Random()].GetInverseValues(x == 3, y == 3);
+                            int length = sets.cornerAreas.Length;
+                            if (length == 0) Debug.LogError("Sub area set error, please check config: " + config.configName);
+                            subArea[x, y].coordinateValues = sets.cornerAreas[length.Random()].GetInverseValues(x == 3, y == 3);
                         }
                         else {
-                            subArea[x, y].coordinateValues = config.vEdgeAreas[config.vEdgeAreas.Length.Random()].GetInverseValues(x == 3, false);
+                            int length = sets.vEdgeAreas.Length;
+                            if (length == 0) Debug.LogError("Sub area set error, please check config: " + config.configName);
+                            subArea[x, y].coordinateValues = sets.vEdgeAreas[length.Random()].GetInverseValues(x == 3, false);
                         }
                         continue;
                     }
                     else if (y == 0 || y == 3) {
-                        subArea[x, y].coordinateValues = config.hEdgeAreas[config.hEdgeAreas.Length.Random()].GetInverseValues(false, y == 3);
+                        int length = sets.hEdgeAreas.Length;
+                        if (length == 0) Debug.LogError("Sub area set error, please check config: " + config.configName);
+                        subArea[x, y].coordinateValues = sets.hEdgeAreas[length.Random()].GetInverseValues(false, y == 3);
                         continue;
                     }
                     else {
-                        subArea[x, y].coordinateValues = config.centreAreas[config.centreAreas.Length.Random()].coordinateValues;
+                        int length = sets.centreAreas.Length;
+                        if (length == 0) Debug.LogError("Sub area set error, please check config: " + config.configName);
+                        subArea[x, y].coordinateValues = sets.centreAreas[length.Random()].coordinateValues;
                     }
-                }                
+                }
             }
 
             List<Location> spawnLocs = new List<Location>();
             AreaInfo info = new AreaInfo {
                 templateHash = config.Hash,
                 loc = preInfo.loc,
-                map = new TileInfo[32, 32]
+                map = new TileInfo[32, 32],
+                passageDic = new Dictionary<Location, Location>()
             };
             for (int x = 0; x < 32; x++) {
                 for (int y = 0; y < 32; y++) {
-                    int value = subArea[x / 8, y / 8].coordinateValues[x % 8, y % 8];
-                    TileType type = value.Random() < 100 ? (TileType)(value % 100) : TileType.Plain;
+                    int value = subArea[x / 8, y / 8].coordinateValues[x % 8 + 8 * (y % 8)];
+                    TileType type = 10.Random() < (value / 100) ? (TileType)(value % 100) : TileType.Plain;
                     if (type == TileType.SpawnZone) spawnLocs.Add(new Location(x, y));
                     info.map[x, y] = new TileInfo(TemplateTile.Dict[type]);
                 }
@@ -205,6 +258,9 @@ namespace Wing.RPGSystem
             foreach (var passage in preInfo.connectionDP) {
                 if (passage == Location.Up) {
                     int x = 30.Random() + 1, y = 31;
+                    info.map[x, y].template = TemplateTile.Dict[TileType.Passage];
+                    info.passageDic.Add(Location.Up, new Location(x, y));
+                    y--;
                     while (info.map[x, y].template.type != TileType.Plain) {
                         info.map[x, y].template = TemplateTile.Dict[TileType.Plain];
                         y--;
@@ -212,6 +268,9 @@ namespace Wing.RPGSystem
                 }
                 else if(passage == Location.Down) {
                     int x = 30.Random() + 1, y = 0;
+                    info.map[x, y].template = TemplateTile.Dict[TileType.Passage];
+                    info.passageDic.Add(Location.Down, new Location(x, y));
+                    y--;
                     while (info.map[x, y].template.type != TileType.Plain) {
                         info.map[x, y].template = TemplateTile.Dict[TileType.Plain];
                         y++;
@@ -219,6 +278,9 @@ namespace Wing.RPGSystem
                 }
                 else if(passage == Location.Left) {
                     int y = 30.Random() + 1, x = 0;
+                    info.map[x, y].template = TemplateTile.Dict[TileType.Passage];
+                    info.passageDic.Add(Location.Left, new Location(x, y));
+                    y--;
                     while (info.map[x, y].template.type != TileType.Plain) {
                         info.map[x, y].template = TemplateTile.Dict[TileType.Plain];
                         x++;
@@ -226,6 +288,9 @@ namespace Wing.RPGSystem
                 }
                 else if (passage == Location.Right) {
                     int y = 30.Random() + 1, x = 31;
+                    info.map[x, y].template = TemplateTile.Dict[TileType.Passage];
+                    info.passageDic.Add(Location.Right, new Location(x, y));
+                    y--;
                     while (info.map[x, y].template.type != TileType.Plain) {
                         info.map[x, y].template = TemplateTile.Dict[TileType.Plain];
                         x--;
@@ -237,8 +302,14 @@ namespace Wing.RPGSystem
             CreatureSet set = config.creatureSets.GetRandomSet(preInfo.isHardSet);
             Location setLoc = spawnLocs[spawnLocs.Count.Random()];
             info.creatureSetHashDic.Add(setLoc, set.Hash);
+            int rotTimes = 4.Random();
+            int cosine = (int)Mathf.Cos(rotTimes * 90 * Mathf.Deg2Rad);
+            int sine = (int)Mathf.Sin(rotTimes * 90 * Mathf.Deg2Rad);
+            int patternX, patternY;
             foreach (var ce in set.creatures) {
-                info.map[setLoc.x + ce.pattern.x, setLoc.y + ce.pattern.y].SetEntity(ce.tCreature.Hash);
+                patternX = ce.pattern.x * cosine + ce.pattern.y * sine;
+                patternY = -ce.pattern.x * sine + ce.pattern.y * cosine;
+                info.map[setLoc.x + patternX, setLoc.y + patternY].SetEntity(ce.tCreature.Hash);
             }
                             
             int chunkIndex = Database.Instance.ActiveGameData.worldMap.Count / Database.Instance.areaChunkSize;
@@ -249,7 +320,12 @@ namespace Wing.RPGSystem
         private void AddAreaInfo(int index, Location dir,Location loc,int typeID)
         {
             Location newLoc = loc + dir;
-            var info = new PreAreaInfo() { loc = newLoc, typeID = typeID, isHardSet = typeID == -2 };
+            var info = new PreAreaInfo() {
+                loc = newLoc,
+                typeID = typeID,
+                isHardSet = typeID == -2,
+                connectionDP = new List<Location>()
+            };
 
             preDic[loc].connectionDP.Add(dir);
 

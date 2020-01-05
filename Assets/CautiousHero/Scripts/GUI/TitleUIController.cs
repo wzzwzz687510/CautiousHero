@@ -8,18 +8,20 @@ namespace Wing.RPGSystem
     public class TitleUIController : MonoBehaviour
     {
         [Header("UI Elements")]
-        public Button continueButton;
-        public InputField nameInputField;
+        public Button continueButton;     
         public Text saveName;
         public Image slotIcon;
         public Sprite[] iconSprites;
- 
+        public InputField nameInputField;
+        public Button infoConfirmButton;
+        public Text infoText;
+
         [Header("Pages")]
         public GameObject startPage;
         public GameObject createPage;
         public GameObject savePage;
         public GameObject nameInputPage;
-        public GameObject newGameCheckPage;
+        public GameObject infoPage;
 
         public Text raceText;
         public Text raceDesText;
@@ -90,18 +92,27 @@ namespace Wing.RPGSystem
 
         public void Button_StartNewGame()
         {
+            gameObject.SetActive(false);
+            Database.Instance.CreateNewGame(selectRaceID, selectClassID);
             WorldMapManager.Instance.StartNewGame();
         }
 
         public void Button_Continue()
         {
+            gameObject.SetActive(false);
             WorldMapManager.Instance.ContinueGame();
         }
 
         public void Button_Summon()
         {
             if (continueButton.interactable) {
-                newGameCheckPage.SetActive(true);
+                infoConfirmButton.onClick.AddListener(() => {
+                    Button_ConfirmNewGame();
+                    infoConfirmButton.onClick.RemoveAllListeners();
+                    infoPage.SetActive(false);
+                });
+                infoText.text = "Summon will create a new world and delete the old world.";
+                infoPage.SetActive(true);
             }
             else Button_ConfirmNewGame();
         }

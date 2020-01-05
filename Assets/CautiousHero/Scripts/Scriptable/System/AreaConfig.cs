@@ -29,10 +29,7 @@ namespace Wing.RPGSystem
         public AreaType type;
         public Sprite sprite;
         public int Hash => configName.GetStableHashCode();
-        public SubArea[] cornerAreas;
-        public SubArea[] vEdgeAreas;
-        public SubArea[] hEdgeAreas;
-        public SubArea[] centreAreas;
+        public SubAreaSet subAreaSets;
         public CreatureSetDifficulty creatureSets;
         public AbioticElement[] abioticSets;
 

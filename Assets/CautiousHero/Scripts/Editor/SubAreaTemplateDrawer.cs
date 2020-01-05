@@ -8,19 +8,28 @@ namespace Wing.RPGSystem
     [CustomEditor(typeof(SubAreaPrefabTool))]
     public class SubAreaTemplateDrawer : Editor
     {
-        public int[,] coordinateValues;
+        SerializedProperty sp;
+
+        private void OnEnable()
+        {
+            sp = serializedObject.FindProperty("values");
+        }
 
         public override void OnInspectorGUI()
         {
             base.OnInspectorGUI();
+            serializedObject.Update();
             SubAreaPrefabTool t = (SubAreaPrefabTool)target;
-            coordinateValues = new int[8, 8];
-
+            
             for (int y = 0; y < 8; y++) {
                 EditorGUILayout.BeginHorizontal();
                 EditorGUILayout.LabelField((7-y).ToString(), new GUILayoutOption[] { GUILayout.Width(20) });
                 for (int x = 0; x < 8; x++) {
-                    EditorGUILayout.IntField(coordinateValues[x, 7-y], new GUILayoutOption[] { GUILayout.MinWidth(40) });
+                    EditorGUI.BeginChangeCheck();
+                    int inputNumber = EditorGUILayout.IntField(sp.GetArrayElementAtIndex(x+8*(7-y)).intValue, new GUILayoutOption[] { GUILayout.MinWidth(40) });
+                    if (EditorGUI.EndChangeCheck()) {
+                        sp.GetArrayElementAtIndex(x + 8 * (7 - y)).intValue = inputNumber;
+                    }
                 }
                 EditorGUILayout.EndHorizontal();
             }
@@ -33,8 +42,12 @@ namespace Wing.RPGSystem
                 EditorGUILayout.EndHorizontal();
             }
             if (GUILayout.Button("Create")) {
-                t.Button_CreateAsset(coordinateValues);
+                t.Button_CreateAsset();
             }
+            if (GUILayout.Button("Load")) {
+                t.LoadTest();
+            }
+            serializedObject.ApplyModifiedProperties();
         }
     }
 }

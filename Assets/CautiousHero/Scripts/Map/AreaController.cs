@@ -16,10 +16,11 @@ namespace Wing.RPGSystem
     [System.Serializable]
     public struct AreaInfo
     {
-        public int templateHash; 
+        public int templateHash;
         public Location loc;
         // Generate map after area generation
         public TileInfo[,] map;
+        public Dictionary<Location, Location> passageDic;// First location is direction pattern
         public Dictionary<Location, int> creatureSetHashDic;
     }
 
@@ -31,27 +32,22 @@ namespace Wing.RPGSystem
         public Transform m_archor;
         public Vector3 Archor { get { return m_archor.position; } }
 
-        public bool IsInit { get; private set; }
+        public bool IsExplored { get; private set; }
         public Location Loc { get; private set; }
         public AreaInfo AreaInfo { get { Database.Instance.TryGetAreaInfo(Loc, out AreaInfo info); return info; } }
 
         public int SortOrder { get { return m_spriteRenderer.sortingOrder; } }
 
         // para sort order, sprite ID and animation delay time
-        public void Init_SpriteRenderer(Location location)
+        public void Init(Location location)
         {
             Loc = location;
             m_spriteRenderer.sortingOrder = Loc.x + Loc.y * 8;
 
-                m_spriteRenderer.sprite = AreaInfo.templateHash.GetAreaConfig().sprite;
+            m_spriteRenderer.sprite = AreaInfo.templateHash.GetAreaConfig().sprite;
 
-            StartCoroutine(PlayAnimation(Random.Range(0.01f, 1f)));
-        }
-
-        IEnumerator PlayAnimation(float delayTime)
-        {
-            yield return new WaitForSeconds(delayTime);
             m_animator.Play("tile_fall");
+            IsExplored = true;
         }
     }
 }

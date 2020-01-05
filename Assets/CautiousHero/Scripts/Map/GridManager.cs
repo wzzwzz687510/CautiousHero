@@ -35,7 +35,7 @@ public class GridManager : MonoBehaviour
     private void Start()
     {
         //m_mg.GenerateMap(tileSprites.Length);
-        Astar = new TileNavigation(32, 32);
+        Astar = new TileNavigation(32, 32,1);
         //RenderMap();       
     }
 
