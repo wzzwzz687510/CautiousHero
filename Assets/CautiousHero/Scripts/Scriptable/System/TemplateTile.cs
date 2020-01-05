@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace Wing.RPGSystem
 {
-    [CreateAssetMenu(fileName = "Tile", menuName = "Wing/Scriptable Patterns/TemplateTile", order = 5)]
+    [CreateAssetMenu(fileName = "Tile", menuName = "Wing/Configs/TemplateTile", order = 5)]
     public class TemplateTile : ScriptableObject
     {
         public TileType type;

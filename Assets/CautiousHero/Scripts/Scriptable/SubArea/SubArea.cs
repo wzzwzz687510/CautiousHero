@@ -12,6 +12,12 @@ namespace Wing.RPGSystem
         Centre
     }
 
+    [System.Serializable]
+    public struct Int2DArray
+    {
+        public int[,] values;
+    }
+
     //[CreateAssetMenu(fileName = "AreaConfig", menuName = "Wing/SubAreaPrefab", order = 2)]
     public class SubArea : ScriptableObject
     {

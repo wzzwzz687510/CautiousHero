@@ -66,8 +66,8 @@ namespace Wing.RPGSystem
                     hEdge.coordinateValues.CopyTo(values, 0);
                     break;
                 case SubAreaType.Centre:
-                    var centre = Resources.LoadAll<CentreArea>("SubAreas");
-                    centre[0].coordinateValues.CopyTo(values, 0);
+                    var centre = AssetDatabase.LoadAssetAtPath<CentreArea>(path + templateName + ".asset");
+                    centre.coordinateValues.CopyTo(values, 0);
                     break;
                 default:
                     break;

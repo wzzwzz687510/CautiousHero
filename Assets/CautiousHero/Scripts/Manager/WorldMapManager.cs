@@ -75,13 +75,14 @@ namespace Wing.RPGSystem
 
         private void RelocateAreaPosition()
         {
-            int cnt = Database.Instance.ActiveGameData.worldMap.Count - areaHolder.childCount;
-            if (cnt > 0) {
-                for (int i = 0; i < cnt; i++) {
+            int cnt = Database.Instance.ActiveGameData.worldMap.Count ;
+            if (cnt - areaHolder.childCount > 0) {
+                for (int i = 0; i < cnt - areaHolder.childCount; i++) {
                     Instantiate(areaPrefab, areaHolder);
                 }
             }
             for (int i = 0; i < areaHolder.childCount; i++) {
+                if (i == cnt) break;
                 Location loc = Database.Instance.ActiveGameData.worldMap[i];
                 Nav.SetTileWeight(loc, 1);
                 AreaController ac = areaHolder.GetChild(i).GetComponent<AreaController>();
@@ -270,7 +271,7 @@ namespace Wing.RPGSystem
                     int x = 30.Random() + 1, y = 0;
                     info.map[x, y].template = TemplateTile.Dict[TileType.Passage];
                     info.passageDic.Add(Location.Down, new Location(x, y));
-                    y--;
+                    y++;
                     while (info.map[x, y].template.type != TileType.Plain) {
                         info.map[x, y].template = TemplateTile.Dict[TileType.Plain];
                         y++;
@@ -280,7 +281,7 @@ namespace Wing.RPGSystem
                     int y = 30.Random() + 1, x = 0;
                     info.map[x, y].template = TemplateTile.Dict[TileType.Passage];
                     info.passageDic.Add(Location.Left, new Location(x, y));
-                    y--;
+                    x++;
                     while (info.map[x, y].template.type != TileType.Plain) {
                         info.map[x, y].template = TemplateTile.Dict[TileType.Plain];
                         x++;
@@ -290,7 +291,7 @@ namespace Wing.RPGSystem
                     int y = 30.Random() + 1, x = 31;
                     info.map[x, y].template = TemplateTile.Dict[TileType.Passage];
                     info.passageDic.Add(Location.Right, new Location(x, y));
-                    y--;
+                    x--;
                     while (info.map[x, y].template.type != TileType.Plain) {
                         info.map[x, y].template = TemplateTile.Dict[TileType.Plain];
                         x--;
@@ -299,22 +300,24 @@ namespace Wing.RPGSystem
             }
 
             // TODO multiple creature set
-            CreatureSet set = config.creatureSets.GetRandomSet(preInfo.isHardSet);
-            Location setLoc = spawnLocs[spawnLocs.Count.Random()];
-            info.creatureSetHashDic.Add(setLoc, set.Hash);
-            int rotTimes = 4.Random();
-            int cosine = (int)Mathf.Cos(rotTimes * 90 * Mathf.Deg2Rad);
-            int sine = (int)Mathf.Sin(rotTimes * 90 * Mathf.Deg2Rad);
-            int patternX, patternY;
-            foreach (var ce in set.creatures) {
-                patternX = ce.pattern.x * cosine + ce.pattern.y * sine;
-                patternY = -ce.pattern.x * sine + ce.pattern.y * cosine;
-                info.map[setLoc.x + patternX, setLoc.y + patternY].SetEntity(ce.tCreature.Hash);
+            if (spawnLocs.Count != 0) {
+                CreatureSet set = config.creatureSets.GetRandomSet(preInfo.isHardSet);
+                Location setLoc = spawnLocs[spawnLocs.Count.Random()];
+                info.creatureSetHashDic.Add(setLoc, set.Hash);
+                int rotTimes = 4.Random();
+                int cosine = (int)Mathf.Cos(rotTimes * 90 * Mathf.Deg2Rad);
+                int sine = (int)Mathf.Sin(rotTimes * 90 * Mathf.Deg2Rad);
+                int patternX, patternY;
+                foreach (var ce in set.creatures) {
+                    patternX = ce.pattern.x * cosine + ce.pattern.y * sine;
+                    patternY = -ce.pattern.x * sine + ce.pattern.y * cosine;
+                    info.map[setLoc.x + patternX, setLoc.y + patternY].SetEntity(ce.tCreature.Hash);
+                }
             }
                             
             int chunkIndex = Database.Instance.ActiveGameData.worldMap.Count / Database.Instance.areaChunkSize;
             Database.Instance.AreaChunks[chunkIndex].areaInfo.Add(info.loc, info);
-            Database.Instance.ActiveGameData.worldMap.Add(preInfo.loc);
+            Database.Instance.ActiveGameData.worldMap.Add(info.loc);
         }
 
         private void AddAreaInfo(int index, Location dir,Location loc,int typeID)

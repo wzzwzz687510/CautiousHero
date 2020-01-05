@@ -209,7 +209,8 @@ namespace Wing.RPGSystem
             m_activeGameData = new WorldData() {
                 seed = System.DateTime.Now.ToString(),
                 attribute = attribute,
-                learnedSkills = skillDeck
+                learnedSkills = skillDeck,
+                worldMap = new List<Location>()
             };
             AreaChunks = new AreaData[0];
 
@@ -223,6 +224,7 @@ namespace Wing.RPGSystem
             AreaChunks = new AreaData[length];
             for (int i = 0; i < length; i++) {
                 AreaChunks[i] = new AreaData();
+                AreaChunks[i].areaInfo = new Dictionary<Location, AreaInfo>();
             }
         }
 
