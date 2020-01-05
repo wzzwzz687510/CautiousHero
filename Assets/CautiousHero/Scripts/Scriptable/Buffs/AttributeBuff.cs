@@ -7,7 +7,11 @@ namespace Wing.RPGSystem
     [CreateAssetMenu(fileName = "Buff", menuName = "Wing/Scriptable Buffs/AttributeBuff", order = 20)]
     public class AttributeBuff : BaseBuff
     {
-        public new BuffType type = BuffType.Attribute;
         public EntityAttribute adjustValue;
+
+        public override void ApplyEffect(BuffHandler bh)
+        {
+            
+        }
     }
 }

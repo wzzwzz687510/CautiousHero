@@ -8,6 +8,7 @@ namespace Wing.RPGSystem
     public struct PreAreaInfo
     {
         public Location loc;
+        public bool isHardSet;
         public int typeID;
         public List<Location> connectionDP;// Connection direction pattern
     }
@@ -15,10 +16,11 @@ namespace Wing.RPGSystem
     [System.Serializable]
     public struct AreaInfo
     {
-        public int templateHash;
+        public int templateHash; 
         public Location loc;
         // Generate map after area generation
         public TileInfo[,] map;
+        public Dictionary<Location, int> creatureSetHashDic;
     }
 
     public class AreaController : MonoBehaviour

@@ -4,11 +4,11 @@ using UnityEngine;
 
 namespace Wing.RPGSystem
 {
-    [CreateAssetMenu(fileName = "Abiotic", menuName = "Wing/Scriptable Abiotic/BaseAbiotic", order = 30)]
+    [CreateAssetMenu(fileName = "Abiotic", menuName = "Wing/Scriptable Abiotic/BaseAbiotic", order = 35)]
     public class BaseAbiotic : ScriptableObject
     {
-        public string abioticName = "New Abiotic";
-        public string description = "A secret abiotic";
+        public string abioticName;
+        public string description;
         public Sprite[] sprite;
         public EntityAttribute attribute;
 

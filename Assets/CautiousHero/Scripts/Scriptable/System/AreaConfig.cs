@@ -21,11 +21,11 @@ namespace Wing.RPGSystem
         Boss
     }
 
-    [CreateAssetMenu(fileName = "AreaConfig", menuName = "Wing/Config/AreaConfig", order = 0)]
+    [CreateAssetMenu(fileName = "AreaConfig", menuName = "Wing/Configs/AreaConfig", order = 0)]
     public class AreaConfig : ScriptableObject
     {
-        public string configName = "New config set";
-        public string description = "A standard area set";
+        public string configName;
+        public string description;
         public AreaType type;
         public Sprite sprite;
         public int Hash => configName.GetStableHashCode();
@@ -33,7 +33,7 @@ namespace Wing.RPGSystem
         public SubArea[] vEdgeAreas;
         public SubArea[] hEdgeAreas;
         public SubArea[] centreAreas;
-        public CreatureSet[] creatureSets;
+        public CreatureSetDifficulty creatureSets;
         public AbioticElement[] abioticSets;
 
         static Dictionary<int, AreaConfig> cache;

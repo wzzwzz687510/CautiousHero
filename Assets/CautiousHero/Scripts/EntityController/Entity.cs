@@ -335,6 +335,7 @@ namespace Wing.RPGSystem
         /// <returns>Absorbed damage</returns>
         public virtual int ImpactArmour(int value, bool isPhysical, bool damage)
         {
+            if (value == 0) return 0;
             int absorbDamage = isPhysical ? PhysicalArmourPoints : MagicalArmourPoints;
             if (absorbDamage > value)
                 absorbDamage = value;
@@ -359,6 +360,7 @@ namespace Wing.RPGSystem
         /// <returns></returns>
         public virtual bool ImpactHP(int value, bool damage)
         {
+            if (value == 0) return true;
             //Debug.Log("Entity: "+EntityName+", HP: " + HealthPoints);
             int tmpHP = HealthPoints;
             HealthPoints = Mathf.Clamp(HealthPoints + (damage ? -1 : 1) * value, 0, MaxHealthPoints);

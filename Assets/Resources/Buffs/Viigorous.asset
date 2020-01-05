@@ -1,0 +1,31 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5b63973488458fe498f32ebef2ab6883, type: 3}
+  m_Name: Viigorous
+  m_EditorClassIdentifier: 
+  buffName: Vigorous
+  description: Increase Max AP
+  sprite: {fileID: 3511992679797895301, guid: 95182df2e629f5c4c90c733881fc6d9c, type: 3}
+  type: 1
+  trigger: 0
+  triggerTimes: 0
+  lastTurn: 0
+  infinity: 1
+  stackable: 0
+  adjustValue:
+    maxHealth: 0
+    maxAction: 1
+    actionPerTurn: 0
+    strength: 0
+    intelligence: 0
+    agility: 0
+    moveCost: 0

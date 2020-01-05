@@ -9,5 +9,9 @@ namespace Wing.RPGSystem
     {
         public float cofReduction;
         public float constReduction;
+
+        public override void ApplyEffect(BuffHandler bh)
+        {
+        }
     }
 }

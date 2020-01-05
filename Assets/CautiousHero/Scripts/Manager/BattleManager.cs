@@ -55,6 +55,8 @@ public class BattleManager : MonoBehaviour
     public delegate void MovePreview(int steps);
     public MovePreview MovePreviewEvent;
 
+    [HideInInspector] public UnityEvent BattleEndEvent;
+
     private void Awake()
     {
         if (!Instance)
@@ -82,7 +84,7 @@ public class BattleManager : MonoBehaviour
     {
         isActive = true;
         AIManager.Instance.Init(battleSet);
-        PreparePlacePlayer();       
+        //PreparePlacePlayer();       
     }
 
     private void OnAnimCompleted()
@@ -289,17 +291,17 @@ public class BattleManager : MonoBehaviour
 
     }
 
-    private void PreparePlacePlayer()
-    {
-        for (int x = 0; x < GridManager.Instance.MapBoundingBox.x; x++) {
-            for (int y = (int)GridManager.Instance.MapBoundingBox.y - 2; y < GridManager.Instance.MapBoundingBox.y; y++) {
-                Location loc = new Location(x, y);
-                if (!loc.IsEmpty()) continue;
-                GridManager.Instance.ChangeTileState(loc, TileState.PlaceZone);
-                tileZone.Add(loc);
-            }
-        }
-    }
+    //private void PreparePlacePlayer()
+    //{
+    //    for (int x = 0; x < GridManager.Instance.MapBoundingBox.x; x++) {
+    //        for (int y = (int)GridManager.Instance.MapBoundingBox.y - 2; y < GridManager.Instance.MapBoundingBox.y; y++) {
+    //            Location loc = new Location(x, y);
+    //            if (!loc.IsEmpty()) continue;
+    //            GridManager.Instance.ChangeTileState(loc, TileState.PlaceZone);
+    //            tileZone.Add(loc);
+    //        }
+    //    }
+    //}
 
     private void PrepareMove()
     {

@@ -5,7 +5,7 @@ using UnityEngine;
 namespace Wing.RPGSystem
 {
 
-    [CreateAssetMenu(fileName = "Loot", menuName = "Wing/BaseLoot", order = 40)]
+    [CreateAssetMenu(fileName = "Loot", menuName = "Wing/Scriptable Loots/BaseLoot", order = 40)]
     public class BaseLoot : ScriptableObject
     {
         public int extraCoin;

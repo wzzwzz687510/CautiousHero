@@ -51,6 +51,10 @@ namespace Wing.RPGSystem
 
         public static BaseBuff GetBaseBuff(this int hash) => BaseBuff.Dict[hash];
 
+        public static TRace GetTRace(this int hash) => TRace.Dict[hash];
+
+        public static TClass GetTClass(this int hash) => TClass.Dict[hash];
+
         public static Entity GetEntity(this int hash) {
             EntityManager.Instance.entityDic.TryGetValue(hash, out Entity entity);
             return entity;

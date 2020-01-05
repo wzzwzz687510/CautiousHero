@@ -15,12 +15,12 @@ namespace Wing.RPGSystem
         Amulet
     }
 
-    [CreateAssetMenu(fileName = "Equipment", menuName = "Wing/BaseEquipment", order = 50)]
+    [CreateAssetMenu(fileName = "Equipment", menuName = "Wing/Scriptable Equipments/BaseEquipment", order = 50)]
     public class BaseEquipment : ScriptableObject
     {
         [Header("Basic Parameters")]
-        public string equipmentName = "New skill";
-        public string description = "A mystical skill";
+        public string equipmentName;
+        public string description;
         public Sprite sprite;
         public int Hash { get { return equipmentName.GetStableHashCode(); } }
         public EntityAttribute attributeEffect;

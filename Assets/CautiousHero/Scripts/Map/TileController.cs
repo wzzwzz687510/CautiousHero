@@ -22,7 +22,8 @@ namespace Wing.RPGSystem
         Forest = 1,
         Water = 2,
         Mountain = 3,
-        Passage = 4
+        Passage = 4,
+        SpawnZone = 5 // 3x3
     }
 
     [System.Serializable]

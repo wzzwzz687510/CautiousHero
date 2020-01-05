@@ -15,8 +15,9 @@ namespace Wing.RPGSystem
         public bool Infinity { get { return TemplateBuff.infinity; } }
         public bool Stackable { get { return TemplateBuff.stackable; } }
 
-        public int LastTurn { get; set; }
-        public int StackCount { get; set; }
+        public int LastTurn { get; private set; }
+        public int TriggerTime { get; private set; }
+        public int StackCount { get; private set; }
 
         public BuffHandler(int casterHash, int targetHash, int buffhash)
         {
@@ -24,42 +25,11 @@ namespace Wing.RPGSystem
             TargetHash = targetHash;
             BuffHash = buffhash;
             LastTurn = TemplateBuff.lastTurn;
+            TriggerTime = TemplateBuff.triggerTimes;
 
             StackCount = 1;
-            if(TemplateBuff.stackable) (TemplateBuff as StackableEventBuff).OnStacked(this);
 
-            Entity target = targetHash.GetEntity();
-            switch (TemplateBuff.trigger) {
-                case BuffTrigger.TurnStart:
-                    target.OnTurnStartedEvent.AddListener(OnTriggered);
-                    break;
-                case BuffTrigger.TurnEnd:
-                    target.OnTurnEndedEvent.AddListener(OnTriggered);
-                    break;
-                case BuffTrigger.HPChange:
-                    target.OnHPChanged.AddListener(OnTriggered);
-                    break;
-                case BuffTrigger.APChange:
-                    target.OnAPChanged.AddListener(OnTriggered);
-                    break;
-                case BuffTrigger.PhysicalAPChange:
-                    target.OnPhysicalAPChanged.AddListener(OnTriggered);
-                    break;
-                case BuffTrigger.MagicalAPChange:
-                    target.OnMagicalAPChanged.AddListener(OnTriggered);
-                    break;
-                case BuffTrigger.SkillChange:
-                    target.OnSkillChanged.AddListener(OnTriggered);
-                    break;
-                case BuffTrigger.CasterDeath:
-                    casterHash.GetEntity().OnDead.AddListener(OnTriggered);
-                    break;
-                case BuffTrigger.TargetDeath:
-                    target.OnDead.AddListener(OnTriggered);
-                    break;
-                default:
-                    break;
-            }
+            ConnectEvent(true);
         }
 
         public void ResetBuff(int casterHash)
@@ -74,48 +44,100 @@ namespace Wing.RPGSystem
         /// <returns>True for last to next turn</returns>
         public bool UpdateBuff()
         {
-            if (Infinity || --LastTurn > 0)
+            if (Infinity || (TriggerTime > 0 && --LastTurn > 0))
                 return true;
 
-            Entity target = TargetHash.GetEntity();
             // Clear event registration.
-            switch (TemplateBuff.trigger) {
-                case BuffTrigger.TurnStart:
-                    target.OnTurnStartedEvent.RemoveListener(OnTriggered);
-                    break;
-                case BuffTrigger.TurnEnd:
-                    target.OnTurnEndedEvent.RemoveListener(OnTriggered);
-                    break;
-                case BuffTrigger.HPChange:
-                    target.OnHPChanged.RemoveListener(OnTriggered);
-                    break;
-                case BuffTrigger.APChange:
-                    target.OnAPChanged.RemoveListener(OnTriggered);
-                    break;
-                case BuffTrigger.PhysicalAPChange:
-                    target.OnPhysicalAPChanged.RemoveListener(OnTriggered);
-                    break;
-                case BuffTrigger.MagicalAPChange:
-                    target.OnMagicalAPChanged.RemoveListener(OnTriggered);
-                    break;
-                case BuffTrigger.SkillChange:
-                    target.OnSkillChanged.RemoveListener(OnTriggered);
-                    break;
-                case BuffTrigger.CasterDeath:
-                    CasterHash.GetEntity().OnDead.RemoveListener(OnTriggered);
-                    break;
-                case BuffTrigger.TargetDeath:
-                    target.OnDead.RemoveListener(OnTriggered);
-                    break;
-                default:
-                    break;
-            }
+            ConnectEvent(false);
             return false;
+        }
+
+        public void OnStacked()
+        {
+            StackCount++;
+            (TemplateBuff as StackableBuff).OnStacked(this);
+        }
+
+        private void ConnectEvent(bool isBind)
+        {
+            Entity target = TargetHash.GetEntity();
+            if (isBind)
+                switch (TemplateBuff.trigger) {
+                    case BuffTrigger.TurnStart:
+                        target.OnTurnStartedEvent.AddListener(OnTriggered);
+                        break;
+                    case BuffTrigger.TurnEnd:
+                        target.OnTurnEndedEvent.AddListener(OnTriggered);
+                        break;
+                    case BuffTrigger.HPChange:
+                        target.OnHPChanged.AddListener(OnTriggered);
+                        break;
+                    case BuffTrigger.APChange:
+                        target.OnAPChanged.AddListener(OnTriggered);
+                        break;
+                    case BuffTrigger.PhysicalAPChange:
+                        target.OnPhysicalAPChanged.AddListener(OnTriggered);
+                        break;
+                    case BuffTrigger.MagicalAPChange:
+                        target.OnMagicalAPChanged.AddListener(OnTriggered);
+                        break;
+                    case BuffTrigger.SkillChange:
+                        target.OnSkillChanged.AddListener(OnTriggered);
+                        break;
+                    case BuffTrigger.CasterDeath:
+                        CasterHash.GetEntity().OnDead.AddListener(OnTriggered);
+                        break;
+                    case BuffTrigger.TargetDeath:
+                        target.OnDead.AddListener(OnTriggered);
+                        break;
+                    case BuffTrigger.BattleEnd:
+                        BattleManager.Instance.BattleEndEvent.AddListener(OnTriggered);
+                        break;
+                    default:
+                        break;
+                }
+            else
+                switch (TemplateBuff.trigger) {
+                    case BuffTrigger.TurnStart:
+                        target.OnTurnStartedEvent.RemoveListener(OnTriggered);
+                        break;
+                    case BuffTrigger.TurnEnd:
+                        target.OnTurnEndedEvent.RemoveListener(OnTriggered);
+                        break;
+                    case BuffTrigger.HPChange:
+                        target.OnHPChanged.RemoveListener(OnTriggered);
+                        break;
+                    case BuffTrigger.APChange:
+                        target.OnAPChanged.RemoveListener(OnTriggered);
+                        break;
+                    case BuffTrigger.PhysicalAPChange:
+                        target.OnPhysicalAPChanged.RemoveListener(OnTriggered);
+                        break;
+                    case BuffTrigger.MagicalAPChange:
+                        target.OnMagicalAPChanged.RemoveListener(OnTriggered);
+                        break;
+                    case BuffTrigger.SkillChange:
+                        target.OnSkillChanged.RemoveListener(OnTriggered);
+                        break;
+                    case BuffTrigger.CasterDeath:
+                        CasterHash.GetEntity().OnDead.RemoveListener(OnTriggered);
+                        break;
+                    case BuffTrigger.TargetDeath:
+                        target.OnDead.RemoveListener(OnTriggered);
+                        break;
+                    case BuffTrigger.BattleEnd:
+                        BattleManager.Instance.BattleEndEvent.RemoveListener(OnTriggered);
+                        break;
+                    default:
+                        break;
+                }
         }
 
         private void OnTriggered()
         {
-            (TemplateBuff as EventBuff).ApplyEffect(this);
+            TriggerTime--;
+            if (TriggerTime <= 0) ConnectEvent(false);
+            TemplateBuff.ApplyEffect(this);
         }
     }
 
@@ -139,8 +161,7 @@ namespace Wing.RPGSystem
                 if (buffs[buffType].ContainsKey(buffhash)) {
                     BuffHandler buffHandler = buffs[buffType][buffhash];
                     if (buffHandler.Stackable) {
-                        buffHandler.StackCount++;
-                        (buffHandler.TemplateBuff as StackableEventBuff).OnStacked(bh);
+                        buffHandler.OnStacked();
                     }
                     else {
                         buffHandler.ResetBuff(bh.CasterHash);

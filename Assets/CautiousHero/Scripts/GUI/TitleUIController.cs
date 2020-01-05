@@ -7,30 +7,118 @@ namespace Wing.RPGSystem
 {
     public class TitleUIController : MonoBehaviour
     {
+        [Header("UI Elements")]
         public Button continueButton;
+        public InputField nameInputField;
+        public Text saveName;
+        public Image slotIcon;
+        public Sprite[] iconSprites;
+ 
+        [Header("Pages")]
         public GameObject startPage;
         public GameObject createPage;
-        public Canvas worldMap;
+        public GameObject savePage;
+        public GameObject nameInputPage;
+        public GameObject newGameCheckPage;
 
         public Text raceText;
-        public Text classText;
         public Text raceDesText;
+        public Image[] raceSprites;
+        public Text classText;
+        public Image[] classSprites;
+
         public GameObject talentCover;
         public GameObject classCover;
+        public SaveSlot[] saveSlots;
+        public GameObject saveIcon;
+
+        private int selectClassID;
+        private int selectRaceID;
 
         private void Start()
         {
-            continueButton.interactable = Database.Instance.saveName != "";
+            if (Database.Instance.SelectSlot!=-1) {
+                saveIcon.SetActive(true);
+                continueButton.interactable = !Database.Instance.ActivePlayerData.isNewGame;
+                selectRaceID = 0;
+                selectClassID = 0;
+                slotIcon.sprite = iconSprites[Database.Instance.SelectSlot];
+                saveName.text = Database.Instance.ActivePlayerData.name;
+            }
+            else {
+                Button_DisplaySaveSlot();
+            }
+        }
+
+        public void Button_SelectSlot(int slotID)
+        {
             
+            Database.Instance.ChangeSelectSaveSlot(slotID);
+            if (saveSlots[slotID].emptyText.enabled) {
+                nameInputField.text = null;
+                nameInputPage.SetActive(true);
+            }
+            else {
+                savePage.SetActive(false);
+                saveName.text = Database.Instance.GetPlayerData(slotID).name;
+                slotIcon.sprite = iconSprites[slotID];
+            }           
+        }
+
+        public void Button_NewSave()
+        {
+            if (nameInputField.text != null) {
+                Database.Instance.CreateNewPlayer(nameInputField.text);
+                saveName.text = nameInputField.text;
+                nameInputPage.SetActive(false);
+                savePage.SetActive(false);
+                saveIcon.SetActive(true);
+                continueButton.interactable = !Database.Instance.ActivePlayerData.isNewGame;
+                selectRaceID = 0;
+                selectClassID = 0;
+                slotIcon.sprite = iconSprites[Database.Instance.SelectSlot];
+            }          
+        }
+
+        public void Button_DisplaySaveSlot()
+        {
+            foreach (var slot in saveSlots) {
+                slot.UpdateUI();
+            }
+            savePage.SetActive(true);
+        }
+
+        public void Button_StartNewGame()
+        {
+            WorldMapManager.Instance.StartNewGame();
         }
 
         public void Button_Continue()
         {
-            worldMap.enabled = true;
+            WorldMapManager.Instance.ContinueGame();
         }
 
         public void Button_Summon()
         {
+            if (continueButton.interactable) {
+                newGameCheckPage.SetActive(true);
+            }
+            else Button_ConfirmNewGame();
+        }
+
+        public void Button_ConfirmNewGame()
+        {
+            TRace tRace = Database.Instance.ActivePlayerData.unlockedRaces[selectRaceID].GetTRace();
+            raceText.text = tRace.name;
+            raceDesText.text = tRace.description;
+            raceSprites[0].sprite = tRace.buffSet[0].sprite;
+            raceSprites[1].sprite = tRace.buffSet[1].sprite;
+            TClass tClass = Database.Instance.ActivePlayerData.unlockedClasses[selectClassID].GetTClass();
+            classText.text = tClass.name;
+            classSprites[0].sprite = tClass.skillSet[0].sprite;
+            classSprites[1].sprite = tClass.skillSet[1].sprite;
+            classSprites[2].sprite = tClass.skillSet[2].sprite;
+
             startPage.SetActive(false);
             createPage.SetActive(true);
         }
@@ -47,22 +135,45 @@ namespace Wing.RPGSystem
 
         public void Button_Race(bool isPrev)
         {
-            // Test
-            bool locked = raceText.text == "LOCKED";
-            raceText.text = locked ? "Human": "LOCKED";
-            raceDesText.text = locked ? "long ago took to the seas and rivers in longboats, first to" +
-                " pillage and terrorize, then to settle. Yet there was an energy," +
-                " a love of adventure, that sang from every page. Long into the" +
-                " night Liriel read, lighting candle after precious candle." : "...";
-            talentCover.SetActive(!locked);
+            selectRaceID += isPrev ? -1 : 1;
+            if (selectRaceID < 0) selectRaceID = TRace.Dict.Count - 1;
+            else if (selectRaceID >= TRace.Dict.Count) selectRaceID = 0;
+
+            if (selectRaceID < Database.Instance.ActivePlayerData.unlockedRaces.Count) {
+                TRace tRace = Database.Instance.ActivePlayerData.unlockedRaces[selectRaceID].GetTRace();
+                raceText.text = tRace.name;
+                raceDesText.text = tRace.description; 
+                raceSprites[0].sprite = tRace.buffSet[0].sprite;
+                raceSprites[1].sprite = tRace.buffSet[1].sprite;
+                talentCover.SetActive(false);
+            }
+            else {
+                raceText.text = "LOCKED";
+                raceDesText.text = "...";
+                talentCover.SetActive(true);
+            }
         }
 
         public void Button_Class(bool isPrev)
         {
-            // Test
-            bool locked = classText.text == "LOCKED";
-            classText.text = locked ? "Saber" : "LOCKED";
-            classCover.SetActive(!locked);
+            selectClassID += isPrev ? -1 : 1;
+            if (selectClassID < 0) selectClassID = TClass.Dict.Count - 1;
+            else if (selectClassID >= TClass.Dict.Count) selectClassID = 0;
+
+            if (selectClassID < Database.Instance.ActivePlayerData.unlockedClasses.Count) {
+                TClass tClass = Database.Instance.ActivePlayerData.unlockedClasses[selectClassID].GetTClass();
+                classText.text = tClass.name;              
+                classSprites[0].sprite = tClass.skillSet[0].sprite;
+                classSprites[1].sprite = tClass.skillSet[1].sprite;
+                classSprites[2].sprite = tClass.skillSet[2].sprite;
+
+                classCover.SetActive(false);
+            }
+            else {
+                classText.text = "LOCKED";
+                classCover.SetActive(true);
+            }
         }
+
     }
 }

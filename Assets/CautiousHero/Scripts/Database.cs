@@ -10,15 +10,46 @@ namespace Wing.RPGSystem
     [System.Serializable]
     public struct PlayerData
     {
+        public string name;
+        public float totalPlayTime;
+        public bool isNewGame;
+        public List<int> unlockedRaces;
+        public List<int> unlockedClasses;
+        public List<int> unlockedSkills;
+        public List<int> unlockedBuffs;
+        public List<int> unlockedEquipments;
+        public List<int> unlockedCreatures;
+
+        public PlayerData(string name)
+        {
+            TRace defaultRace = Database.Instance.defaultRace;
+            TClass defaultClass = Database.Instance.defaultClass;
+            this.name = name;
+            isNewGame = true;
+            totalPlayTime = 0;
+            unlockedRaces = new List<int>() { defaultRace.Hash };
+            unlockedClasses = new List<int>() { defaultClass.Hash };
+            unlockedSkills = new List<int>() { defaultClass.skillSet[0].Hash,
+                    defaultClass.skillSet[1].Hash , defaultClass.skillSet[2].Hash };
+            unlockedBuffs = new List<int>() { defaultRace.buffSet[0].Hash, defaultRace.buffSet[1].Hash };
+            unlockedCreatures = new List<int>();
+            unlockedEquipments = new List<int>();
+        }
+    }
+
+    [System.Serializable]
+    public struct WorldData
+    {
         public string seed;
         public long randomCnt;
         public int mapFileCnt;
         public int worldConfigHash;
-
         public string worldName;
-        public string playerName;
+        public float playTime;
+
         public int spriteID;
         public EntityAttribute attribute;
+        public int HealthPoints;
         public long coins;
         public long gainedExp;
         public List<int> learnedSkills;
@@ -39,24 +70,21 @@ namespace Wing.RPGSystem
         public int areaChunkSize = 16;
 
         [Header("Test")]
-        public bool resetData;
-        public string seed = "";
-        public string worldName;
-        public string playerName;
-        public int spriteID;
+        public TRace defaultRace;
+        public TClass defaultClass;
         public EntityAttribute attribute;
-        public BaseSkill[] skills;
-        public AreaConfig config;
 
-        private List<int> defaultSkillDeck;
-
-        public PlayerData ActiveData { get { return m_activeData; } }
-        private PlayerData m_activeData;
-        public AreaData[] AreaChunks { get; private set; }
-        public string saveName;
+        public WorldData ActiveGameData { get { return m_activeGameData; } }
+        private WorldData m_activeGameData;
+        public PlayerData ActivePlayerData { get { return m_playerData[SelectSlot]; } }
+        private PlayerData[] m_playerData;
+        public AreaData[] AreaChunks { get; private set; }        
         private System.Random sr;
 
-        private string nameKey = "LastSaveName";
+        public string[] SaveNames { get; private set; }
+        public int SelectSlot { get; private set; }
+        private readonly string selectSlotKey = "SelectSlot";
+        private readonly string[] saveKeys = { "Slot0", "Slot1", "Slot2" };        
 
         private void Awake()
         {
@@ -65,13 +93,14 @@ namespace Wing.RPGSystem
 
             DontDestroyOnLoad(gameObject);
 
-            defaultSkillDeck = new List<int>();
-            for (int i = 0; i < skills.Length; i++) {
-                defaultSkillDeck.Add(skills[i].Hash);
+            SelectSlot = PlayerPrefs.GetInt(selectSlotKey, -1);
+            SaveNames = new string[3];
+            for (int i = 0; i < 3; i++) {
+                SaveNames[i] = PlayerPrefs.GetString(saveKeys[i],null);
+                if (SelectSlot == -1 && SaveNames[i] != null) SelectSlot = i;
             }
-            if (resetData) CreateNewSave(seed, worldName, playerName, spriteID, attribute, defaultSkillDeck);
-            saveName = PlayerPrefs.GetString(nameKey);
-            LoadData(saveName);
+            m_playerData = new PlayerData[3];
+            if (SelectSlot != -1) LoadAll();
         }
 
         private void Start()
@@ -85,74 +114,103 @@ namespace Wing.RPGSystem
             while (!ao.isDone) {
                 yield return null;
             }
+            
         }
 
-        public void SaveData(string saveName)
+        public void SaveAll()
         {
-            m_activeData.mapFileCnt = AreaChunks.Length;
-            BinaryFormatter bf = new BinaryFormatter();
-            string path = Application.persistentDataPath + "/" + saveName + ".sav";
-            FileStream file = File.Create(path);
-            bf.Serialize(file, m_activeData);
-            file.Close();
+            SaveData(ActivePlayerData.name, ActivePlayerData);
+            m_activeGameData.mapFileCnt = AreaChunks.Length;
+            SaveData("GameData_" + ActivePlayerData.name, ActiveGameData);
 
             for (int i = 0; i < AreaChunks.Length; i++) {
-                bf = new BinaryFormatter();
-                path = Application.persistentDataPath + "/" + saveName + "-MapChunk" + i + ".sav";
-                file = File.Create(path);
-                bf.Serialize(file, AreaChunks[i]);
-                file.Close();
+                SaveData("GameData_MapChunk" + i, AreaChunks[i]);
             }
 
-            PlayerPrefs.SetString(nameKey, saveName);
-            Debug.Log("Game has saved to " + path);
+            for (int i = 0; i < 3; i++) {
+                if (m_playerData[i].name != null) PlayerPrefs.SetString(saveKeys[i], m_playerData[i].name);
+            }            
         }
 
-        public void LoadData(string saveName)
+        public void SavePlayerData()
         {
-            if (saveName == "" || !File.Exists(Application.persistentDataPath + "/" + saveName + ".sav")) {
-                CreateNewSave(seed, worldName, playerName, spriteID, attribute, defaultSkillDeck);
+            PlayerPrefs.SetInt(selectSlotKey, SelectSlot);
+            PlayerPrefs.SetString(saveKeys[SelectSlot], ActivePlayerData.name);
+            SaveData(ActivePlayerData.name, ActivePlayerData);
+        }
+
+        private void SaveData(string fileName, object target)
+        {
+            BinaryFormatter bf = new BinaryFormatter();
+            string path = Application.persistentDataPath + "/" + fileName + ".sav";
+            FileStream file = File.Create(path);
+            bf.Serialize(file, target);
+            file.Close();
+
+            Debug.Log("Data has saved to " + path);
+        }
+
+        public void LoadAll()
+        {
+            for (int i = 0; i < 3; i++) {
+                if (SaveNames[i]!="")
+                    LoadData(SaveNames[i], ref m_playerData[i]);
+            }
+
+            if (ActivePlayerData.isNewGame) {
+                Debug.Log("Game Loaded");
                 return;
             }
 
-            BinaryFormatter bf = new BinaryFormatter();
-            FileStream file = File.Open(Application.persistentDataPath + "/" + saveName + ".sav", FileMode.Open);
-            m_activeData = (PlayerData)bf.Deserialize(file);
-            file.Close();
-
-            AreaChunks = new AreaData[m_activeData.mapFileCnt];
-            for (int i = 0; i < m_activeData.mapFileCnt; i++) {
-                bf = new BinaryFormatter();
-                file = File.Open(Application.persistentDataPath + "/" + saveName + "-MapChunk" + i + ".sav", FileMode.Open);
-                AreaChunks[i] = (AreaData)bf.Deserialize(file);
-                file.Close();
+            LoadData("GameData_" + ActivePlayerData.name,ref m_activeGameData);
+            AreaChunks = new AreaData[m_activeGameData.mapFileCnt];
+            for (int i = 0; i < m_activeGameData.mapFileCnt; i++) {
+                LoadData("GameData_MapChunk" + i,ref AreaChunks[i]);
             }
 
-            sr = new System.Random(ActiveData.seed.GetStableHashCode());
-            for (int i = 0; i < ActiveData.randomCnt; i++) {
+            sr = new System.Random(ActiveGameData.seed.GetStableHashCode());
+            for (int i = 0; i < ActiveGameData.randomCnt; i++) {
                 sr.Next();
             }
 
             Debug.Log("Game Loaded");
         }
 
-        public void CreateNewSave(string seed, string worldName, string playerName, int spriteID, EntityAttribute attribute, List<int> skillDeck)
+        private void LoadData<T>(string fileName,ref T target)
         {
-            m_activeData = new PlayerData {
-                seed = seed,
-                worldName = worldName,
-                playerName = playerName,
-                spriteID = spriteID,
+            BinaryFormatter bf = new BinaryFormatter();
+            FileStream file = File.Open(Application.persistentDataPath + "/" + fileName + ".sav", FileMode.Open);
+            target = (T)bf.Deserialize(file);
+            file.Close();
+        }
+
+        public void ChangeSelectSaveSlot(int slotID) => SelectSlot = slotID;
+
+        public void CreateNewPlayer(string name)
+        {
+            m_playerData[SelectSlot] = new PlayerData(name);
+            SavePlayerData();
+        }
+
+        public void CreateNewGame(int raceHash, int classHash)
+        {
+            List<int> skillDeck = new List<int>();
+            for (int i = 0; i < 5; i++) {
+                skillDeck.Add(classHash.GetTClass().skillSet[0].Hash);
+            }
+            for (int i = 0; i < 4; i++) {
+                skillDeck.Add(classHash.GetTClass().skillSet[1].Hash);
+            }
+            skillDeck.Add(classHash.GetTClass().skillSet[2].Hash);
+            m_activeGameData = new WorldData() {
+                seed = System.DateTime.Now.ToString(),
                 attribute = attribute,
                 learnedSkills = skillDeck
             };
-            if (seed == "") {
-                m_activeData.seed = System.DateTime.Now.ToString();
-            }
             AreaChunks = new AreaData[0];
 
-            sr = new System.Random(ActiveData.seed.GetStableHashCode());
-            SaveData(worldName);
+            sr = new System.Random(ActiveGameData.seed.GetStableHashCode());
+            SaveAll();
         }
 
         public void InitAreaChunk(int areaNumber)
@@ -164,26 +222,12 @@ namespace Wing.RPGSystem
             }
         }
 
+        public PlayerData GetPlayerData(int slotID) => m_playerData[slotID];
+
         public int Random(int min, int max)
         {
-            m_activeData.randomCnt++;
+            m_activeGameData.randomCnt++;
             return sr.Next(min, max);
-        }
-
-        // Obsolute
-        public BaseSkill[] GetEquippedSkills()
-        {
-            //foreach (var key in BaseSkill.Dict.Keys) {
-            //    Debug.Log(key);
-            //}
-
-            var skills = new BaseSkill[ActiveData.learnedSkills.Count];
-            for (int i = 0; i < skills.Length; i++) {
-                if (!BaseSkill.Dict.TryGetValue(ActiveData.learnedSkills[i], out skills[i])) {
-                    Debug.LogError("Skill does not exist, please check!");
-                }
-            }
-            return skills;
         }
 
         public bool TryGetAreaInfo(Location key, out AreaInfo areaInfo)

@@ -18,11 +18,11 @@ namespace Wing.RPGSystem
         public AreaConfig[] specialConfigs;
     }
 
-    [CreateAssetMenu(fileName = "WorldConfig", menuName = "Wing/Config/WorldConfig", order = 2)]
+    [CreateAssetMenu(fileName = "WorldConfig", menuName = "Wing/Configs/WorldConfig", order = 2)]
     public class WorldConfig : ScriptableObject
     {
-        public string configName = "Rank N World";
-        public string description = "A mystical config";
+        public string configName;
+        public string description;
         public int Hash => configName.GetStableHashCode();
 
         public AdventureStage[] stages;

@@ -70,8 +70,8 @@ namespace Wing.RPGSystem
     public abstract class BaseSkill : ScriptableObject
     {
         [Header("Basic Parameters")]
-        public string skillName = "New skill";
-        public string description = "A mystical skill";
+        public string skillName;
+        public string description;
         public Sprite sprite;
         public int actionPointsCost;
         public int Hash => skillName.GetStableHashCode(); 
