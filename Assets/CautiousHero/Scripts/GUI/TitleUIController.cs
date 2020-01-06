@@ -39,7 +39,7 @@ namespace Wing.RPGSystem
 
         private void Start()
         {
-            if (Database.Instance.SelectSlot!=-1) {
+            if (Database.Instance.SelectSlot != -1) {
                 saveIcon.SetActive(true);
                 continueButton.interactable = !Database.Instance.ActivePlayerData.isNewGame;
                 selectRaceID = 0;

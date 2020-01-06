@@ -58,7 +58,8 @@ namespace Wing.RPGSystem
 
         public void ContinueGame()
         {
-            if (!m_worldUIController.gameObject.activeSelf) m_worldUIController.gameObject.SetActive(true);
+            m_worldUIController.gameObject.SetActive(true);
+            m_worldUIController.UpdateUI();
 
             // Init map visual
             Location bound = ActiveWorldData.worldBound;

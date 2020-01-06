@@ -84,7 +84,6 @@ namespace Wing.RPGSystem
         public AreaData[] AreaChunks { get; private set; }        
         private System.Random sr;
 
-        public string[] SaveNames { get; private set; }
         public int SelectSlot { get; private set; }
         private readonly string selectSlotKey = "SelectSlot";
         private readonly string[] saveKeys = { "Slot0", "Slot1", "Slot2" };        
@@ -96,7 +95,6 @@ namespace Wing.RPGSystem
             DontDestroyOnLoad(gameObject);
 
             SelectSlot = -1;
-            SaveNames = new string[3];
             m_playerData = new PlayerData[3];
             if (!reset) LoadAll();
         }
@@ -117,7 +115,7 @@ namespace Wing.RPGSystem
 
         public void SaveAll()
         {
-            SaveData(ActivePlayerData.name, ActivePlayerData);
+            SaveData(saveKeys[SelectSlot], ActivePlayerData);
             m_activeWorldData.mapFileCnt = AreaChunks.Length;
             SaveData("GameData_" + ActivePlayerData.name, ActiveWorldData);
 
@@ -134,13 +132,13 @@ namespace Wing.RPGSystem
         {
             PlayerPrefs.SetInt(selectSlotKey, SelectSlot);
             PlayerPrefs.SetString(saveKeys[SelectSlot], ActivePlayerData.name);
-            SaveData(ActivePlayerData.name, ActivePlayerData);
+            SaveData(saveKeys[SelectSlot], ActivePlayerData);
         }
 
         private void SaveData(string fileName, object target)
         {
             BinaryFormatter bf = new BinaryFormatter();
-            string path = Application.persistentDataPath + "/" + fileName + ".sav";
+            string path = GetFilePath(fileName);
             FileStream file = File.Create(path);
             bf.Serialize(file, target);
             file.Close();
@@ -150,27 +148,36 @@ namespace Wing.RPGSystem
 
         public void LoadAll()
         {
+            string filePath;
             SelectSlot = PlayerPrefs.GetInt(selectSlotKey, -1);
+            
             for (int i = 0; i < 3; i++) {
-                SaveNames[i] = PlayerPrefs.GetString(saveKeys[i], null);
-                if (SelectSlot == -1 && SaveNames[i] != null) SelectSlot = i;
+                filePath = GetFilePath(saveKeys[i]);
+                if (File.Exists(filePath))
+                    LoadData(filePath, ref m_playerData[i]);
+                if (SelectSlot == -1 && m_playerData[i].name != null) SelectSlot = i;
             }
-            if (SelectSlot == -1) return;
-
-            for (int i = 0; i < 3; i++) {
-                if (SaveNames[i]!="")
-                    LoadData(SaveNames[i], ref m_playerData[i]);
+            if(m_playerData[SelectSlot].name == null) {
+                SelectSlot = -1;
+                for (int i = 0; i < 3; i++) {
+                    if(m_playerData[i].name != null) SelectSlot = i;
+                }
             }
-
+            if (SelectSlot == -1) {
+                PlayerPrefs.SetInt(selectSlotKey, -1);
+                return;
+            }
             if (ActivePlayerData.isNewGame) {
                 Debug.Log("Game Loaded");
                 return;
             }
 
-            LoadData("GameData_" + ActivePlayerData.name,ref m_activeWorldData);
+            filePath = GetFilePath("GameData_" + ActivePlayerData.name);
+            LoadData(filePath, ref m_activeWorldData);
             AreaChunks = new AreaData[m_activeWorldData.mapFileCnt];
             for (int i = 0; i < m_activeWorldData.mapFileCnt; i++) {
-                LoadData("GameData_MapChunk" + i,ref AreaChunks[i]);
+                filePath = GetFilePath("GameData_MapChunk" + i);
+                LoadData(filePath, ref AreaChunks[i]);
             }
 
             sr = new System.Random(ActiveWorldData.seed.GetStableHashCode());
@@ -181,10 +188,15 @@ namespace Wing.RPGSystem
             Debug.Log("Game Loaded");
         }
 
-        private void LoadData<T>(string fileName,ref T target)
+        private string GetFilePath(string fileName)
+        {
+            return Application.persistentDataPath + "/" + fileName + ".sav";
+        }
+
+        private void LoadData<T>(string filePath,ref T target)
         {
             BinaryFormatter bf = new BinaryFormatter();
-            FileStream file = File.Open(Application.persistentDataPath + "/" + fileName + ".sav", FileMode.Open);
+            FileStream file = File.Open(filePath, FileMode.Open);
             target = (T)bf.Deserialize(file);
             file.Close();
         }
@@ -213,13 +225,14 @@ namespace Wing.RPGSystem
             m_activeWorldData = new WorldData() {
                 seed = System.DateTime.Now.ToString(),
                 attribute = attribute,
+                HealthPoints = attribute.maxHealth,
                 learnedSkills = skillDeck,
                 worldMap = new List<Location>()
             };
             AreaChunks = new AreaData[0];
 
             sr = new System.Random(ActiveWorldData.seed.GetStableHashCode());
-            SaveAll();
+            //SaveAll();
         }
 
         public void InitAreaChunk(int areaNumber)

@@ -62,7 +62,13 @@ namespace Wing.RPGSystem
             m_animator.Play("tile_fall");
             IsExplored = true;
             m_coll.enabled = true;
-            ChangeAreaState(AreaState.Selectable);
+            StartCoroutine(DelayChange(AreaState.Selectable, 1));
+        }
+
+        private IEnumerator DelayChange(AreaState state, float time)
+        {
+            yield return new WaitForSeconds(time);
+            ChangeAreaState(state);
         }
 
         public void ChangeAreaState(AreaState state)

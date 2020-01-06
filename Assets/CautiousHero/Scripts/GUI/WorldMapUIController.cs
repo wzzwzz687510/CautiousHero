@@ -1,6 +1,8 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 namespace Wing.RPGSystem
 {
@@ -8,12 +10,31 @@ namespace Wing.RPGSystem
     {
         public static WorldMapUIController Instance { get; private set; }
 
+        [Header("UI Elements")]
+        public Button infoConfirmButton;
+        public Text infoText;
+        public Text playerName;
+        public Text hpText;
+        public Text coinText;
+
+        [Header("Pages")]
         public GameObject loadingPage;
+        public GameObject infoPage;
+
+        public PlayerData ActivePlayerData => Database.Instance.ActivePlayerData;
+        public WorldData ActiveWorldData => Database.Instance.ActiveWorldData;
 
         private void Awake()
         {
             if (!Instance)
                 Instance = this;
+        }
+
+        public void UpdateUI()
+        {
+            playerName.text = ActivePlayerData.name;
+            hpText.text = ActiveWorldData.HealthPoints + "/" + ActiveWorldData.attribute.maxHealth;
+            coinText.text = ActiveWorldData.coins.ToString();
         }
 
         public void SetLoadingPage(bool isShow)
@@ -24,6 +45,19 @@ namespace Wing.RPGSystem
         public void ShowAreaInteractionBoard()
         {
 
+        }
+
+        public void Button_System()
+        {
+            infoConfirmButton.onClick.AddListener(() => {
+                Database.Instance.SaveAll();
+                infoConfirmButton.onClick.RemoveAllListeners();
+                infoPage.SetActive(false);
+                SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+            });
+            infoText.text = "Progress is automatically saved.";
+            infoPage.SetActive(true);
+            
         }
     }
 }
