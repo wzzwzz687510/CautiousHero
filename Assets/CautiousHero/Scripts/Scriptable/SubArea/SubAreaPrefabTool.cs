@@ -51,28 +51,27 @@ namespace Wing.RPGSystem
 
         public void LoadTest()
         {
-            string path = "Assets/Resources/SubAreas/";
             switch (type) {
                 case SubAreaType.Corner:
-                    var corner = AssetDatabase.LoadAssetAtPath<CornerArea>(path + templateName + ".asset");
+                    var corner = Resources.Load<CornerArea>("SubAreas/" + templateName);
                     corner.coordinateValues.CopyTo(values, 0);
                     break;
                 case SubAreaType.VerticalEdge:
-                    var vEdge = AssetDatabase.LoadAssetAtPath<VEdgeArea>(path + templateName + ".asset");
+                    var vEdge = Resources.Load<VEdgeArea>("SubAreas/" + templateName);
                     vEdge.coordinateValues.CopyTo(values, 0);
                     break;
                 case SubAreaType.HorizontalEdge:
-                    var hEdge = AssetDatabase.LoadAssetAtPath<HEdgeArea>(path + templateName + ".asset");
+                    var hEdge = Resources.Load<HEdgeArea>("SubAreas/" + templateName);
                     hEdge.coordinateValues.CopyTo(values, 0);
                     break;
                 case SubAreaType.Centre:
-                    var centre = AssetDatabase.LoadAssetAtPath<CentreArea>(path + templateName + ".asset");
+                    var centre = Resources.Load<CentreArea>("SubAreas/" + templateName);
                     centre.coordinateValues.CopyTo(values, 0);
+                    Debug.Log(values[0]);
                     break;
                 default:
                     break;
             }
-            
         }
 
 

@@ -41,13 +41,15 @@ namespace Wing.RPGSystem
                 }
                 EditorGUILayout.EndHorizontal();
             }
+
+            serializedObject.ApplyModifiedProperties();
             if (GUILayout.Button("Create")) {
                 t.Button_CreateAsset();
             }
             if (GUILayout.Button("Load")) {
                 t.LoadTest();
             }
-            serializedObject.ApplyModifiedProperties();
+            
         }
     }
 }

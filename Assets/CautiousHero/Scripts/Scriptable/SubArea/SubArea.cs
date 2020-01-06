@@ -13,9 +13,9 @@ namespace Wing.RPGSystem
     }
 
     [System.Serializable]
-    public struct Int2DArray
+    public struct SubAreaArray
     {
-        public int[,] values;
+        public int[] values;
     }
 
     //[CreateAssetMenu(fileName = "AreaConfig", menuName = "Wing/SubAreaPrefab", order = 2)]
@@ -26,7 +26,8 @@ namespace Wing.RPGSystem
 
         public virtual void SetValues(int[] values)
         {
-            coordinateValues = values;
+            coordinateValues = new int[64];
+            values.CopyTo(coordinateValues,0);
         }
 
         public void SetType(SubAreaType type)

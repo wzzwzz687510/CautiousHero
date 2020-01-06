@@ -209,33 +209,32 @@ namespace Wing.RPGSystem
         private void SaveToDatabase(PreAreaInfo preInfo,AreaConfig config)
         {
             SubAreaSet sets = config.subAreaSets;           
-            SubArea[,] subArea = new SubArea[4, 4];
+            SubAreaArray[,] arrays = new SubAreaArray[4, 4];
             for (int x = 0; x < 4; x++) {
                 for (int y = 0; y < 4; y++) {
-                    subArea[x, y] = new SubArea();
                     if (x == 0 || x == 3) {
                         if (y == 0 || y == 3) {
                             int length = sets.cornerAreas.Length;
                             if (length == 0) Debug.LogError("Sub area set error, please check config: " + config.configName);
-                            subArea[x, y].coordinateValues = sets.cornerAreas[length.Random()].GetInverseValues(x == 3, y == 3);
+                            arrays[x, y].values = sets.cornerAreas[length.Random()].GetInverseValues(x == 3, y == 3);
                         }
                         else {
                             int length = sets.vEdgeAreas.Length;
                             if (length == 0) Debug.LogError("Sub area set error, please check config: " + config.configName);
-                            subArea[x, y].coordinateValues = sets.vEdgeAreas[length.Random()].GetInverseValues(x == 3, false);
+                            arrays[x, y].values = sets.vEdgeAreas[length.Random()].GetInverseValues(x == 3, false);
                         }
                         continue;
                     }
                     else if (y == 0 || y == 3) {
                         int length = sets.hEdgeAreas.Length;
                         if (length == 0) Debug.LogError("Sub area set error, please check config: " + config.configName);
-                        subArea[x, y].coordinateValues = sets.hEdgeAreas[length.Random()].GetInverseValues(false, y == 3);
+                        arrays[x, y].values = sets.hEdgeAreas[length.Random()].GetInverseValues(false, y == 3);
                         continue;
                     }
                     else {
                         int length = sets.centreAreas.Length;
                         if (length == 0) Debug.LogError("Sub area set error, please check config: " + config.configName);
-                        subArea[x, y].coordinateValues = sets.centreAreas[length.Random()].coordinateValues;
+                        arrays[x, y].values = sets.centreAreas[length.Random()].coordinateValues;
                     }
                 }
             }
@@ -249,7 +248,7 @@ namespace Wing.RPGSystem
             };
             for (int x = 0; x < 32; x++) {
                 for (int y = 0; y < 32; y++) {
-                    int value = subArea[x / 8, y / 8].coordinateValues[x % 8 + 8 * (y % 8)];
+                    int value = arrays[x / 8, y / 8].values[x % 8 + 8 * (y % 8)];
                     TileType type = 10.Random() < (value / 100) ? (TileType)(value % 100) : TileType.Plain;
                     if (type == TileType.SpawnZone) spawnLocs.Add(new Location(x, y));
                     info.map[x, y] = new TileInfo(TemplateTile.Dict[type]);
