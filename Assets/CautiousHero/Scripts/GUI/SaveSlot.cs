@@ -15,11 +15,11 @@ namespace Wing.RPGSystem
         public GameObject playerData;
 
         public void UpdateUI()
-        {            
+        {
             if (Database.Instance.GetPlayerData(slotID).name != null) {
                 PlayerData data = Database.Instance.GetPlayerData(slotID);
                 emptyText.enabled = false;
-                playerName.text = data.name;                
+                playerName.text = data.name;
                 playtime.text = "Playtime " + System.TimeSpan.FromSeconds(data.totalPlayTime).ToString(@"hh\:mm\:ss");
                 int unlockedCnt = data.unlockedBuffs.Count + data.unlockedClasses.Count + data.unlockedCreatures.Count +
                     data.unlockedEquipments.Count + data.unlockedRaces.Count + data.unlockedSkills.Count;

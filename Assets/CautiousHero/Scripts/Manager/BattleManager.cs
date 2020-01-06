@@ -7,7 +7,6 @@ using System;
 
 public enum BattleState
 {
-    PlacePlayer,
     PlayerMove,
     PlayerCast,    
     PlayerAnim,
@@ -69,7 +68,7 @@ public class BattleManager : MonoBehaviour
         // Agility decides player first or creature first
         //State = BattleState.PlayerMove;
         //GridManager.Instance.OnCompleteMapRenderEvent += PrepareBattleStart;
-        AnimationManager.Instance.OnAnimCompleted.AddListener(OnAnimCompleted);
+        //AnimationManager.Instance.OnAnimCompleted.AddListener(OnAnimCompleted);
 
         //player.InitPlayer(Database.Instance.ActiveData.attribute);
         //GetComponent<BattleUIController>()?.Init();
@@ -83,13 +82,12 @@ public class BattleManager : MonoBehaviour
     public void PrepareBattleStart(List<int> battleSet)
     {
         isActive = true;
-        AIManager.Instance.Init(battleSet);
-        //PreparePlacePlayer();       
+        AIManager.Instance.Init(battleSet);      
     }
 
     private void OnAnimCompleted()
     {
-        if (State != BattleState.PlacePlayer && GameConditionCheck())
+        if (GameConditionCheck())
             return;
 
         if (State == BattleState.PlayerAnim) {
@@ -184,15 +182,6 @@ public class BattleManager : MonoBehaviour
         if (hit) {
             var tile = hit.transform.parent.GetComponent<TileController>();
             switch (State) {
-                case BattleState.PlacePlayer:
-                    SelectVisual(tile.Loc, TileState.PlaceZone);
-
-                    if (Input.GetMouseButtonDown(0) && tileZone.Contains(tile.Loc)) {
-                        player.MoveToTile(tile.Loc, true);
-                        player.DropAnimation();
-                        CompletePlacement();
-                    }
-                    break;
                 case BattleState.PlayerMove:
                     SelectVisual(tile.Loc, TileState.MoveZone);
 
@@ -228,8 +217,6 @@ public class BattleManager : MonoBehaviour
             hit = Physics2D.Raycast(ray.origin, ray.direction, 20, entityLayer);
             if (hit && hit.transform.CompareTag("Player")) {
                 switch (State) {
-                    case BattleState.PlacePlayer:
-                        break;
                     case BattleState.PlayerMove:
                         player.ChangeOutlineColor(Color.red);
 
@@ -263,8 +250,6 @@ public class BattleManager : MonoBehaviour
                 CreatureBoardEvent?.Invoke(cc.Hash, false);
             }
             switch (State) {
-                case BattleState.PlacePlayer:
-                    break;
                 case BattleState.PlayerMove:
                     break;
                 case BattleState.PlayerCast:
@@ -290,18 +275,6 @@ public class BattleManager : MonoBehaviour
         }
 
     }
-
-    //private void PreparePlacePlayer()
-    //{
-    //    for (int x = 0; x < GridManager.Instance.MapBoundingBox.x; x++) {
-    //        for (int y = (int)GridManager.Instance.MapBoundingBox.y - 2; y < GridManager.Instance.MapBoundingBox.y; y++) {
-    //            Location loc = new Location(x, y);
-    //            if (!loc.IsEmpty()) continue;
-    //            GridManager.Instance.ChangeTileState(loc, TileState.PlaceZone);
-    //            tileZone.Add(loc);
-    //        }
-    //    }
-    //}
 
     private void PrepareMove()
     {
@@ -393,7 +366,6 @@ public class BattleManager : MonoBehaviour
 
             currentSelected.Add(loc);
             switch (stateZone) {
-                case TileState.PlaceZone:
                 case TileState.MoveZone:
                     tile.ChangeTileState(stateZone + 1);
                     break;

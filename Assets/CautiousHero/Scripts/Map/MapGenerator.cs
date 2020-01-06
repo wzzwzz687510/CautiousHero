@@ -191,13 +191,13 @@ namespace Wing.RPGSystem
 
         public static Vector3 LocationToWorldPoint(Location tile)
         {
-            return new Vector3((tile.x - tile.y) * 0.524f, (tile.x + tile.y) * -0.262f, 0);
+            return new Vector3((tile.x - tile.y) * -0.524f, (tile.x + tile.y) * 0.262f, 0);
         }
 
         public static Location WorldPointToLocation(Vector3 point)
         {
-            float a = point.x / 0.524f;
-            float b = point.y / -0.262f;
+            float a = point.x / -0.524f;
+            float b = point.y / 0.262f;
             return new Location((int)(a + b) / 2, (int)(b - a) / 2);
         }
 

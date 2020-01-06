@@ -8,8 +8,6 @@ namespace Wing.RPGSystem
     public enum TileState
     {
         Normal,
-        PlaceZone,
-        PlaceSelected,
         MoveZone,
         MoveSelected,
         CastZone,
@@ -18,26 +16,33 @@ namespace Wing.RPGSystem
 
     public enum TileType
     {
-        Plain = 0,
-        Forest = 1,
-        Water = 2,
-        Mountain = 3,
-        Passage = 4,
-        SpawnZone = 5 // 3x3
+        Accessible = 0,
+        Entrance = 1,
+        SpawnZone = 2, // 3x3
+        Teleport = 3
     }
 
     [System.Serializable]
     public struct TileInfo
     {
-        public TemplateTile template;
+        public int tTileHash;
         public ElementMana mana;
         public bool isExplored;
         public bool isEmpty;
         public int stayEntityHash;
 
-        public TileInfo(TemplateTile template)
+        public TileInfo(int tTileHash)
         {
-            this.template = template;
+            this.tTileHash = tTileHash;
+            TTile template = tTileHash.GetTTile();
+            mana = template.mana;
+            isExplored = false;
+            isEmpty = true;
+            stayEntityHash = 0;
+        }
+        public TileInfo(TTile template)
+        {
+            this.tTileHash = template.Hash;
             mana = template.mana;
             isExplored = false;
             isEmpty = true;
@@ -62,13 +67,17 @@ namespace Wing.RPGSystem
 
     public class TileController : MonoBehaviour
     {
+        [Header("Components")]
         public SpriteRenderer m_spriteRenderer;
         public SpriteRenderer m_cover;
         public Animator m_animator;
         public Transform m_archor;
+
+        [Header("Colours")]
+        public Color moveColor = new Color(0.36f, 1.0f, 0.36f);
+        public Color castColor = new Color(1.0f, 0.3f, 0.0f);
         
         public Vector3 Archor { get { return m_archor.position; } }
-
         public TileInfo Info => AreaManager.Instance.ActiveData.map[Loc.x,Loc.y];
         
         public Location Loc { get; private set; }
@@ -85,7 +94,7 @@ namespace Wing.RPGSystem
         {
             Loc = location;
             m_spriteRenderer.sortingOrder = Loc.x + Loc.y * 32 - 32 * 32;
-            m_spriteRenderer.sprite = Info.template.sprite;
+            m_spriteRenderer.sprite = Info.tTileHash.GetTTile().fSprite;
 
             StartCoroutine(PlayAnimation(Random.Range(0.01f, 1f)));
         }
@@ -103,25 +112,19 @@ namespace Wing.RPGSystem
                     SetCoverColor(new Color(0, 0, 0, 0));
                     SetStayEntityOutline(Color.black);
                     break;
-                case TileState.PlaceZone:
-                    SetCoverColor(new Color(1.0f, 1.0f, 0.0f, 0.3f));
-                    break;
                 case TileState.MoveZone:
-                    SetCoverColor(new Color(0.36f, 1.0f, 0.36f, 0.3f));
+                    SetCoverColor(moveColor.SetAlpha(0.3f));
                     break;
                 case TileState.CastZone:
-                    SetCoverColor(new Color(1.0f, 0.3f, 0.0f, 0.3f));
+                    SetCoverColor(castColor.SetAlpha(0.3f));
                     SetStayEntityOutline(Color.black);
                     break;
                 case TileState.MoveSelected:
-                    SetCoverColor(new Color(0.36f, 1.0f, 0.36f, 0.7f));
+                    SetCoverColor(moveColor.SetAlpha(0.7f));
                     break;
                 case TileState.CastSelected:
-                    SetCoverColor(new Color(1.0f, 0.1f, 0.1f, 0.7f));
+                    SetCoverColor(castColor.SetAlpha(0.7f));
                     SetStayEntityOutline(Color.red);
-                    break;
-                case TileState.PlaceSelected:
-                    SetCoverColor(new Color(1.0f, 1.0f, 0.0f, 0.7f));
                     break;
                 default:
                     break;

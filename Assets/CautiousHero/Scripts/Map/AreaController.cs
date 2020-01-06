@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using DG.Tweening;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -24,14 +25,26 @@ namespace Wing.RPGSystem
         public Dictionary<Location, int> creatureSetHashDic;
     }
 
+    public enum AreaState
+    {
+        Default,
+        Selectable,
+        Selecting
+    }
+
     public class AreaController : MonoBehaviour
     {
+        [Header("Components")]
         public SpriteRenderer m_spriteRenderer;
         public SpriteRenderer m_cover;
         public Animator m_animator;
         public Transform m_archor;
-        public Vector3 Archor { get { return m_archor.position; } }
+        public PolygonCollider2D m_coll;
+        
+        [Header("Colours")]
+        public Color moveColor = new Color(0.36f, 1.0f, 0.36f);
 
+        public Vector3 Archor { get { return m_archor.position; } }
         public bool IsExplored { get; private set; }
         public Location Loc { get; private set; }
         public AreaInfo AreaInfo { get { Database.Instance.TryGetAreaInfo(Loc, out AreaInfo info); return info; } }
@@ -42,12 +55,36 @@ namespace Wing.RPGSystem
         public void Init(Location location)
         {
             Loc = location;
-            m_spriteRenderer.sortingOrder = Loc.x + Loc.y * 8;
+            m_spriteRenderer.sortingOrder = -(Loc.x + Loc.y * 8);
 
             m_spriteRenderer.sprite = AreaInfo.templateHash.GetAreaConfig().sprite;
 
             m_animator.Play("tile_fall");
             IsExplored = true;
+            m_coll.enabled = true;
+            ChangeAreaState(AreaState.Selectable);
+        }
+
+        public void ChangeAreaState(AreaState state)
+        {
+            switch (state) {
+                case AreaState.Default:
+                    SetCoverColor(new Color(0, 0, 0, 0));
+                    break;
+                case AreaState.Selectable:
+                    SetCoverColor(moveColor.SetAlpha(0.3f));
+                    break;
+                case AreaState.Selecting:
+                    SetCoverColor(moveColor.SetAlpha(0.7f));
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        private void SetCoverColor(Color c)
+        {
+            m_cover.DOColor(c, 0.2f);
         }
     }
 }

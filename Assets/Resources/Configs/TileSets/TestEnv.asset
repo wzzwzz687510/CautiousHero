@@ -1,0 +1,18 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 325fbbae15071f64eb82e7b03b74b964, type: 3}
+  m_Name: TestEnv
+  m_EditorClassIdentifier: 
+  defaultTile: {fileID: 11400000, guid: d117d085420ed71428c15c39d80d6153, type: 2}
+  entranceTile: {fileID: 11400000, guid: b9ebe50232d53bc4cb2289a68677c1a6, type: 2}
+  tTiles:
+  - {fileID: 11400000, guid: cc389c73cb17eda4783972cfd6cc31f7, type: 2}

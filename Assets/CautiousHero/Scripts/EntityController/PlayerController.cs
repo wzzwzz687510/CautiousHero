@@ -29,7 +29,7 @@ namespace Wing.RPGSystem
             BuffManager = new BuffManager(Hash);
 
             HealthPoints = MaxHealthPoints;
-            SkillDeck = new List<int>(Database.Instance.ActiveGameData.learnedSkills);
+            SkillDeck = new List<int>(Database.Instance.ActiveWorldData.learnedSkills);
             SkillDiscardPile = new List<int>();
             for (int i = 0; i < defaultSkillCount; i++) {
                 ShiftASkill();

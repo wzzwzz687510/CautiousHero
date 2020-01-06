@@ -54,6 +54,7 @@ namespace Wing.RPGSystem
         public long gainedExp;
         public List<int> learnedSkills;
         public List<Location> worldMap;
+        public Location worldBound;
     }
 
     [System.Serializable]
@@ -70,13 +71,14 @@ namespace Wing.RPGSystem
         public int areaChunkSize = 16;
 
         [Header("Test")]
+        public bool reset;
         public TRace defaultRace;
         public TClass defaultClass;
         public WorldConfig defaultWorldConfig;
         public EntityAttribute attribute;
 
-        public WorldData ActiveGameData { get { return m_activeGameData; } }
-        private WorldData m_activeGameData;
+        public WorldData ActiveWorldData { get { return m_activeWorldData; } }
+        private WorldData m_activeWorldData;
         public PlayerData ActivePlayerData { get { return m_playerData[SelectSlot]; } }
         private PlayerData[] m_playerData;
         public AreaData[] AreaChunks { get; private set; }        
@@ -91,17 +93,12 @@ namespace Wing.RPGSystem
         {
             if (!Instance)
                 Instance = this;
-
             DontDestroyOnLoad(gameObject);
 
-            SelectSlot = PlayerPrefs.GetInt(selectSlotKey, -1);
+            SelectSlot = -1;
             SaveNames = new string[3];
-            for (int i = 0; i < 3; i++) {
-                SaveNames[i] = PlayerPrefs.GetString(saveKeys[i],null);
-                if (SelectSlot == -1 && SaveNames[i] != null) SelectSlot = i;
-            }
             m_playerData = new PlayerData[3];
-            if (SelectSlot != -1) LoadAll();
+            if (!reset) LoadAll();
         }
 
         private void Start()
@@ -121,8 +118,8 @@ namespace Wing.RPGSystem
         public void SaveAll()
         {
             SaveData(ActivePlayerData.name, ActivePlayerData);
-            m_activeGameData.mapFileCnt = AreaChunks.Length;
-            SaveData("GameData_" + ActivePlayerData.name, ActiveGameData);
+            m_activeWorldData.mapFileCnt = AreaChunks.Length;
+            SaveData("GameData_" + ActivePlayerData.name, ActiveWorldData);
 
             for (int i = 0; i < AreaChunks.Length; i++) {
                 SaveData("GameData_MapChunk" + i, AreaChunks[i]);
@@ -153,6 +150,13 @@ namespace Wing.RPGSystem
 
         public void LoadAll()
         {
+            SelectSlot = PlayerPrefs.GetInt(selectSlotKey, -1);
+            for (int i = 0; i < 3; i++) {
+                SaveNames[i] = PlayerPrefs.GetString(saveKeys[i], null);
+                if (SelectSlot == -1 && SaveNames[i] != null) SelectSlot = i;
+            }
+            if (SelectSlot == -1) return;
+
             for (int i = 0; i < 3; i++) {
                 if (SaveNames[i]!="")
                     LoadData(SaveNames[i], ref m_playerData[i]);
@@ -163,14 +167,14 @@ namespace Wing.RPGSystem
                 return;
             }
 
-            LoadData("GameData_" + ActivePlayerData.name,ref m_activeGameData);
-            AreaChunks = new AreaData[m_activeGameData.mapFileCnt];
-            for (int i = 0; i < m_activeGameData.mapFileCnt; i++) {
+            LoadData("GameData_" + ActivePlayerData.name,ref m_activeWorldData);
+            AreaChunks = new AreaData[m_activeWorldData.mapFileCnt];
+            for (int i = 0; i < m_activeWorldData.mapFileCnt; i++) {
                 LoadData("GameData_MapChunk" + i,ref AreaChunks[i]);
             }
 
-            sr = new System.Random(ActiveGameData.seed.GetStableHashCode());
-            for (int i = 0; i < ActiveGameData.randomCnt; i++) {
+            sr = new System.Random(ActiveWorldData.seed.GetStableHashCode());
+            for (int i = 0; i < ActiveWorldData.randomCnt; i++) {
                 sr.Next();
             }
 
@@ -206,7 +210,7 @@ namespace Wing.RPGSystem
                 skillDeck.Add(tClass.skillSet[1].Hash);
             }
             skillDeck.Add(tClass.skillSet[2].Hash);
-            m_activeGameData = new WorldData() {
+            m_activeWorldData = new WorldData() {
                 seed = System.DateTime.Now.ToString(),
                 attribute = attribute,
                 learnedSkills = skillDeck,
@@ -214,7 +218,7 @@ namespace Wing.RPGSystem
             };
             AreaChunks = new AreaData[0];
 
-            sr = new System.Random(ActiveGameData.seed.GetStableHashCode());
+            sr = new System.Random(ActiveWorldData.seed.GetStableHashCode());
             SaveAll();
         }
 
@@ -232,7 +236,7 @@ namespace Wing.RPGSystem
 
         public int Random(int min, int max)
         {
-            m_activeGameData.randomCnt++;
+            m_activeWorldData.randomCnt++;
             return sr.Next(min, max);
         }
 
@@ -246,6 +250,11 @@ namespace Wing.RPGSystem
             }
             areaInfo = new AreaInfo();
             return false;
+        }
+
+        public void SetWorldBound(int x,int y)
+        {
+            m_activeWorldData.worldBound = new Location(x, y);
         }
     }
 }

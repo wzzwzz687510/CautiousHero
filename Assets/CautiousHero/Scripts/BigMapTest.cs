@@ -63,7 +63,7 @@ public class BigMapTest : MonoBehaviour
     private void OnCompleteMapRenderEvent()
     {
         
-        player.InitPlayer(Database.Instance.ActiveGameData.attribute);
+        player.InitPlayer(Database.Instance.ActiveWorldData.attribute);
         player.MoveToTile(GridManager.Instance.GetRandomLoc(true), true);
         player.EntitySprite.color = Color.white;
         mainCamera.enabled = true;

@@ -30,14 +30,15 @@ namespace Wing.RPGSystem
         public Sprite sprite;
         public int Hash => configName.GetStableHashCode();
         public SubAreaSet subAreaSets;
-        public CreatureSetDifficulty creatureSets;
+        public TileSet tileSet;
+        public CreatureDifficultySet creatureSets;
         public AbioticElement[] abioticSets;
 
         static Dictionary<int, AreaConfig> cache;
         public static Dictionary<int, AreaConfig> Dict {
             get {
                 // load if not loaded yet
-                return cache ?? (cache = Resources.LoadAll<AreaConfig>("AreaConfigs").ToDictionary(
+                return cache ?? (cache = Resources.LoadAll<AreaConfig>("Configs").ToDictionary(
                     item => item.configName.GetStableHashCode(), item => item)
                 );
             }

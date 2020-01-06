@@ -5,7 +5,7 @@ namespace Wing.RPGSystem
 {
     public static class Extensions
     {
-        
+
         public static int GetStableHashCode(this string text)
         {
             unchecked {
@@ -17,6 +17,17 @@ namespace Wing.RPGSystem
         }
 
         public static int Random(this int max) => Database.Instance.Random(0, max);
+
+        public static Location Set(this Location location, int x,int y)
+        {
+            location.x = x; location.y = y;
+            return location;
+        }
+        public static Location Set(this Location location,Location loc)
+        {
+            location.x = loc.x; location.y = loc.y;
+            return location;
+        }
 
         public static bool IsValid(this Location location) => GridManager.Instance.TileDic.ContainsKey(location);
 
@@ -55,10 +66,16 @@ namespace Wing.RPGSystem
 
         public static TClass GetTClass(this int hash) => TClass.Dict[hash];
 
+        public static TTile GetTTile(this int hash) => TTile.Dict[hash];
+
         public static Entity GetEntity(this int hash) {
             EntityManager.Instance.entityDic.TryGetValue(hash, out Entity entity);
             return entity;
         }
 
+        public static UnityEngine.Color SetAlpha(this UnityEngine.Color c, float a)
+        {
+            return new UnityEngine.Color(c.r, c.g, c.b, a);
+        }
     }
 }
