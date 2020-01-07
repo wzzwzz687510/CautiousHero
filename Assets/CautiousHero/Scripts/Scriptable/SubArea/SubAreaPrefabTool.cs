@@ -9,9 +9,10 @@ namespace Wing.RPGSystem
 {
     public class SubAreaPrefabTool : MonoBehaviour
     {
+        public SubArea toLoadFile;
+
         public string templateName;
-        public SubAreaType type;
-        public AreaConfig a;
+        public SubAreaType type;     
         [HideInInspector]public int[] values = new int[64];
         readonly string path = "Assets/Resources/SubAreas/";
 
@@ -45,33 +46,37 @@ namespace Wing.RPGSystem
             if (!Directory.Exists(path)) return;
             AssetDatabase.CreateAsset(asset, path + templateName + ".asset");
             AssetDatabase.SaveAssets();
-            EditorUtility.FocusProjectWindow();
+            toLoadFile = asset;
             //Selection.activeObject = asset;
         }
 
         public void LoadTest()
         {
-            switch (type) {
-                case SubAreaType.Corner:
-                    var corner = Resources.Load<CornerArea>("SubAreas/" + templateName);
-                    corner.coordinateValues.CopyTo(values, 0);
-                    break;
-                case SubAreaType.VerticalEdge:
-                    var vEdge = Resources.Load<VEdgeArea>("SubAreas/" + templateName);
-                    vEdge.coordinateValues.CopyTo(values, 0);
-                    break;
-                case SubAreaType.HorizontalEdge:
-                    var hEdge = Resources.Load<HEdgeArea>("SubAreas/" + templateName);
-                    hEdge.coordinateValues.CopyTo(values, 0);
-                    break;
-                case SubAreaType.Centre:
-                    var centre = Resources.Load<CentreArea>("SubAreas/" + templateName);
-                    centre.coordinateValues.CopyTo(values, 0);
-                    Debug.Log(values[0]);
-                    break;
-                default:
-                    break;
-            }
+            //switch (type) {
+            //    case SubAreaType.Corner:
+            //        var corner = Resources.Load<CornerArea>("SubAreas/" + templateName);
+            //        corner.coordinateValues.CopyTo(values, 0);
+            //        break;
+            //    case SubAreaType.VerticalEdge:
+            //        var vEdge = Resources.Load<VEdgeArea>("SubAreas/" + templateName);
+            //        vEdge.coordinateValues.CopyTo(values, 0);
+            //        break;
+            //    case SubAreaType.HorizontalEdge:
+            //        var hEdge = Resources.Load<HEdgeArea>("SubAreas/" + templateName);
+            //        hEdge.coordinateValues.CopyTo(values, 0);
+            //        break;
+            //    case SubAreaType.Centre:
+            //        var centre = Resources.Load<CentreArea>("SubAreas/" + templateName);
+            //        centre.coordinateValues.CopyTo(values, 0);
+            //        Debug.Log(values[0]);
+            //        break;
+            //    default:
+            //        break;
+            //}
+            if (toLoadFile == null) return;
+            type = toLoadFile.type;
+            templateName = toLoadFile.name;
+            values = toLoadFile.coordinateValues;
         }
 
 

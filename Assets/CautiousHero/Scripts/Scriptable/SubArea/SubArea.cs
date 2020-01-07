@@ -22,7 +22,7 @@ namespace Wing.RPGSystem
     public class SubArea : ScriptableObject
     {
         public int[] coordinateValues;
-        private SubAreaType type;
+        public SubAreaType type;
 
         public virtual void SetValues(int[] values)
         {
