@@ -1,1 +1,14 @@
 *.meta
+*.csproj
+CautiousHero.sln
+.vs/
+Assets/Demigiant/
+Assets/Fonts/
+Assets/MagicArsenal/
+Assets/Modern & Clean GUI/
+Assets/SFX/
+Assets/Simple Icons/
+Assets/Sprites/
+Library/
+obj/
+Logs/

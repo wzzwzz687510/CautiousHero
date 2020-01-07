@@ -17,8 +17,8 @@ TagManager:
   - Tile
   - Entity
   - Post Process
-  - 
-  - 
+  - Area
+  - World
   - 
   - 
   - 
@@ -42,9 +42,21 @@ TagManager:
   - name: Default
     uniqueID: 0
     locked: 0
+  - name: AreaElement
+    uniqueID: 2683894897
+    locked: 0
+  - name: TileElement
+    uniqueID: 2725231865
+    locked: 0
+  - name: Cover
+    uniqueID: 2778356465
+    locked: 0
   - name: Entity
     uniqueID: 442063065
     locked: 0
   - name: EntityBar
     uniqueID: 1676112897
+    locked: 0
+  - name: SkillEffect
+    uniqueID: 3421428295
     locked: 0
