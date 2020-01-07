@@ -21,8 +21,13 @@ namespace Wing.RPGSystem
         public Location loc;
         // Generate map after area generation
         public TileInfo[,] map;
-        public Dictionary<Location, Location> passageDic;// First location is direction pattern
+        public Dictionary<Location, Location> entranceDic;// First location is direction pattern
         public Dictionary<Location, int> creatureSetHashDic;
+
+        public static AreaInfo GetActiveAreaInfo(int chunkID, Location loc)
+            => Database.Instance.AreaChunks[chunkID].areaInfo[loc];
+        public static void SaveToDatabase(int chunkID, AreaInfo info)
+            => Database.Instance.SaveAreaInfo(chunkID, info);
     }
 
     public enum AreaState

@@ -137,7 +137,7 @@ namespace Wing.RPGSystem
 
         private Queue<BaseAnimClip> clips = new Queue<BaseAnimClip>();
         private Transform effectHolder;
-
+        private bool isWorldView => WorldMapManager.Instance.IsWorldView;
         private bool isPlayAll;
         private Coroutine currentCoroutine;
 
@@ -231,7 +231,7 @@ namespace Wing.RPGSystem
                     //var pathLoc = (Location)movePathClip.path[movePathClip.path.Length - 1];
                     entity.transform.DOPath(entity.MovePath, movePathClip.duration * entity.MovePath.Length * animRate);
                     for (int i = 0; i < movePathClip.path.Length; i++) {
-                        var pathLoc = (Location)movePathClip.path[i];
+                        var pathLoc = isWorldView ? movePathClip.path[i].WorldViewToLocation() : movePathClip.path[i].AreaViewToLocation();
                         yield return new WaitForSeconds(clip.duration * animRate);
                         entity.OnSortingOrderChanged?.Invoke(pathLoc.x + pathLoc.y * 8);
                     }
@@ -241,18 +241,20 @@ namespace Wing.RPGSystem
                     if (!EntityManager.Instance.TryGetEntity(moveInstantClip.entityHash, out entity))
                         break;
 
-                    entity.transform.position = moveInstantClip.destination;
+                    entity.transform.position = isWorldView ? 
+                        moveInstantClip.destination.ToWorldView(): moveInstantClip.destination.ToAreaView();
                     entity.OnSortingOrderChanged?.Invoke(moveInstantClip.destination.x + moveInstantClip.destination.y * 8);
                     break;
                 case AnimType.Cast:
                     var castClip = clip as CastAnimClip;
                     if (castClip.skillHash.GetBaseSkill().castEffect.prefab == null) break;
                     GameObject effect;
-                    Vector3 fix = new Vector3(0, 0.5f, 0);
+                    Vector3 endPosition = new Vector3(0, 0.5f, 0) + 
+                        (isWorldView ? castClip.end.ToWorldView() : castClip.end.ToAreaView());
                     switch (castClip.castType) {
                         case CastType.Instant:                            
-                            effect = Instantiate(castClip.skillHash.GetBaseSkill().castEffect.prefab, 
-                                castClip.end + fix, Quaternion.identity, effectHolder);
+                            effect = Instantiate(castClip.skillHash.GetBaseSkill().castEffect.prefab,
+                                endPosition, Quaternion.identity, effectHolder);
 
                             effect.TryGetComponent(out Animator anim);
                             anim?.Play(effect.name.Replace("(Clone)",""), 0);
@@ -261,10 +263,12 @@ namespace Wing.RPGSystem
                             StartCoroutine(DelayDestory(effect, castClip.duration * animRate));
                             break;
                         case CastType.Trajectory:
-                            effect = Instantiate(castClip.skillHash.GetBaseSkill().castEffect.prefab, 
-                                castClip.start + fix, Quaternion.identity, effectHolder);
+                            Vector3 startPosition = new Vector3(0, 0.5f, 0) + 
+                                (isWorldView ? castClip.start.ToWorldView() : castClip.start.ToAreaView());
+                            effect = Instantiate(castClip.skillHash.GetBaseSkill().castEffect.prefab,
+                                startPosition, Quaternion.identity, effectHolder);
                             int distance = AStarSearch.Heuristic(castClip.start, castClip.end);
-                            effect.transform.DOMove(castClip.end + fix, castClip.duration * distance * animRate)
+                            effect.transform.DOMove(endPosition, castClip.duration * distance * animRate)
                                   .OnComplete(() => Destroy(effect));
                             yield return new WaitForSeconds(castClip.duration * distance * animRate);
                             break;

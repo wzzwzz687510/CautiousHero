@@ -17,9 +17,10 @@ namespace Wing.RPGSystem
     public enum TileType
     {
         Accessible = 0,
-        Entrance = 1,
-        SpawnZone = 2, // 3x3
-        Teleport = 3
+        Obstacle = 1,
+        Entrance = 2,
+        SpawnZone = 3, // 3x3
+        Teleport = 4
     }
 
     [System.Serializable]
@@ -68,7 +69,8 @@ namespace Wing.RPGSystem
     public class TileController : MonoBehaviour
     {
         [Header("Components")]
-        public SpriteRenderer m_spriteRenderer;
+        public SpriteRenderer m_bSpriteRenderer;
+        public SpriteRenderer m_fSpriteRenderer;
         public SpriteRenderer m_cover;
         public Animator m_animator;
         public Transform m_archor;
@@ -78,7 +80,7 @@ namespace Wing.RPGSystem
         public Color castColor = new Color(1.0f, 0.3f, 0.0f);
         
         public Vector3 Archor { get { return m_archor.position; } }
-        public TileInfo Info => AreaManager.Instance.ActiveData.map[Loc.x,Loc.y];
+        public TileInfo Info => AreaManager.Instance.TempData.map[Loc.x,Loc.y];
         
         public Location Loc { get; private set; }
         public Location CastLoc { get; private set; }
@@ -87,16 +89,19 @@ namespace Wing.RPGSystem
         public bool IsEmpty { get { return Info.isEmpty; } }
         public bool IsBind { get; private set; }
 
-        public int SortOrder { get { return m_spriteRenderer.sortingOrder; } }
+        public int SortOrder { get { return m_bSpriteRenderer.sortingOrder; } }
 
         // para sort order, sprite ID and animation delay time
-        public void Init_SpriteRenderer(Location location)
+        public void Init(Location location)
         {
             Loc = location;
-            m_spriteRenderer.sortingOrder = Loc.x + Loc.y * 32 - 32 * 32;
-            m_spriteRenderer.sprite = Info.tTileHash.GetTTile().fSprite;
+            m_bSpriteRenderer.sortingOrder = Loc.x + Loc.y * 32 - 32 * 32;            
+        }
 
-            StartCoroutine(PlayAnimation(Random.Range(0.01f, 1f)));
+        public void UpdateSprite()
+        {
+            m_bSpriteRenderer.sprite = Info.tTileHash.GetTTile().bSprite;
+            m_fSpriteRenderer.sprite = Info.tTileHash.GetTTile().fSprite;
         }
 
         IEnumerator PlayAnimation(float delayTime)

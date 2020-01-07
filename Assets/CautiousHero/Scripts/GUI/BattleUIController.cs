@@ -41,6 +41,7 @@ public class BattleUIController : MonoBehaviour
     [Header("Skill Board")]
     public float waitDuration;
     public Transform skillBoard;
+    public Button endTurnButton;
     public Text skillName;
     public Text skillCost;
     public Text skillValue;
@@ -90,16 +91,25 @@ public class BattleUIController : MonoBehaviour
 
     private void Start()
     {
-
-    }
-
-    private void OnDestroy()
-    {
-        player.OnAPChanged.RemoveListener(OnPlayerAPChanged);
+        endTurnButton.gameObject.SetActive(false);
+        BindEvent();
     }
 
     // Init after player init.
     public void Init()
+    {  
+        UpdateSkillSprites();
+
+        PlayerHPChangeAnimation(0, 0);
+        PlayerHPChangeAnimation(1, 2);
+        PlayerArmourPointsChangeAnimation(true, player.PhysicalArmourPoints);
+        PlayerArmourPointsChangeAnimation(false, player.MagicalArmourPoints);
+
+        
+        //StartCoroutine(BattleStart());
+    }
+
+    private void BindEvent()
     {
         player.HPChangeAnimation += PlayerHPChangeAnimation;
         player.ArmourPointsChangeAnimation += PlayerArmourPointsChangeAnimation;
@@ -110,18 +120,11 @@ public class BattleUIController : MonoBehaviour
         for (int i = 0; i < skillSlots.Length; i++) {
             skillSlots[i].SkillBoardEvent += OnSkillBoardEvent;
         }
-        UpdateSkillSprites();
 
         BattleManager.Instance.OnTurnSwitched += OnTurnSwitched;
         BattleManager.Instance.CreatureBoardEvent += OnCreatureBoardEvent;
         BattleManager.Instance.MovePreviewEvent += MovePreviewEvent;
         AnimationManager.Instance.OnGameoverEvent.AddListener(Gameover);
-
-        PlayerHPChangeAnimation(0, 0);
-        PlayerHPChangeAnimation(1, 2);
-        PlayerArmourPointsChangeAnimation(true, player.PhysicalArmourPoints);
-        PlayerArmourPointsChangeAnimation(false, player.MagicalArmourPoints);
-        StartCoroutine(BattleStart());
     }
 
     private void PlayerSkillShiftAnimation(float duration)
@@ -171,6 +174,7 @@ public class BattleUIController : MonoBehaviour
 
     private void UpdateSkillSprites()
     {
+        if (player.SkillHashes.Count != player.defaultSkillCount) return;
         for (int i = 0; i < player.defaultSkillCount; i++) {
             skills[i].sprite = player.SkillHashes[i].GetBaseSkill().sprite;
         }

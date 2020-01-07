@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   templateName: entrance
   description: 
-  type: 0
+  type: 2
   fSprite: {fileID: 6701099697679513738, guid: ffd8af6b3e8fc3447a09c7edcff70ac7, type: 3}
   bSprite: {fileID: 2732243654350341029, guid: dbbbf61c854a2f8468000cad593d9e75, type: 3}
   mana:

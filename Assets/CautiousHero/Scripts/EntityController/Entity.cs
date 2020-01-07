@@ -245,13 +245,15 @@ namespace Wing.RPGSystem
                 }
 
                 Vector3[] sortedPath = new Vector3[path.Count];
+
                 for (int i = 0; i < sortedPath.Length; i++) {
-                    sortedPath[i] = path.Pop();
+                    sortedPath[i] = path.Pop().ToAreaView();
                 }
+
                 MovePath = sortedPath;
 
                 // AP cost and invoke event
-                ImpactActionPoints(sortedPath.Length * MoveCost,true);
+                ImpactActionPoints(sortedPath.Length * MoveCost, true);
                 // Animation move
             }
 

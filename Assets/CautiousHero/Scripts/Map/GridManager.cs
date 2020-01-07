@@ -7,36 +7,31 @@ public class GridManager : MonoBehaviour
 {
     public static GridManager Instance { get; private set; }
 
-    [Range(0, 0.1f)] public float animationDuration = 0.01f;
-
-    public TileController tcPrefab;
-    public AbioticController abioticPrefab;
-    public Sprite[] tileSprites;
-    public Sprite[] darkArea;
-
-    public bool IsRendered { get; private set; }
+    [Header("Tile Elements")]
+    public TileController tilePrefab;
+    public Transform tileHolder;
+    
     public TileNavigation Astar { get; private set; }
     public Dictionary<Location, TileController> TileDic { get; private set; }
-    public Vector2 MapBoundingBox => new Vector2(m_mg.width, m_mg.height);
 
-    private MapGenerator m_mg;    
-    private GameObject tileHolder;
-        
-    private HashSet<Location> playerEffectZone = new HashSet<Location>();   
+    private WorldData worldData => Database.Instance.ActiveWorldData;
 
     private void Awake()
     {
         if (!Instance)
             Instance = this;
-        m_mg = GetComponent<MapGenerator>();
-        TileDic = new Dictionary<Location, TileController>();
-    }
 
-    private void Start()
-    {
-        //m_mg.GenerateMap(tileSprites.Length);
-        Astar = new TileNavigation(32, 32,1);
-        //RenderMap();       
+        TileDic = new Dictionary<Location, TileController>();
+        Astar = new TileNavigation(32, 32, 1);
+
+        for (int x = 0; x < 32; x++) {
+            for (int y = 0; y < 32; y++) {
+                Location loc = new Location(x, y);
+                //Instantiate(tilePrefab, new Vector3(x+100, y+100, 0), Quaternion.identity, tileHolder);
+                TileDic.Add(loc, tileHolder.GetChild(x * 32 + y).GetComponent<TileController>());
+                TileDic[loc].Init(loc);
+            }
+        }
     }
 
     private IEnumerator AddAbiotics()
@@ -72,20 +67,12 @@ public class GridManager : MonoBehaviour
         yield return null;
     }
 
-    private void RenderMap()
+    public void LoadMap()
     {
-        if (tileHolder)
-            Destroy(tileHolder);
-
-        tileHolder = new GameObject("Tile Holder");
-        TileDic = new Dictionary<Location, TileController>();
-
         for (int x = 0; x < 32; x++) {
             for (int y = 0; y < 32; y++) {
-                var pos = new Location(x, y);
-                TileController tc = Instantiate(tcPrefab, new Vector3(x, y, 0),
-                    Quaternion.identity, tileHolder.transform).GetComponent<TileController>();
-                TileDic.Add(pos, tc);
+                Location loc = new Location(x, y);
+                TileDic[loc].UpdateSprite();
             }
         }
     }

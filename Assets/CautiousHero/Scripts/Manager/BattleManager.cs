@@ -7,6 +7,7 @@ using System;
 
 public enum BattleState
 {
+    FreeMove,
     PlayerMove,
     PlayerCast,    
     PlayerAnim,
@@ -30,6 +31,7 @@ public class BattleManager : MonoBehaviour
     public PlayerController player;
 
     public BattleState State { get; private set; }
+    public bool IsInBattle => State != BattleState.FreeMove;
     public bool IsPlayerTurn => State == BattleState.PlayerMove 
         || State == BattleState.PlayerCast
         || State == BattleState.PlayerAnim;
@@ -43,7 +45,6 @@ public class BattleManager : MonoBehaviour
 
     private HashSet<Location> tileZone = new HashSet<Location>();
     private bool endTurn;
-    private bool isActive;
 
     public delegate void TurnSwitchCallback(bool isPlayerTurn);
     public event TurnSwitchCallback OnTurnSwitched;
@@ -60,7 +61,7 @@ public class BattleManager : MonoBehaviour
     {
         if (!Instance)
             Instance = this;
-
+        State = BattleState.FreeMove;
     }
 
     private void Start()
@@ -74,14 +75,9 @@ public class BattleManager : MonoBehaviour
         //GetComponent<BattleUIController>()?.Init();
     }
 
-    public void Deactivate()
-    {
-        isActive = false;
-    }
-
     public void PrepareBattleStart(List<int> battleSet)
     {
-        isActive = true;
+        State = BattleState.PlayerMove;
         AIManager.Instance.Init(battleSet);      
     }
 
@@ -159,15 +155,15 @@ public class BattleManager : MonoBehaviour
 
     private void Update()
     {
-        if (!isActive) return;
+        if (!IsInBattle) return;
 
-        if (Input.GetKeyDown(KeyCode.Q))
+        if (Input.GetKeyDown(KeyCode.Alpha1))
             CastSkill(0);
-        if (Input.GetKeyDown(KeyCode.W))
+        if (Input.GetKeyDown(KeyCode.Alpha2))
             CastSkill(1);
-        if (Input.GetKeyDown(KeyCode.E))
+        if (Input.GetKeyDown(KeyCode.Alpha3))
             CastSkill(2);
-        if (Input.GetKeyDown(KeyCode.R))
+        if (Input.GetKeyDown(KeyCode.Alpha4))
             CastSkill(3);
 
         if (Input.GetMouseButtonDown(1) && (State == BattleState.PlayerMove || State == BattleState.PlayerCast)) {
@@ -453,7 +449,7 @@ public class BattleManager : MonoBehaviour
 
     public void EndTurn()
     {
-        if (!IsPlayerTurn || State == BattleState.PlayerAnim) {
+        if (State == BattleState.PlayerAnim) {
             endTurn = true;
             return;
         }

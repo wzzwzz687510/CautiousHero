@@ -55,6 +55,8 @@ namespace Wing.RPGSystem
         public List<int> learnedSkills;
         public List<Location> worldMap;
         public Location worldBound;
+
+        public static WorldData ActiveData => Database.Instance.ActiveWorldData;
     }
 
     [System.Serializable]
@@ -68,7 +70,7 @@ namespace Wing.RPGSystem
         public static Database Instance { get; private set; }
 
         [Header("Setting")]
-        public int areaChunkSize = 16;
+        public const int AreaChunkSize = 16;
 
         [Header("Test")]
         public bool reset;
@@ -237,7 +239,7 @@ namespace Wing.RPGSystem
 
         public void InitAreaChunk(int areaNumber)
         {
-            int length = Mathf.CeilToInt(1.0f * areaNumber / areaChunkSize);
+            int length = Mathf.CeilToInt(1.0f * areaNumber / AreaChunkSize);
             AreaChunks = new AreaData[length];
             for (int i = 0; i < length; i++) {
                 AreaChunks[i] = new AreaData();
@@ -268,6 +270,12 @@ namespace Wing.RPGSystem
         public void SetWorldBound(int x,int y)
         {
             m_activeWorldData.worldBound = new Location(x, y);
+        }
+
+        public void SaveAreaInfo(int chunkID,AreaInfo info)
+        {
+            AreaChunks[chunkID].areaInfo[info.loc] = info;
+            SaveData("GameData_MapChunk" + chunkID, AreaChunks[chunkID]);
         }
     }
 }

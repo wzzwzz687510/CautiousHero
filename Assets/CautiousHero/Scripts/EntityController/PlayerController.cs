@@ -29,11 +29,12 @@ namespace Wing.RPGSystem
             BuffManager = new BuffManager(Hash);
 
             HealthPoints = MaxHealthPoints;
-            SkillDeck = new List<int>(Database.Instance.ActiveWorldData.learnedSkills);
+            SkillDeck = new List<int>(WorldData.ActiveData.learnedSkills);
             SkillDiscardPile = new List<int>();
             for (int i = 0; i < defaultSkillCount; i++) {
                 ShiftASkill();
             }
+
         }
 
         public override int MoveToTile(Location targetLoc, bool isInstance = false)
@@ -55,7 +56,7 @@ namespace Wing.RPGSystem
 
                 Vector3[] sortedPath = new Vector3[path.Count];
                 for (int i = 0; i < sortedPath.Length; i++) {
-                    sortedPath[i] = path.Pop();
+                    sortedPath[i] = path.Pop().ToWorldView();
                 }
                 MovePath = sortedPath;
             }

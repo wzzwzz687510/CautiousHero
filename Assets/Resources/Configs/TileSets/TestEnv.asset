@@ -16,3 +16,4 @@ MonoBehaviour:
   entranceTile: {fileID: 11400000, guid: b9ebe50232d53bc4cb2289a68677c1a6, type: 2}
   tTiles:
   - {fileID: 11400000, guid: cc389c73cb17eda4783972cfd6cc31f7, type: 2}
+  - {fileID: 11400000, guid: 054d4b3ec68bfb44f8f9b9ad299e3361, type: 2}

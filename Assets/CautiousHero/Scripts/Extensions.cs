@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using UnityEngine;
 
 namespace Wing.RPGSystem
 {
@@ -28,12 +29,26 @@ namespace Wing.RPGSystem
             location.x = loc.x; location.y = loc.y;
             return location;
         }
+        public static Vector3 ToWorldView(this Location location)
+            => new Vector3((location.x - location.y) * -0.524f, (location.x + location.y) * 0.262f, 0);
+        public static Vector3 ToAreaView(this Location location)
+            => new Vector3(location.x + 100, location.y + 100, 0);
+        public static Location WorldViewToLocation(this Vector3 position)
+        {
+            float a = position.x / -0.524f;
+            float b = position.y / 0.262f;
+            return new Location((int)(a + b) / 2, (int)(b - a) / 2);
+        }
+        public static Location AreaViewToLocation(this Vector3 position)
+            => new Location((int)position.x - 100, (int)position.y - 100);
+
 
         public static bool IsValid(this Location location) => GridManager.Instance.TileDic.ContainsKey(location);
 
         public static bool IsEmpty(this Location location) => GridManager.Instance.IsEmptyLocation(location);
 
-        public static bool TryGetTileController(this Location location, out TileController tc) => GridManager.Instance.TileDic.TryGetValue(location, out tc);
+        public static bool TryGetTileController(this Location location, out TileController tc) 
+            => GridManager.Instance.TileDic.TryGetValue(location, out tc);
 
         public static TileController GetTileController(this Location location) => GridManager.Instance.TileDic[location];
 
@@ -46,7 +61,8 @@ namespace Wing.RPGSystem
             return false;
         }
 
-        public static int Distance(this Location location, Location loc) => Math.Abs(location.x - loc.x) + Math.Abs(location.y - loc.y);
+        public static int Distance(this Location location, Location loc) 
+            => Math.Abs(location.x - loc.x) + Math.Abs(location.y - loc.y);
 
         public static bool HasPath(this Location from, Location to) => GridManager.Instance.Astar.HasPath(from, to);
 
@@ -73,9 +89,9 @@ namespace Wing.RPGSystem
             return entity;
         }
 
-        public static UnityEngine.Color SetAlpha(this UnityEngine.Color c, float a)
+        public static Color SetAlpha(this Color c, float a)
         {
-            return new UnityEngine.Color(c.r, c.g, c.b, a);
+            return new Color(c.r, c.g, c.b, a);
         }
     }
 }

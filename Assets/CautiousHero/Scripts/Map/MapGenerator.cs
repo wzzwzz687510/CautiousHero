@@ -189,18 +189,6 @@ namespace Wing.RPGSystem
             }
         }
 
-        public static Vector3 LocationToWorldPoint(Location tile)
-        {
-            return new Vector3((tile.x - tile.y) * -0.524f, (tile.x + tile.y) * 0.262f, 0);
-        }
-
-        public static Location WorldPointToLocation(Vector3 point)
-        {
-            float a = point.x / -0.524f;
-            float b = point.y / 0.262f;
-            return new Location((int)(a + b) / 2, (int)(b - a) / 2);
-        }
-
         private void DrawCircle(Location c, int r)
         {
             for (int x = -r; x <= r; x++) {
@@ -454,10 +442,15 @@ namespace Wing.RPGSystem
         public static Location operator -(Location a) => new Location(-a.x, -a.y);
         public static Location operator +(Location a, Location b) => new Location(a.x + b.x, a.y + b.y);
         public static Location operator -(Location a, Location b) => a + (-b);
+        public static Location operator *(int scalar, Location vector) => new Location(scalar * vector.x, scalar * vector.y);
+        public static Location operator *(float scalar, Location vector) => (int)scalar * vector;
+        public static Location operator *(Location vector, int scalar) => scalar * vector;
+        public static Location operator *(Location vector, float scalar) => scalar * vector;
+        public static Location operator /(Location vector, int scalar) => new Location(vector.x / scalar, vector.y / scalar);
         public static bool operator ==(Location a, Location b) => a.Equals(b);
         public static bool operator !=(Location a, Location b) => !a.Equals(b);
-        public static implicit operator Vector3(Location a) => MapGenerator.LocationToWorldPoint(a);
-        public static explicit operator Location(Vector3 a) => MapGenerator.WorldPointToLocation(a);
+        //public static implicit operator Vector3(Location a) => MapGenerator.LocationToWorldPoint(a);
+        //public static explicit operator Location(Vector3 a) => MapGenerator.WorldPointToLocation(a);
     }
 
     class LandBlock : IComparable<LandBlock>

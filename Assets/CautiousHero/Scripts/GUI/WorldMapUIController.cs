@@ -60,7 +60,11 @@ namespace Wing.RPGSystem
         {
             SetLoadingPage(true);
             worldView.DOFade(0, switchTime);
-            worldViewBG.DOFade(0, switchTime).OnComplete(() => SetLoadingPage(false));
+            worldViewBG.DOFade(0, switchTime).OnComplete(() => {
+                SetLoadingPage(false);
+                worldView.gameObject.SetActive(false);
+                worldViewBG.gameObject.SetActive(false);
+            });
         }
 
         public void Button_System()
