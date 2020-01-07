@@ -185,8 +185,9 @@ namespace Wing.RPGSystem
         protected SpriteGlowEffect m_glowEffect;
         protected BoxCollider2D m_collider;
 
-        public delegate void SortingOrderChange(int sortingOrder);
-        public SortingOrderChange OnSortingOrderChanged;
+        public delegate void IntDelegate(int value);
+        public IntDelegate OnMovedEvent;
+        public IntDelegate OnSortingOrderChanged;
         public delegate void PointsChange(float ratio, float duraion);
         public PointsChange HPChangeAnimation;
         public delegate void ArmourChange(bool isPhysical,int remainedNumber);
@@ -257,6 +258,7 @@ namespace Wing.RPGSystem
                 // Animation move
             }
 
+            OnMovedEvent?.Invoke(Loc.Distance(targetLoc));
             if (Loc.TryGetTileController(out TileController leaveTile)) {
                 leaveTile.OnEntityLeaving();
             }
@@ -271,17 +273,19 @@ namespace Wing.RPGSystem
                 AnimationManager.Instance.AddAnimClip(new MovePathAnimClip(Hash, MovePath, 0.2f));
             }
 
+            
             return isInstance ? 1 : MovePath.Length;
         }
 
-        public virtual void CastSkill(int skillID, Location castLoc)
+        public virtual bool CastSkill(int skillID, Location castLoc)
         {
             BaseSkill tSkill = SkillHashes[skillID].GetBaseSkill();
             if (ActionPoints < tSkill.actionPointsCost)
-                return;
+                return false;
             ImpactActionPoints(tSkill.actionPointsCost,true);
 
             tSkill.ApplyEffect(Hash, castLoc);
+            return true;
         }
 
         public virtual void DropAnimation()

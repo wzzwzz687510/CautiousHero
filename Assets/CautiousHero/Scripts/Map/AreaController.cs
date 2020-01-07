@@ -24,6 +24,15 @@ namespace Wing.RPGSystem
         public Dictionary<Location, Location> entranceDic;// First location is direction pattern
         public Dictionary<Location, int> creatureSetHashDic;
 
+        public AreaInfo(int templateHash, Location loc)
+        {
+            this.templateHash = templateHash;
+            this.loc = loc;
+            map = new TileInfo[32, 32];
+            entranceDic = new Dictionary<Location, Location>();
+            creatureSetHashDic = new Dictionary<Location, int>();
+        }
+
         public static AreaInfo GetActiveAreaInfo(int chunkID, Location loc)
             => Database.Instance.AreaChunks[chunkID].areaInfo[loc];
         public static void SaveToDatabase(int chunkID, AreaInfo info)

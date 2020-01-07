@@ -29,6 +29,7 @@ public class BattleManager : MonoBehaviour
     public LayerMask tileLayer;
     public LayerMask entityLayer;
     public PlayerController player;
+    public Camera battleCamera;
 
     public BattleState State { get; private set; }
     public bool IsInBattle => State != BattleState.FreeMove;
@@ -75,10 +76,11 @@ public class BattleManager : MonoBehaviour
         //GetComponent<BattleUIController>()?.Init();
     }
 
-    public void PrepareBattleStart(List<int> battleSet)
+    public void PrepareBattle(List<int> battleSet)
     {
-        State = BattleState.PlayerMove;
-        AIManager.Instance.Init(battleSet);      
+        AnimationManager.Instance.OnAnimCompleted.AddListener(OnAnimCompleted);
+        AIManager.Instance.Init(battleSet);
+        StartNewTurn(true);
     }
 
     private void OnAnimCompleted()
@@ -158,22 +160,22 @@ public class BattleManager : MonoBehaviour
         if (!IsInBattle) return;
 
         if (Input.GetKeyDown(KeyCode.Alpha1))
-            CastSkill(0);
-        if (Input.GetKeyDown(KeyCode.Alpha2))
             CastSkill(1);
-        if (Input.GetKeyDown(KeyCode.Alpha3))
+        if (Input.GetKeyDown(KeyCode.Alpha2))
             CastSkill(2);
-        if (Input.GetKeyDown(KeyCode.Alpha4))
+        if (Input.GetKeyDown(KeyCode.Alpha3))
             CastSkill(3);
+        if (Input.GetKeyDown(KeyCode.Alpha4))
+            CastSkill(4);
 
         if (Input.GetMouseButtonDown(1) && (State == BattleState.PlayerMove || State == BattleState.PlayerCast)) {
             ChangeState(BattleState.PlayerMove);
             MovePreviewEvent?.Invoke(0);
         }
 
-        var ray = Camera.main.ViewportPointToRay(new Vector3(Input.mousePosition.x / Screen.width,
+        var ray = battleCamera.ViewportPointToRay(new Vector3(Input.mousePosition.x / Screen.width,
             Input.mousePosition.y / Screen.height, Input.mousePosition.z));
-        //Debug.DrawRay(ray.origin,10* ray.direction,Color.red,10);
+        Debug.DrawRay(ray.origin,10* ray.direction,Color.red,10);
         var hit = Physics2D.Raycast(ray.origin, ray.direction, 20, tileLayer);
         if (hit) {
             var tile = hit.transform.parent.GetComponent<TileController>();
@@ -277,7 +279,7 @@ public class BattleManager : MonoBehaviour
         if (player.ActionPoints == 0)
             return;
         player.SetActiveCollider(false);
-        SetVisualPlayer(player.transform.position + new Vector3(0, 0.3f, 0), player.Loc.GetTileController().SortOrder + 64);
+        SetVisualPlayer(player.transform.position, player.Loc.GetTileController().SortOrder + 64);
 
         player.EntitySprite.color = new Color(1, 1, 1, 0.5f);
         foreach (var loc in GridManager.Instance.Nav.GetGivenDistancePoints(player.Loc, player.ActionPoints / player.MoveCost)) {
@@ -289,7 +291,7 @@ public class BattleManager : MonoBehaviour
     private void SetVisualPlayer(Vector3 des,int sortingOrder)
     {
         if (!tmpVisualPlayer) {
-            tmpVisualPlayer = Instantiate(player.EntitySprite.gameObject, player.transform.position + new Vector3(0, 0.3f, 0),
+            tmpVisualPlayer = Instantiate(player.EntitySprite.gameObject, player.transform.position,
                 Quaternion.identity).GetComponent<SpriteRenderer>();
 
             tmpVisualPlayer.GetComponent<SpriteRenderer>().sortingOrder = player.Loc.x + player.Loc.y * 8 + 1;
@@ -442,7 +444,7 @@ public class BattleManager : MonoBehaviour
             InformLackAP();
             return;
         }
-        selectedSkillID = id + 1;
+        selectedSkillID = id;
         ChangeState(BattleState.PlayerCast);
         PrepareSkill();
     }

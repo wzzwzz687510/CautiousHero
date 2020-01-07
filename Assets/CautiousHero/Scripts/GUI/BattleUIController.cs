@@ -105,15 +105,14 @@ public class BattleUIController : MonoBehaviour
         PlayerArmourPointsChangeAnimation(true, player.PhysicalArmourPoints);
         PlayerArmourPointsChangeAnimation(false, player.MagicalArmourPoints);
 
-        
-        //StartCoroutine(BattleStart());
     }
 
     private void BindEvent()
     {
+        player.OnMovedEvent += OnPlayerMovedEvent;
         player.HPChangeAnimation += PlayerHPChangeAnimation;
         player.ArmourPointsChangeAnimation += PlayerArmourPointsChangeAnimation;
-        player.OnCancelArmourEvent.AddListener(PlayerOnCancelArmourEvent);
+        player.OnCancelArmourEvent.AddListener(OnPlayerCancelArmourEvent);
 
         player.ssAnimEvent += PlayerSkillShiftAnimation;
         player.OnAPChanged.AddListener(OnPlayerAPChanged);
@@ -127,12 +126,17 @@ public class BattleUIController : MonoBehaviour
         AnimationManager.Instance.OnGameoverEvent.AddListener(Gameover);
     }
 
+    private void OnPlayerMovedEvent(int steps)
+    {
+        UpdateSkillSprites();
+    }
+
     private void PlayerSkillShiftAnimation(float duration)
     {
         UpdateSkillSprites();
     }
 
-    private void PlayerOnCancelArmourEvent()
+    private void OnPlayerCancelArmourEvent()
     {
         physicalArmourFill.DOFade(0, 0.5f);
         magicalArmourFill.DOFade(0, 0.5f);
@@ -161,7 +165,7 @@ public class BattleUIController : MonoBehaviour
             DOTween.To(() => hpFill.fillAmount, ratio => hpFill.fillAmount = ratio, hpRatio, duration);
         }
         DOTween.To(() => playerHPBar.value, ratio => playerHPBar.value = ratio, hpRatio, duration);
-        hpFill.color = hpRatio > 0.2f ? new Color(0.5f, 1, 0.4f) : Color.red;
+        //hpFill.color = hpRatio > 0.2f ? new Color(0.5f, 1, 0.4f) : Color.red;
         playerHpText.text = ((int)(hpRatio * player.MaxHealthPoints)).ToString() + "/" + player.MaxHealthPoints.ToString();
     }
 
@@ -192,6 +196,12 @@ public class BattleUIController : MonoBehaviour
         }
     }
 
+    public void BattleStartAnim()
+    {
+        StartCoroutine(BattleStart());
+        endTurnButton.gameObject.SetActive(true);
+    }
+
     public void OnTurnSwitched(bool isPlayerTurn)
     {
         StartCoroutine(TurnSwitchAnimation(isPlayerTurn));
@@ -204,10 +214,10 @@ public class BattleUIController : MonoBehaviour
         }
         string text;
         if (isPlayerTurn) {
-            text = "我  方  回  合";
+            text = "Your Turn";
         }
         else {
-            text = "敌  方  回  合";
+            text = "Enemy Turn";
         }
 
         turnText.text = text;
@@ -228,7 +238,7 @@ public class BattleUIController : MonoBehaviour
     public IEnumerator BattleStart()
     {
         yield return new WaitForSeconds(1f);
-        turnText.text = "战  略  布  局";
+        turnText.text = "Battle Start";
         turnText.color = Color.white;
         turnBG.fillAmount = 0;
         turnBG.color = Color.white;

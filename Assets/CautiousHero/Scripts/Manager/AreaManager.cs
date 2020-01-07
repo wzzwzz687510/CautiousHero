@@ -12,9 +12,13 @@ namespace Wing.RPGSystem
 
         public float moveSpeed = 0.1f;
 
+        [Header("Components")]
         public LayerMask tileLayer;
         public PlayerController player;
         public BattleUIController m_uIController;
+        public GameObject creaturePrefab;
+
+        [Header("View")]
         public Camera areaCamera;
         public CinemachineVirtualCamera vCamera;
         public Transform viewPin;
@@ -23,8 +27,11 @@ namespace Wing.RPGSystem
         public int CurrentAreaIndex { get; private set; }
         public int ChunkIndex { get; private set; }
         public AreaInfo TempData { get; private set; }
-        public bool isMovable { get; private set; }
+        public bool IsMovable { get; private set; }
+        public Dictionary<Location, List<int>> RemainedCreatures { get; private set; } // key - spawn point, value - creature set
+        public List<Location> InBatlleCreatureSets { get; private set; }
 
+        private Transform creatureHolder;
         private Location highlightTile;
         private bool hasHighlighted;
 
@@ -37,7 +44,7 @@ namespace Wing.RPGSystem
         private void Update()
         {
             CameraAdjustment();
-            if (!isMovable|| BattleManager.Instance.IsInBattle || WorldMapManager.Instance.IsWorldView) return;
+            if (!IsMovable|| BattleManager.Instance.IsInBattle || WorldMapManager.Instance.IsWorldView) return;
             var ray = areaCamera.ViewportPointToRay(new Vector3(Input.mousePosition.x / Screen.width,
             Input.mousePosition.y / Screen.height, Input.mousePosition.z));
             var hit = Physics2D.Raycast(ray.origin, ray.direction, 20, tileLayer);
@@ -71,6 +78,20 @@ namespace Wing.RPGSystem
             if (!tileLoc.IsValid()) return;
 
             player.MoveToLocation(tileLoc, false, false);
+            BattleCheck();
+        }
+
+        private void BattleCheck()
+        {
+            foreach (var spawnLoc in TempData.creatureSetHashDic.Keys) {
+                // TODO: improve trigger condition
+                if (spawnLoc.Distance(player.Loc) < 4) {
+                    BattleManager.Instance.PrepareBattle(RemainedCreatures[spawnLoc]);
+                    m_uIController.BattleStartAnim();
+                    RemainedCreatures.Remove(spawnLoc);
+                    InBatlleCreatureSets.Add(spawnLoc);
+                }
+            }
         }
 
         private void HighlightVisual(Location loc)
@@ -91,7 +112,7 @@ namespace Wing.RPGSystem
 
         public void SetMovable(bool isMovable)
         {
-            this.isMovable = isMovable;
+            this.IsMovable = isMovable;
         }
 
         public void InitArea(Location areaLoc,Location spawnLoc)
@@ -100,15 +121,49 @@ namespace Wing.RPGSystem
             CurrentAreaIndex = WorldData.ActiveData.worldMap.IndexOf(CurrentAreaLoc);
             ChunkIndex = CurrentAreaIndex / Database.AreaChunkSize;
             TempData = AreaInfo.GetActiveAreaInfo(ChunkIndex, CurrentAreaLoc);
+            RemainedCreatures = new Dictionary<Location, List<int>>();
+            InBatlleCreatureSets = new List<Location>();
+
             player.InitPlayer(WorldData.ActiveData.attribute);
             player.MoveToTile(spawnLoc, true);
+
             m_uIController.Init();
             GridManager.Instance.LoadMap();
+            InstantiateCreature();
+        }
+
+        public void InstantiateCreature()
+        {
+            if (creatureHolder) Destroy(creatureHolder.gameObject);
+            creatureHolder = new GameObject("Creature Holder").transform;
+
+            foreach (var spawnLoc in TempData.creatureSetHashDic.Keys) {
+                List<int> creatureHashes = new List<int>();
+                foreach (var ce in TempData.creatureSetHashDic[spawnLoc].GetCreatureSet().creatures) {
+                    var cc = Instantiate(creaturePrefab, creatureHolder).GetComponent<CreatureController>();
+                    cc.InitCreature(ce.tCreature, ce.pattern + spawnLoc);
+                    creatureHashes.Add(cc.Hash);
+                    SetEntityHash(cc.Loc, cc.Hash);
+                }
+                RemainedCreatures.Add(spawnLoc, creatureHashes);
+            } 
         }
 
         public void SaveAreaInfo()
         {
             AreaInfo.SaveToDatabase(ChunkIndex, TempData);
+        }
+
+        public void SetEntityHash(Location loc, int hash)
+        {
+            TempData.map[loc.x, loc.y].stayEntityHash = hash;
+            TempData.map[loc.x, loc.y].isEmpty = false;
+        }
+
+        public void ClearEntity(Location loc)
+        {
+            TempData.map[loc.x, loc.y].stayEntityHash = 0;
+            TempData.map[loc.x, loc.y].isEmpty = true;
         }
     }
 }

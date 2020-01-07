@@ -34,7 +34,7 @@ namespace Wing.RPGSystem
             for (int i = 0; i < defaultSkillCount; i++) {
                 ShiftASkill();
             }
-
+            Debug.Log("Player hash: " + Hash);
         }
 
         public override int MoveToTile(Location targetLoc, bool isInstance = false)
@@ -71,7 +71,15 @@ namespace Wing.RPGSystem
                 MovePath = sortedPath;
             }
 
-            Loc = targetLoc;
+            if(isWorldMap) Loc = targetLoc;
+            else {
+                if (Loc.TryGetTileController(out TileController leaveTile)) {
+                    leaveTile.OnEntityLeaving();
+                }
+                Loc = targetLoc;
+                Loc.GetTileController().OnEntityEntering(Hash);
+            }
+
             if (isInstance) {
                 AnimationManager.Instance.AddAnimClip(new MoveInstantAnimClip(Hash, targetLoc, 0.2f));                
             }
@@ -88,11 +96,12 @@ namespace Wing.RPGSystem
             SaveStatus();
         }
 
-        public override void CastSkill(int skillID, Location castLoc)
+        public override bool CastSkill(int skillID, Location castLoc)
         {
-            base.CastSkill(skillID, castLoc);
-            RemoveASkill(skillID);
+            bool res = base.CastSkill(skillID, castLoc);
+            if (res) RemoveASkill(skillID);
             SaveStatus();
+            return res;
         }
 
         public override void DropAnimation()

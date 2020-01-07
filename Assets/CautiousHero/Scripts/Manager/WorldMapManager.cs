@@ -110,6 +110,7 @@ namespace Wing.RPGSystem
 
         private void EnterArea(Location areaLoc)
         {
+            if (areaLoc == WorldData.ActiveData.worldMap[0]) return;
             IsWorldView = false;
             m_worldUIController.SwitchToAreaView();
             AreaManager.Instance.InitArea(areaLoc, AreaDic[areaLoc].AreaInfo.entranceDic[currentLoc - areaLoc]);
@@ -289,12 +290,7 @@ namespace Wing.RPGSystem
             }
 
             List<Location> spawnLocs = new List<Location>();
-            AreaInfo info = new AreaInfo {
-                templateHash = config.Hash,
-                loc = preInfo.loc,
-                map = new TileInfo[32, 32],
-                entranceDic = new Dictionary<Location, Location>()
-            };
+            AreaInfo info = new AreaInfo(config.Hash, preInfo.loc);
             for (int x = 0; x < 32; x++) {
                 for (int y = 0; y < 32; y++) {
                     int value = arrays[x / 8, y / 8].values[x % 8 + 8 * (y % 8)];
@@ -364,7 +360,7 @@ namespace Wing.RPGSystem
                 foreach (var ce in set.creatures) {
                     patternX = ce.pattern.x * cosine + ce.pattern.y * sine;
                     patternY = -ce.pattern.x * sine + ce.pattern.y * cosine;
-                    info.map[setLoc.x + patternX, setLoc.y + patternY].SetEntity(ce.tCreature.Hash);
+                    info.map[setLoc.x + patternX, setLoc.y + patternY].isEmpty = false;
                 }
             }
                             

@@ -25,7 +25,7 @@ namespace Wing.RPGSystem {
             base.Awake();
         }
 
-        public IEnumerator InitCreature(BaseCreature creature, Location loc)
+        public void InitCreature(BaseCreature creature, Location loc)
         {           
             Template = creature;
             EntityName = Template.creatureName;
@@ -43,15 +43,14 @@ namespace Wing.RPGSystem {
             }
             NextCastSkillID = 0;
 
-            var h = EntitySprite.bounds.size.y;
-            hpBar.transform.localPosition += new Vector3(0, h, 0);
+            //var h = EntitySprite.bounds.size.y;
+            //hpBar.transform.localPosition += new Vector3(0, h, 0);
 
             hpBar.enabled = false;
             mask_hpEffect.alphaCutoff = 1;
             mask_hp.alphaCutoff = 1;
             MoveToTile(loc, true);
-            DropAnimation();
-            yield return new WaitForSeconds(0.5f);
+
             hpBar.enabled = true;
             CreatureHpChangeAnimation(1,1);
         }
@@ -61,10 +60,11 @@ namespace Wing.RPGSystem {
             nextSkillTargetHash = hash;
         }
 
-        public override void CastSkill(int skillID, Location castLoc)
+        public override bool CastSkill(int skillID, Location castLoc)
         {
-            base.CastSkill(skillID, castLoc);
+            bool res = base.CastSkill(skillID, castLoc);
             NextCastSkillID = NextCastSkillID == SkillHashes.Count - 1 ? 0 : NextCastSkillID++;
+            return res;
         }
 
         protected override void OnSortingOrderChangedEvent(int sortingOrder)

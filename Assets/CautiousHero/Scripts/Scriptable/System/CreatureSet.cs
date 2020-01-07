@@ -28,7 +28,7 @@ namespace Wing.RPGSystem
         static Dictionary<int, CreatureSet> cache;
         public static Dictionary<int, CreatureSet> Dict {
             get {
-                return cache ?? (cache = Resources.LoadAll<CreatureSet>("CreatureSet").ToDictionary(
+                return cache ?? (cache = Resources.LoadAll<CreatureSet>("Configs").ToDictionary(
                     item => item.setName.GetStableHashCode(), item => item)
                     );
             }

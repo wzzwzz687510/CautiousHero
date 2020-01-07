@@ -84,8 +84,11 @@ namespace Wing.RPGSystem
 
         public static TTile GetTTile(this int hash) => TTile.Dict[hash];
 
+        public static CreatureSet GetCreatureSet(this int hash) => CreatureSet.Dict[hash];
+
         public static Entity GetEntity(this int hash) {
-            EntityManager.Instance.entityDic.TryGetValue(hash, out Entity entity);
+            if (!EntityManager.Instance.entityDic.TryGetValue(hash, out Entity entity))
+                Debug.LogError("Entity manager do not have given hash: " + hash + " entity.");
             return entity;
         }
 

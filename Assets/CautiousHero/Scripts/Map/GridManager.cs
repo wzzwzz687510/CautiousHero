@@ -14,7 +14,7 @@ public class GridManager : MonoBehaviour
     public TileNavigation Nav { get; private set; }
     public Dictionary<Location, TileController> TileDic { get; private set; }
 
-    private WorldData worldData => Database.Instance.ActiveWorldData;
+    private List<Location> changedTies;
 
     private void Awake()
     {
@@ -22,6 +22,7 @@ public class GridManager : MonoBehaviour
             Instance = this;
 
         TileDic = new Dictionary<Location, TileController>();
+        changedTies = new List<Location>();
         Nav = new TileNavigation(32, 32, 1);
 
         for (int x = 0; x < 32; x++) {
@@ -81,10 +82,11 @@ public class GridManager : MonoBehaviour
 
     public void ResetAllTiles()
     {
-        foreach (var tile in TileDic.Values) {
-            tile.ChangeTileState(TileState.Normal);
-            tile.DebindCastLocation();
-        } 
+        foreach (var loc in changedTies) {
+            TileDic[loc].ChangeTileState(TileState.Normal);
+            TileDic[loc].DebindCastLocation();
+        }
+        changedTies.Clear();
     }
 
     public bool IsEmptyLocation(Location id)
@@ -96,6 +98,12 @@ public class GridManager : MonoBehaviour
     {
         if(!TileDic.ContainsKey(id))
             return false;
+
+        if (state != TileState.Normal) {
+            if (!changedTies.Contains(id))
+                changedTies.Add(id);
+        }
+        else changedTies.Remove(id);
 
         TileDic[id].ChangeTileState(state);
         return true;

@@ -54,16 +54,6 @@ namespace Wing.RPGSystem
             stayEntityHash = 0;
         }
 
-        public void SetEntity(int hash)
-        {
-            isEmpty = false;
-            stayEntityHash = hash;
-        }
-        public void ClearEntity()
-        {
-            isEmpty = true;
-            stayEntityHash = 0;
-        }
         public void SetMana(ElementMana mana)
         {
             this.mana = mana;
@@ -126,7 +116,7 @@ namespace Wing.RPGSystem
         {
             switch (state) {
                 case TileState.Normal:
-                    SetCoverColor(new Color(0, 0, 0, 0));
+                    SetCoverColor(new Color(1, 1, 1, 0));
                     SetStayEntityOutline(Color.black);
                     break;
                 case TileState.MoveZone:
@@ -165,14 +155,16 @@ namespace Wing.RPGSystem
         public void OnEntityEntering(int hash)
         {
             // Do something to entity;
-            Info.SetEntity(hash);
+            AreaManager.Instance.SetEntityHash(Loc, hash);
             GridManager.Instance.Nav.SetTileWeight(Loc, 0);
+            Debug.Log("Tile: " + Loc.ToString() + " set hash: " + hash);
+            Debug.Log(Info.stayEntityHash);
         }
 
         public void OnEntityLeaving()
         {
             // Do something to entity;
-            Info.ClearEntity();
+            AreaManager.Instance.ClearEntity(Loc);
             GridManager.Instance.Nav.SetTileWeight(Loc, 1);
         }
 
