@@ -16,7 +16,7 @@ MonoBehaviour:
   description: 
   type: 0
   fSprite: {fileID: 0}
-  bSprite: {fileID: 2732243654350341029, guid: dbbbf61c854a2f8468000cad593d9e75, type: 3}
+  bSprite: {fileID: 8838930765261437045, guid: dbbbf61c854a2f8468000cad593d9e75, type: 3}
   mana:
     mana:
       fire: 0

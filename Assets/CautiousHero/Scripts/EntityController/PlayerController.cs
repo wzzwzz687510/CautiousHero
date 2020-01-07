@@ -47,17 +47,27 @@ namespace Wing.RPGSystem
             return movesteps;
         }
 
-        public void MoveToArea(Location targetLoc,bool isInstance = false)
+        public void MoveToLocation(Location targetLoc,bool isWorldMap, bool isInstance)
         {
             if (targetLoc == Loc)  return;
 
             if (!isInstance) {
-                Stack<Location> path = WorldMapManager.Instance.Nav.GetPath(Loc, targetLoc);
+                TileNavigation nav = isWorldMap ? WorldMapManager.Instance.Nav : GridManager.Instance.Nav;
+                if (!nav.HasPath(Loc, targetLoc)) return;
+                Stack<Location> path = nav.GetPath(Loc, targetLoc);
 
                 Vector3[] sortedPath = new Vector3[path.Count];
-                for (int i = 0; i < sortedPath.Length; i++) {
-                    sortedPath[i] = path.Pop().ToWorldView();
+                if (isWorldMap) {
+                    for (int i = 0; i < sortedPath.Length; i++) {
+                        sortedPath[i] = path.Pop().ToWorldView();
+                    }
                 }
+                else {
+                    for (int i = 0; i < sortedPath.Length; i++) {
+                        sortedPath[i] = path.Pop().ToAreaView();
+                    }
+                }
+
                 MovePath = sortedPath;
             }
 

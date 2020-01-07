@@ -17,3 +17,5 @@ MonoBehaviour:
   tTiles:
   - {fileID: 11400000, guid: cc389c73cb17eda4783972cfd6cc31f7, type: 2}
   - {fileID: 11400000, guid: 054d4b3ec68bfb44f8f9b9ad299e3361, type: 2}
+  - {fileID: 11400000, guid: 6f4f429917d397a46bd715f6cf372eba, type: 2}
+  - {fileID: 11400000, guid: 5cd3763a576019649b2994cca5170d1f, type: 2}

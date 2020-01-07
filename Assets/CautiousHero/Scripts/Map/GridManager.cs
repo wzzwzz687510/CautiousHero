@@ -11,7 +11,7 @@ public class GridManager : MonoBehaviour
     public TileController tilePrefab;
     public Transform tileHolder;
     
-    public TileNavigation Astar { get; private set; }
+    public TileNavigation Nav { get; private set; }
     public Dictionary<Location, TileController> TileDic { get; private set; }
 
     private WorldData worldData => Database.Instance.ActiveWorldData;
@@ -22,7 +22,7 @@ public class GridManager : MonoBehaviour
             Instance = this;
 
         TileDic = new Dictionary<Location, TileController>();
-        Astar = new TileNavigation(32, 32, 1);
+        Nav = new TileNavigation(32, 32, 1);
 
         for (int x = 0; x < 32; x++) {
             for (int y = 0; y < 32; y++) {
@@ -73,6 +73,7 @@ public class GridManager : MonoBehaviour
             for (int y = 0; y < 32; y++) {
                 Location loc = new Location(x, y);
                 TileDic[loc].UpdateSprite();
+                Nav.SetTileWeight(loc, TileDic[loc].Info.Blocked ? 0 : 1);
             }
         }
     }
@@ -200,7 +201,7 @@ public class GridManager : MonoBehaviour
         int entityMoveStep = entityAP / entity.MoveCost;
         for (int i = 0; i < entityMoveStep + 1; i++) {
             if (skill.actionPointsCost <= entityAP - i * entity.MoveCost) {
-                foreach (var loc in Astar.GetGivenDistancePoints(entity.Loc, i, false)) {
+                foreach (var loc in Nav.GetGivenDistancePoints(entity.Loc, i, false)) {
                     foreach (var effectLoc in skill.GetEffectZone(loc)) {
                         if (!zone.Contains(effectLoc)) {
                             zone.Add(effectLoc);
@@ -228,7 +229,7 @@ public class GridManager : MonoBehaviour
         int entityMoveStep = entityAP / entity.MoveCost;
         for (int i = 0; i < entityMoveStep + 1; i++) {
             if (skill.actionPointsCost <= entityAP - i * entity.MoveCost) {
-                foreach (var loc in Astar.GetGivenDistancePoints(entity.Loc, i, false)) {
+                foreach (var loc in Nav.GetGivenDistancePoints(entity.Loc, i, false)) {
                     if (avoidZone.Contains(loc))
                         continue;
                     foreach (var effectLoc in skill.GetEffectZone(loc)) {
@@ -248,7 +249,7 @@ public class GridManager : MonoBehaviour
         int availableAP = isPrediction ? Mathf.Clamp(entity.ActionPoints + entity.ActionPointsPerTurn, 0, 8) : entity.ActionPoints - skill.actionPointsCost;
         if (availableAP < 0) yield break;
         for (int i = 0; i < availableAP / entity.MoveCost + 1; i++) {
-            foreach (var loc in Astar.GetGivenDistancePoints(entity.Loc, i)) {
+            foreach (var loc in Nav.GetGivenDistancePoints(entity.Loc, i)) {
                 foreach (var cp in skill.CastPattern) {
                     foreach (var el in skill.GetSubEffectZone(loc, cp)) {
                         if (el.Equals(target)) {
@@ -262,7 +263,7 @@ public class GridManager : MonoBehaviour
 
     public bool TryGetTileOutsideZone(Entity self,HashSet<Location> zone,out TileController safeTile)
     {
-        foreach (var reachableLoc in Astar.GetGivenDistancePoints(self.Loc, self.ActionPoints/self.MoveCost)) {
+        foreach (var reachableLoc in Nav.GetGivenDistancePoints(self.Loc, self.ActionPoints/self.MoveCost)) {
             if (!zone.Contains(reachableLoc) && IsEmptyLocation(reachableLoc)) {
                 safeTile = TileDic[reachableLoc];
                 return true;
@@ -275,7 +276,7 @@ public class GridManager : MonoBehaviour
 
     public IEnumerable<Location> TryGetLocationOutsideZone(Entity self, Entity caster, HashSet<Location> zone)
     {
-        foreach (var reachableLoc in Astar.GetGivenDistancePoints(self.Loc, self.ActionPoints / self.MoveCost)) {
+        foreach (var reachableLoc in Nav.GetGivenDistancePoints(self.Loc, self.ActionPoints / self.MoveCost)) {
             if (!zone.Contains(reachableLoc) && IsEmptyLocation(reachableLoc)) {
                 yield return reachableLoc;
             }

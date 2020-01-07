@@ -280,7 +280,7 @@ public class BattleManager : MonoBehaviour
         SetVisualPlayer(player.transform.position + new Vector3(0, 0.3f, 0), player.Loc.GetTileController().SortOrder + 64);
 
         player.EntitySprite.color = new Color(1, 1, 1, 0.5f);
-        foreach (var loc in GridManager.Instance.Astar.GetGivenDistancePoints(player.Loc, player.ActionPoints / player.MoveCost)) {
+        foreach (var loc in GridManager.Instance.Nav.GetGivenDistancePoints(player.Loc, player.ActionPoints / player.MoveCost)) {
             GridManager.Instance.ChangeTileState(loc, TileState.MoveZone);
             tileZone.Add(loc);
         }

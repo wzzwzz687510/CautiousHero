@@ -64,13 +64,13 @@ namespace Wing.RPGSystem
         public static int Distance(this Location location, Location loc) 
             => Math.Abs(location.x - loc.x) + Math.Abs(location.y - loc.y);
 
-        public static bool HasPath(this Location from, Location to) => GridManager.Instance.Astar.HasPath(from, to);
+        public static bool HasPath(this Location from, Location to) => GridManager.Instance.Nav.HasPath(from, to);
 
         public static IEnumerable<Location> GetGivenDistancePoints(this Location target, int step, bool includeInside = true)
-            => GridManager.Instance.Astar.GetGivenDistancePoints(target, step, includeInside);
+            => GridManager.Instance.Nav.GetGivenDistancePoints(target, step, includeInside);
 
         public static Location GetLocationWithGivenStep(this Location from, Location to, int step)
-            => GridManager.Instance.Astar.GetLocationWithGivenStep(from, to, step);
+            => GridManager.Instance.Nav.GetLocationWithGivenStep(from, to, step);
 
         public static AreaConfig GetAreaConfig(this int hash) => AreaConfig.Dict[hash];
 

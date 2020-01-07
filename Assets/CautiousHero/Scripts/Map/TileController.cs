@@ -28,15 +28,18 @@ namespace Wing.RPGSystem
     {
         public int tTileHash;
         public ElementMana mana;
+        public bool isObstacle;
         public bool isExplored;
         public bool isEmpty;
         public int stayEntityHash;
+        public bool Blocked => isObstacle || !isEmpty;
 
         public TileInfo(int tTileHash)
         {
             this.tTileHash = tTileHash;
             TTile template = tTileHash.GetTTile();
             mana = template.mana;
+            isObstacle = template.type == TileType.Obstacle;
             isExplored = false;
             isEmpty = true;
             stayEntityHash = 0;
@@ -45,6 +48,7 @@ namespace Wing.RPGSystem
         {
             this.tTileHash = template.Hash;
             mana = template.mana;
+            isObstacle = template.type == TileType.Obstacle;
             isExplored = false;
             isEmpty = true;
             stayEntityHash = 0;
@@ -64,6 +68,13 @@ namespace Wing.RPGSystem
         {
             this.mana = mana;
         }
+
+        public void SetTemplate(TTile template)
+        {
+            this.tTileHash = template.Hash;
+            mana = template.mana;
+            isObstacle = template.type == TileType.Obstacle;
+        }
     }
 
     public class TileController : MonoBehaviour
@@ -77,6 +88,7 @@ namespace Wing.RPGSystem
 
         [Header("Colours")]
         public Color moveColor = new Color(0.36f, 1.0f, 0.36f);
+        public Color unreachableColor = new Color(1.0f, 0.2f, 0.0f);
         public Color castColor = new Color(1.0f, 0.3f, 0.0f);
         
         public Vector3 Archor { get { return m_archor.position; } }
@@ -125,7 +137,8 @@ namespace Wing.RPGSystem
                     SetStayEntityOutline(Color.black);
                     break;
                 case TileState.MoveSelected:
-                    SetCoverColor(moveColor.SetAlpha(0.7f));
+                    if(!Info.Blocked) SetCoverColor(moveColor.SetAlpha(0.7f));
+                    else SetCoverColor(unreachableColor.SetAlpha(0.7f));
                     break;
                 case TileState.CastSelected:
                     SetCoverColor(castColor.SetAlpha(0.7f));
@@ -153,14 +166,14 @@ namespace Wing.RPGSystem
         {
             // Do something to entity;
             Info.SetEntity(hash);
-            GridManager.Instance.Astar.SetTileWeight(Loc, 0);
+            GridManager.Instance.Nav.SetTileWeight(Loc, 0);
         }
 
         public void OnEntityLeaving()
         {
             // Do something to entity;
             Info.ClearEntity();
-            GridManager.Instance.Astar.SetTileWeight(Loc, 1);
+            GridManager.Instance.Nav.SetTileWeight(Loc, 1);
         }
 
         public void BindCastLocation(Location from)

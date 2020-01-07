@@ -64,6 +64,7 @@ namespace Wing.RPGSystem
                 SetLoadingPage(false);
                 worldView.gameObject.SetActive(false);
                 worldViewBG.gameObject.SetActive(false);
+                AreaManager.Instance.SetMovable(true);
             });
         }
 

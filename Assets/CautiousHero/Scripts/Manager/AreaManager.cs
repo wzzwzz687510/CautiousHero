@@ -23,6 +23,7 @@ namespace Wing.RPGSystem
         public int CurrentAreaIndex { get; private set; }
         public int ChunkIndex { get; private set; }
         public AreaInfo TempData { get; private set; }
+        public bool isMovable { get; private set; }
 
         private Location highlightTile;
         private bool hasHighlighted;
@@ -36,7 +37,7 @@ namespace Wing.RPGSystem
         private void Update()
         {
             CameraAdjustment();
-            if (BattleManager.Instance.IsInBattle || WorldMapManager.Instance.IsWorldView) return;
+            if (!isMovable|| BattleManager.Instance.IsInBattle || WorldMapManager.Instance.IsWorldView) return;
             var ray = areaCamera.ViewportPointToRay(new Vector3(Input.mousePosition.x / Screen.width,
             Input.mousePosition.y / Screen.height, Input.mousePosition.z));
             var hit = Physics2D.Raycast(ray.origin, ray.direction, 20, tileLayer);
@@ -68,7 +69,8 @@ namespace Wing.RPGSystem
         private void MoveToTile(Location tileLoc)
         {
             if (!tileLoc.IsValid()) return;
-            player.MoveToTile(tileLoc);
+
+            player.MoveToLocation(tileLoc, false, false);
         }
 
         private void HighlightVisual(Location loc)
@@ -85,6 +87,11 @@ namespace Wing.RPGSystem
                 GridManager.Instance.ChangeTileState(highlightTile, TileState.MoveSelected);
             }
 
+        }
+
+        public void SetMovable(bool isMovable)
+        {
+            this.isMovable = isMovable;
         }
 
         public void InitArea(Location areaLoc,Location spawnLoc)

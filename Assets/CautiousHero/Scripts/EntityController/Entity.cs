@@ -238,7 +238,7 @@ namespace Wing.RPGSystem
             }
 
             if (!isInstance) {
-                Stack<Location> path = GridManager.Instance.Astar.GetPath(Loc, targetLoc);
+                Stack<Location> path = GridManager.Instance.Nav.GetPath(Loc, targetLoc);
 
                 if (path.Count * MoveCost > ActionPoints) {
                     return 0;

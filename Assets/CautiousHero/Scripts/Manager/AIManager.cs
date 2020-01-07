@@ -241,8 +241,8 @@ namespace Wing.RPGSystem
                                     castableSkills.Add(new CastableSkill(creatureID, new CastSkillAction(destination, destination + cp)));
                                     destinations.Add(destination);
                                     // Set map temporary
-                                    GridManager.Instance.Astar.SetTileWeight(bot.Loc, 1);
-                                    GridManager.Instance.Astar.SetTileWeight(destination, 0);
+                                    GridManager.Instance.Nav.SetTileWeight(bot.Loc, 1);
+                                    GridManager.Instance.Nav.SetTileWeight(destination, 0);
                                     finished = true;
                                     break;
                                 }
@@ -255,10 +255,10 @@ namespace Wing.RPGSystem
             }
             // Resume map status
             foreach (var bot in Creatures) {
-                GridManager.Instance.Astar.SetTileWeight(bot.Loc, 0);
+                GridManager.Instance.Nav.SetTileWeight(bot.Loc, 0);
             }
             foreach (var loc in destinations) {
-                GridManager.Instance.Astar.SetTileWeight(loc, 1);
+                GridManager.Instance.Nav.SetTileWeight(loc, 1);
             }
         }
 

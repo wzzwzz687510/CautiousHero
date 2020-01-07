@@ -87,7 +87,7 @@ namespace Wing.RPGSystem
         {
             yield return new WaitForSeconds(time);
             player.InitPlayer(WorldData.ActiveData.attribute);
-            player.MoveToArea(currentLoc, true);
+            player.MoveToLocation(currentLoc, true, true);
             player.EntitySprite.DOFade(1, 0.5f);
         }
 
@@ -101,7 +101,7 @@ namespace Wing.RPGSystem
         private void MoveToArea(Location areaLoc)
         {
             if (!AreaDic.ContainsKey(areaLoc) || !AreaDic[areaLoc].IsExplored) return;
-            player.MoveToArea(areaLoc);
+            player.MoveToLocation(areaLoc, true, false);
             EnterArea(areaLoc);
 
             //ExploreArea(loc);
@@ -112,7 +112,7 @@ namespace Wing.RPGSystem
         {
             IsWorldView = false;
             m_worldUIController.SwitchToAreaView();
-            AreaManager.Instance.InitArea(areaLoc, AreaDic[areaLoc].AreaInfo.entranceDic[currentLoc - areaLoc]);            
+            AreaManager.Instance.InitArea(areaLoc, AreaDic[areaLoc].AreaInfo.entranceDic[currentLoc - areaLoc]);
             currentLoc = areaLoc;
         }
 
@@ -312,7 +312,7 @@ namespace Wing.RPGSystem
             foreach (var passage in preInfo.connectionDP) {
                 if (passage == Location.Up) {
                     int x = 30.Random() + 1, y = 31;
-                    info.map[x, y].tTileHash = config.tileSet.entranceTile.Hash;
+                    info.map[x, y].SetTemplate(config.tileSet.entranceTile);
                     info.entranceDic.Add(Location.Up, new Location(x, y));
                     y--;
                     while (info.map[x, y].tTileHash.GetTTile().type != TileType.Accessible) {
@@ -322,7 +322,7 @@ namespace Wing.RPGSystem
                 }
                 else if(passage == Location.Down) {
                     int x = 30.Random() + 1, y = 0;
-                    info.map[x, y].tTileHash = config.tileSet.entranceTile.Hash;
+                    info.map[x, y].SetTemplate(config.tileSet.entranceTile);
                     info.entranceDic.Add(Location.Down, new Location(x, y));
                     y++;
                     while (info.map[x, y].tTileHash.GetTTile().type != TileType.Accessible) {
@@ -332,7 +332,7 @@ namespace Wing.RPGSystem
                 }
                 else if(passage == Location.Left) {
                     int y = 30.Random() + 1, x = 0;
-                    info.map[x, y].tTileHash = config.tileSet.entranceTile.Hash;
+                    info.map[x, y].SetTemplate(config.tileSet.entranceTile);
                     info.entranceDic.Add(Location.Left, new Location(x, y));
                     x++;
                     while (info.map[x, y].tTileHash.GetTTile().type != TileType.Accessible) {
@@ -342,7 +342,7 @@ namespace Wing.RPGSystem
                 }
                 else if (passage == Location.Right) {
                     int y = 30.Random() + 1, x = 31;
-                    info.map[x, y].tTileHash = config.tileSet.entranceTile.Hash;
+                    info.map[x, y].SetTemplate(config.tileSet.entranceTile);
                     info.entranceDic.Add(Location.Right, new Location(x, y));
                     x--;
                     while (info.map[x, y].tTileHash.GetTTile().type != TileType.Accessible) {
