@@ -34,7 +34,6 @@ namespace Wing.RPGSystem
             for (int i = 0; i < defaultSkillCount; i++) {
                 ShiftASkill();
             }
-            Debug.Log("Player hash: " + Hash);
         }
 
         public override int MoveToTile(Location targetLoc, bool isInstance = false)

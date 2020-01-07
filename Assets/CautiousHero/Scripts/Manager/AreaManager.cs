@@ -65,33 +65,40 @@ namespace Wing.RPGSystem
         private void CameraAdjustment()
         {
             if (Input.mouseScrollDelta.y != 0) {
-                vCamera.m_Lens.OrthographicSize = Mathf.Clamp(areaCamera.orthographicSize - 10 * Time.deltaTime * Input.mouseScrollDelta.y, 3, 4);
+                vCamera.m_Lens.OrthographicSize = Mathf.Clamp(areaCamera.orthographicSize - 10 * 
+                    Time.deltaTime * Input.mouseScrollDelta.y, 3, 4);
             }
             float x = Input.GetAxis("Horizontal");
             float y = Input.GetAxis("Vertical");
             Vector2 axis = new Vector2(x, y);
-            viewPin.position = new Vector3(Mathf.Clamp(viewPin.position.x + x * moveSpeed, 96, 138), Mathf.Clamp(viewPin.position.y + y * moveSpeed, 96, 138), 0);
+            viewPin.position = new Vector3(Mathf.Clamp(viewPin.position.x + x * moveSpeed, 96, 138), 
+                Mathf.Clamp(viewPin.position.y + y * moveSpeed, 96, 138), 0);
         }
 
         private void MoveToTile(Location tileLoc)
         {
             if (!tileLoc.IsValid()) return;
 
-            player.MoveToLocation(tileLoc, false, false);
-            BattleCheck();
+            //player.MoveToLocation(tileLoc, false, false);
+            BattleCheck(tileLoc);
         }
 
-        private void BattleCheck()
+        private void BattleCheck(Location loc)
         {
             foreach (var spawnLoc in TempData.creatureSetHashDic.Keys) {
+                int delta = 4 - spawnLoc.Distance(loc);
                 // TODO: improve trigger condition
-                if (spawnLoc.Distance(player.Loc) < 4) {
-                    BattleManager.Instance.PrepareBattle(RemainedCreatures[spawnLoc]);
-                    m_uIController.BattleStartAnim();
-                    RemainedCreatures.Remove(spawnLoc);
-                    InBatlleCreatureSets.Add(spawnLoc);
-                }
+                if (delta < 0) continue;
+                Location stopLoc = delta > 0 ?
+                    player.Loc.GetLocationWithGivenStep(loc, player.Loc.Distance(loc) - delta) : loc;
+                player.MoveToLocation(stopLoc, false, false);
+                BattleManager.Instance.PrepareBattle(RemainedCreatures[spawnLoc]);
+                m_uIController.BattleStartAnim();
+                RemainedCreatures.Remove(spawnLoc);
+                InBatlleCreatureSets.Add(spawnLoc);
+                return;
             }
+            player.MoveToLocation(loc, false, false);
         }
 
         private void HighlightVisual(Location loc)

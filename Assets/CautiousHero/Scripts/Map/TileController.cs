@@ -157,8 +157,6 @@ namespace Wing.RPGSystem
             // Do something to entity;
             AreaManager.Instance.SetEntityHash(Loc, hash);
             GridManager.Instance.Nav.SetTileWeight(Loc, 0);
-            Debug.Log("Tile: " + Loc.ToString() + " set hash: " + hash);
-            Debug.Log(Info.stayEntityHash);
         }
 
         public void OnEntityLeaving()

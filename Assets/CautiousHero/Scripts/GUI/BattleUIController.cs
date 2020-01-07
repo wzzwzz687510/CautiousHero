@@ -128,7 +128,6 @@ public class BattleUIController : MonoBehaviour
 
     private void OnPlayerMovedEvent(int steps)
     {
-        UpdateSkillSprites();
     }
 
     private void PlayerSkillShiftAnimation(float duration)
@@ -178,7 +177,7 @@ public class BattleUIController : MonoBehaviour
 
     private void UpdateSkillSprites()
     {
-        if (player.SkillHashes.Count != player.defaultSkillCount) return;
+        if (player.SkillHashes.Count <= player.defaultSkillCount) return;
         for (int i = 0; i < player.defaultSkillCount; i++) {
             skills[i].sprite = player.SkillHashes[i].GetBaseSkill().sprite;
         }
