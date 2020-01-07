@@ -14,6 +14,7 @@ namespace Wing.RPGSystem
         public Transform areaHolder;
         public WorldMapUIController m_worldUIController;
         public TitleUIController titleUIController;
+        public BattleUIController battleUIController;
         public PlayerController player;
 
         public Dictionary<Location, AreaController> AreaDic { get; private set; }
@@ -22,6 +23,7 @@ namespace Wing.RPGSystem
         private Location currentLoc;
         private Location highlightArea;
         private bool hasHighlighted;
+        private bool isInsideArea;
 
         private Dictionary<Location, PreAreaInfo> preDic;
         private List<Location> stageAreaLocs;
@@ -37,6 +39,7 @@ namespace Wing.RPGSystem
 
         private void Update()
         {
+            if (isInsideArea) return;
             var ray = Camera.main.ViewportPointToRay(new Vector3(Input.mousePosition.x / Screen.width,
             Input.mousePosition.y / Screen.height, Input.mousePosition.z));
             var hit = Physics2D.Raycast(ray.origin, ray.direction, 20, areaLayer);
@@ -73,7 +76,7 @@ namespace Wing.RPGSystem
             StartCoroutine(DelayInitPlayer(1));
         }
 
-        public IEnumerator DelayInitPlayer(float time)
+        private IEnumerator DelayInitPlayer(float time)
         {
             yield return new WaitForSeconds(time);
             player.InitPlayer(ActiveWorldData.attribute);
@@ -94,6 +97,14 @@ namespace Wing.RPGSystem
             player.MoveToArea(loc);
             currentLoc = loc;
             ExploreArea(loc);
+            EnterArea();
+        }
+
+        private void EnterArea()
+        {
+            m_worldUIController.SwitchToAreaView();
+            battleUIController.gameObject.SetActive(true);
+            isInsideArea = true;
         }
 
         private void RelocateAreaPosition()

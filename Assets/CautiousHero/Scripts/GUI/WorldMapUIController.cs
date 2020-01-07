@@ -3,12 +3,21 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using Cinemachine;
+using DG.Tweening;
 
 namespace Wing.RPGSystem
 {
     public class WorldMapUIController : MonoBehaviour
     {
         public static WorldMapUIController Instance { get; private set; }
+
+        [Header("View")]
+        public Image worldViewBG;
+        public RawImage worldView;
+        public PlayerController worldPlayer;
+        public PlayerController areaPlayer;
+        public float switchTime = 0.3f;
 
         [Header("UI Elements")]
         public Button infoConfirmButton;
@@ -45,6 +54,13 @@ namespace Wing.RPGSystem
         public void ShowAreaInteractionBoard()
         {
 
+        }
+
+        public void SwitchToAreaView()
+        {
+            SetLoadingPage(true);
+            worldView.DOFade(0, switchTime);
+            worldViewBG.DOFade(0, switchTime).OnComplete(() => SetLoadingPage(false));
         }
 
         public void Button_System()

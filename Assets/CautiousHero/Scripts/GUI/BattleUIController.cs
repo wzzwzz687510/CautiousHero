@@ -9,6 +9,7 @@ using Wing.RPGSystem;
 public class BattleUIController : MonoBehaviour
 {
     public PlayerController player;
+    public GameObject battleUI;
 
     [Header("HP Visual")]
     public Slider playerHPBar;
@@ -66,11 +67,6 @@ public class BattleUIController : MonoBehaviour
     public Text creatureElement;
     private int selectCreatureID = -1;
     private bool isCreatureBoardDisplayed;
-
-    void Awake()
-    {
-
-    }
 
     private void FixedUpdate()
     {
