@@ -3,22 +3,31 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
-using Wing.RPGSystem;
+using UnityEngine.UI;
+using DG.Tweening;
 
-public class SkillSlot : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
+namespace Wing.RPGSystem
 {
-    public int skillID;
-
-    public delegate void SkillBoard(int id,bool isExit);
-    public SkillBoard SkillBoardEvent;
-
-    public void OnPointerEnter(PointerEventData eventData)
+    public class SkillSlot : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
     {
-        SkillBoardEvent?.Invoke(skillID, false);
-    }
+        public int slotID;
+        public Image frame;
+        public Color selectColour;
 
-    public void OnPointerExit(PointerEventData eventData)
-    {
-        SkillBoardEvent?.Invoke(-1, true);
+    public delegate void SkillBoard(int id, bool isExit);
+        public SkillBoard SkillBoardEvent;
+
+        public void OnPointerEnter(PointerEventData eventData)
+        {
+            SkillBoardEvent?.Invoke(slotID, false);
+            frame.DOColor(selectColour, 0.1f);
+        }
+
+        public void OnPointerExit(PointerEventData eventData)
+        {
+            SkillBoardEvent?.Invoke(-1, true);
+            frame.DOColor(Color.white, 0.1f);
+        }
     }
 }
+
