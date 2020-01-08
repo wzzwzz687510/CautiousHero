@@ -184,7 +184,7 @@ public class BattleUIController : MonoBehaviour
     private void MovePreviewEvent(int steps)
     {
         for (int i = 0; i < steps; i++) {
-            if (i > skills.Length) return;
+            if (i >= skills.Length) return;
             skills[i].sprite = unknownSkill;
         }
 
