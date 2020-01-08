@@ -406,9 +406,9 @@ public class BattleUIController : MonoBehaviour
                 creatureResistance.text = "?";
                 creatureElement.text = "?";
             }
-            Debug.Log(1);
-            creatureBoard.position = Input.mousePosition + 
-                new Vector3((Input.mousePosition.x > Screen.width - 300 ? -310 : 10), (Input.mousePosition.y > Screen.height - 170 ? -170 : 170), 0);
+
+            creatureBoard.position = Input.mousePosition +
+                new Vector3((Input.mousePosition.x > Screen.width - 360 ? -360 : 60), (Input.mousePosition.y < 360 ? 360 : 0), 0);
         }
     }
 

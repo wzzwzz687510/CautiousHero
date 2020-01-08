@@ -69,8 +69,8 @@ namespace Wing.RPGSystem
                 vCamera.m_Lens.OrthographicSize = Mathf.Clamp(areaCamera.orthographicSize - 10 * 
                     Time.deltaTime * Input.mouseScrollDelta.y, 3, 4);
             }
-            float x = Input.GetAxis("Horizontal");
-            float y = Input.GetAxis("Vertical");
+            float x = Input.GetAxisRaw("Horizontal");
+            float y = Input.GetAxisRaw("Vertical");
             Vector2 axis = new Vector2(x, y);
             viewPin.position = new Vector3(Mathf.Clamp(viewPin.position.x + x * moveSpeed, 96, 138), 
                 Mathf.Clamp(viewPin.position.y + y * moveSpeed, 96, 138), 0);
@@ -81,6 +81,7 @@ namespace Wing.RPGSystem
             if (!tileLoc.IsValid()) return;
 
             //player.MoveToLocation(tileLoc, false, false);
+            viewPin.localPosition = Vector3.zero;
             BattleCheck(tileLoc);
         }
 
