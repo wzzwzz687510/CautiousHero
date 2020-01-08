@@ -15,6 +15,29 @@ namespace Wing.RPGSystem
     }
 
     [System.Serializable]
+    public struct ChestEntity
+    {
+        public Location loc;
+        public int coin;
+        public List<int> relicHashes;
+
+        public ChestEntity(Location loc, BaseChest template)
+        {
+            this.loc = loc;
+            coin = template.coins;
+            relicHashes = new List<int>();
+            foreach (var relic in template.relics) {
+                relicHashes.Add(relic.Hash);
+            }
+        }
+
+        public void RemoveCoin()
+        {
+            coin = 0;
+        }
+    }
+
+    [System.Serializable]
     public struct AreaInfo
     {
         public int templateHash;
@@ -23,6 +46,7 @@ namespace Wing.RPGSystem
         public TileInfo[,] map;
         public Dictionary<Location, Location> entranceDic;// First location is direction pattern
         public Dictionary<Location, int> creatureSetHashDic;
+        public List<ChestEntity> chests;
 
         public AreaInfo(int templateHash, Location loc)
         {
@@ -31,6 +55,7 @@ namespace Wing.RPGSystem
             map = new TileInfo[32, 32];
             entranceDic = new Dictionary<Location, Location>();
             creatureSetHashDic = new Dictionary<Location, int>();
+            chests = new List<ChestEntity>();
         }
 
         public static AreaInfo GetActiveAreaInfo(int chunkID, Location loc)
