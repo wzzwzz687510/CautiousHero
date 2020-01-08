@@ -15,7 +15,7 @@ namespace Wing.RPGSystem
         [Header("Components")]
         public LayerMask tileLayer;
         public PlayerController player;
-        public BattleUIController m_uIController;
+        public BattleUIController m_battleUIController;
         public GameObject creaturePrefab;
 
         [Header("View")]
@@ -39,6 +39,7 @@ namespace Wing.RPGSystem
         {
             if (!Instance)
                 Instance = this;
+            vCamera.transform.rotation = Quaternion.identity;
         }
 
         private void Update()
@@ -93,7 +94,6 @@ namespace Wing.RPGSystem
                     player.Loc.GetLocationWithGivenStep(loc, player.Loc.Distance(loc) - delta) : loc;
                 player.MoveToLocation(stopLoc, false, false);
                 BattleManager.Instance.PrepareBattle(RemainedCreatures[spawnLoc]);
-                m_uIController.BattleStartAnim();
                 RemainedCreatures.Remove(spawnLoc);
                 InBatlleCreatureSets.Add(spawnLoc);
                 return;
@@ -134,8 +134,7 @@ namespace Wing.RPGSystem
             player.InitPlayer(WorldData.ActiveData.attribute);
             player.MoveToTile(spawnLoc, true);
 
-            m_uIController.Init();
-            GridManager.Instance.LoadMap();
+            BattleManager.Instance.Init();
             InstantiateCreature();
         }
 

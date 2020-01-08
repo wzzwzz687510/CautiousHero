@@ -95,8 +95,7 @@ public class BattleUIController : MonoBehaviour
         BindEvent();
     }
 
-    // Init after player init.
-    public void Init()
+    public void EnterAreaAnim()
     {  
         UpdateSkillSprites();
 
@@ -104,7 +103,6 @@ public class BattleUIController : MonoBehaviour
         PlayerHPChangeAnimation(1, 2);
         PlayerArmourPointsChangeAnimation(true, player.PhysicalArmourPoints);
         PlayerArmourPointsChangeAnimation(false, player.MagicalArmourPoints);
-
     }
 
     private void BindEvent()
@@ -175,9 +173,9 @@ public class BattleUIController : MonoBehaviour
         }
     }
 
-    private void UpdateSkillSprites()
+    public void UpdateSkillSprites()
     {
-        if (player.SkillHashes.Count <= player.defaultSkillCount) return;
+        if (player.SkillHashes.Count < player.defaultSkillCount) return;
         for (int i = 0; i < player.defaultSkillCount; i++) {
             skills[i].sprite = player.SkillHashes[i].GetBaseSkill().sprite;
         }
@@ -408,7 +406,9 @@ public class BattleUIController : MonoBehaviour
                 creatureResistance.text = "?";
                 creatureElement.text = "?";
             }
-            creatureBoard.position = new Vector3(10, 1070, 0);
+            Debug.Log(1);
+            creatureBoard.position = Input.mousePosition + 
+                new Vector3((Input.mousePosition.x > Screen.width - 300 ? -310 : 10), (Input.mousePosition.y > Screen.height - 170 ? -170 : 170), 0);
         }
     }
 

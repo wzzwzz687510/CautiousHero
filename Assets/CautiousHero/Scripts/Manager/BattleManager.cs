@@ -29,6 +29,7 @@ public class BattleManager : MonoBehaviour
     public LayerMask tileLayer;
     public LayerMask entityLayer;
     public PlayerController player;
+    public BattleUIController m_battleUIController;
     public Camera battleCamera;
 
     public BattleState State { get; private set; }
@@ -76,10 +77,17 @@ public class BattleManager : MonoBehaviour
         //GetComponent<BattleUIController>()?.Init();
     }
 
+    public void Init()
+    {
+        m_battleUIController.EnterAreaAnim();
+        GridManager.Instance.LoadMap();
+    }
+
     public void PrepareBattle(List<int> battleSet)
     {
         AnimationManager.Instance.OnAnimCompleted.AddListener(OnAnimCompleted);
         AIManager.Instance.Init(battleSet);
+        m_battleUIController.BattleStartAnim();
         StartNewTurn(true);
     }
 
@@ -440,6 +448,7 @@ public class BattleManager : MonoBehaviour
         if (!IsPlayerTurn)
             return;
 
+        m_battleUIController.UpdateSkillSprites();
         if(player.ActionPoints < player.SkillHashes[id].GetBaseSkill().actionPointsCost) {
             InformLackAP();
             return;
