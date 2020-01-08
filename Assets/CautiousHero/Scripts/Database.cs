@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.SceneManagement;
 
 namespace Wing.RPGSystem
@@ -51,7 +52,7 @@ namespace Wing.RPGSystem
         public EntityAttribute attribute;
         public int HealthPoints;
         public long coins;
-        public long gainedExp;
+        public long exp;
         public List<int> learnedSkills;
         public List<Location> worldMap;
         public Location worldBound;
@@ -88,7 +89,10 @@ namespace Wing.RPGSystem
 
         public int SelectSlot { get; private set; }
         private readonly string selectSlotKey = "SelectSlot";
-        private readonly string[] saveKeys = { "Slot0", "Slot1", "Slot2" };        
+        private readonly string[] saveKeys = { "Slot0", "Slot1", "Slot2" };
+
+        public UnityEvent WorldDataChangedEvent;
+        public UnityEvent AreaDataChangedEvent;
 
         private void Awake()
         {
@@ -117,23 +121,35 @@ namespace Wing.RPGSystem
 
         public void SaveAll()
         {
-            SaveData(saveKeys[SelectSlot], ActivePlayerData);
-            m_activeWorldData.mapFileCnt = AreaChunks.Length;
-            SaveData("GameData_" + ActivePlayerData.name, ActiveWorldData);
+            SavePlayerData();
+            SaveWorldData();
 
             for (int i = 0; i < AreaChunks.Length; i++) {
                 SaveData("GameData_MapChunk" + i, AreaChunks[i]);
             }
 
-            for (int i = 0; i < 3; i++) {
-                if (m_playerData[i].name != null) PlayerPrefs.SetString(saveKeys[i], m_playerData[i].name);
-            }            
+           
+        }
+
+        public void SaveAreaInfo(int chunkID, AreaInfo info)
+        {
+            AreaChunks[chunkID].areaInfo[info.loc] = info;
+            SaveData("GameData_MapChunk" + chunkID, AreaChunks[chunkID]);
+            AreaDataChangedEvent?.Invoke();
+        }
+
+        public void SaveWorldData()
+        {
+            m_activeWorldData.mapFileCnt = AreaChunks.Length;
+            SaveData("GameData_" + ActivePlayerData.name, ActiveWorldData);
         }
 
         public void SavePlayerData()
         {
             PlayerPrefs.SetInt(selectSlotKey, SelectSlot);
-            PlayerPrefs.SetString(saveKeys[SelectSlot], ActivePlayerData.name);
+            for (int i = 0; i < 3; i++) {
+                if (m_playerData[i].name != null) PlayerPrefs.SetString(saveKeys[i], m_playerData[i].name);
+            }
             SaveData(saveKeys[SelectSlot], ActivePlayerData);
         }
 
@@ -242,8 +258,9 @@ namespace Wing.RPGSystem
             int length = Mathf.CeilToInt(1.0f * areaNumber / AreaChunkSize);
             AreaChunks = new AreaData[length];
             for (int i = 0; i < length; i++) {
-                AreaChunks[i] = new AreaData();
-                AreaChunks[i].areaInfo = new Dictionary<Location, AreaInfo>();
+                AreaChunks[i] = new AreaData {
+                    areaInfo = new Dictionary<Location, AreaInfo>()
+                };
             }
         }
 
@@ -272,10 +289,23 @@ namespace Wing.RPGSystem
             m_activeWorldData.worldBound = new Location(x, y);
         }
 
-        public void SaveAreaInfo(int chunkID,AreaInfo info)
+        public void ApplyResourceChange(int coin, int exp,bool isIncrease)
         {
-            AreaChunks[chunkID].areaInfo[info.loc] = info;
-            SaveData("GameData_MapChunk" + chunkID, AreaChunks[chunkID]);
+            if (isIncrease) {
+                m_activeWorldData.coins += coin;
+                m_activeWorldData.exp += exp;
+            }
+            else {
+                m_activeWorldData.coins -= coin;
+                m_activeWorldData.exp -= exp;
+            }
+            WorldDataChangedEvent?.Invoke();
+        }
+
+        public void LearnASkill(int skillHash)
+        {
+            m_activeWorldData.learnedSkills.Add(skillHash);
+            WorldDataChangedEvent?.Invoke();
         }
     }
 }
