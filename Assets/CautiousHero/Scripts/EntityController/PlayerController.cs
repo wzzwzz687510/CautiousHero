@@ -27,8 +27,13 @@ namespace Wing.RPGSystem
             EntityName = "Player";
             Hash = EntityManager.Instance.AddEntity(this);            
             BuffManager = new BuffManager(Hash);
+            InitSkillDeck();
 
             HealthPoints = MaxHealthPoints;
+        }
+
+        public void InitSkillDeck()
+        {
             SkillDeck = new List<int>(WorldData.ActiveData.learnedSkills);
             SkillDiscardPile = new List<int>();
             for (int i = 0; i < defaultSkillCount; i++) {
@@ -112,8 +117,6 @@ namespace Wing.RPGSystem
         public void RemoveASkill(int skillID)
         {
             if (SkillDeck.Count == 0) {
-                //SkillDeadwood.Sort();
-                // might be new List<int>(SkillDeadwood)
                 SkillDeck = SkillDiscardPile;
                 SkillDiscardPile = new List<int>();
             }
@@ -128,8 +131,6 @@ namespace Wing.RPGSystem
         public void ShiftASkill()
         {
             if(SkillDeck.Count==0) {
-                //SkillDeadwood.Sort();
-                // might be new List<int>(SkillDeadwood)
                 SkillDeck = SkillDiscardPile;
                 SkillDiscardPile = new List<int>();
             }
@@ -142,6 +143,23 @@ namespace Wing.RPGSystem
 
             SkillDiscardPile.Add(SkillHashes[defaultSkillCount]);
             SkillHashes.RemoveAt(defaultSkillCount);            
+        }
+
+        public void AddASkillToDeck(int skillHash)
+        {
+            SkillDeck.Add(skillHash);
+        }
+
+        public void AddASkillToDiscardPile(int skillHash)
+        {
+            SkillDiscardPile.Add(skillHash);
+        }
+
+        public void AddASkillToMind(int insertID,int skillHash)
+        {
+            SkillHashes.Insert(insertID, skillHash);
+            SkillHashes.RemoveAt(defaultSkillCount);
+
         }
 
         private void SaveStatus()
