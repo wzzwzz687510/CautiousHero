@@ -54,6 +54,11 @@ public class BattleUIController : MonoBehaviour
     private int selectSkillID=-1;
     private bool isSkillBoardDisplayed;
 
+    [Header("Skill Learning Page")]
+    public Image[] skillLearningImages;
+    public GameObject skillLearningPage;
+    public SkillSlot[] skillStudySlots;
+
     private float timer;
     private bool startCount;
 
@@ -116,6 +121,9 @@ public class BattleUIController : MonoBehaviour
         player.OnAPChanged.AddListener(OnPlayerAPChanged);
         for (int i = 0; i < skillSlots.Length; i++) {
             skillSlots[i].SkillBoardEvent += OnSkillBoardEvent;
+        }
+        for (int i = 0; i < skillStudySlots.Length; i++) {
+            skillStudySlots[i].SkillBoardEvent += OnSkillBoardEvent;
         }
 
         BattleManager.Instance.OnTurnSwitched += OnTurnSwitched;
@@ -412,5 +420,11 @@ public class BattleUIController : MonoBehaviour
         }
     }
 
-
+    public void ShowSkillLearningPage(bool isActive)
+    {
+        for (int i = 0; i < skillStudySlots.Length; i++) {
+            skillLearningImages[i].sprite = AreaManager.Instance.RandomedSkillHashes[i].GetBaseSkill().sprite;
+        }
+        skillLearningPage.SetActive(isActive);
+    }
 }

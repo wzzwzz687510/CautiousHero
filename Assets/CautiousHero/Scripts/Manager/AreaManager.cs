@@ -12,11 +12,17 @@ namespace Wing.RPGSystem
 
         public float moveSpeed = 0.1f;
 
+        [Header("Test")]
+        public BaseSkill[] skills;
+
         [Header("Components")]
         public LayerMask tileLayer;
         public PlayerController player;
         public BattleUIController m_battleUIController;
+        public RewardUIController m_lootUIController;
+        public RewardUIController m_chestUIController;
         public GameObject creaturePrefab;
+        public GameObject chestPrefab;
 
         [Header("View")]
         public Camera areaCamera;
@@ -27,11 +33,13 @@ namespace Wing.RPGSystem
         public int CurrentAreaIndex { get; private set; }
         public int ChunkIndex { get; private set; }
         public AreaInfo TempData { get; private set; }
-        public bool IsMovable { get; private set; }
+        public bool MoveCheck { get; private set; }
         public Dictionary<Location, List<int>> RemainedCreatures { get; private set; } // key - spawn point, value - creature set
         public List<Location> InBatlleCreatureSets { get; private set; }
+        public List<int> RandomedSkillHashes { get; private set; }
 
         private Transform creatureHolder;
+        private Transform chestHolder;
         private Location highlightTile;
         private bool hasHighlighted;
 
@@ -45,16 +53,31 @@ namespace Wing.RPGSystem
         private void Update()
         {
             CameraAdjustment();
-            if (!IsMovable|| BattleManager.Instance.IsInBattle || WorldMapManager.Instance.IsWorldView) return;
+            if (!MoveCheck || BattleManager.Instance.IsInBattle || WorldMapManager.Instance.IsWorldView) return;
             var ray = areaCamera.ViewportPointToRay(new Vector3(Input.mousePosition.x / Screen.width,
             Input.mousePosition.y / Screen.height, Input.mousePosition.z));
             var hit = Physics2D.Raycast(ray.origin, ray.direction, 20, tileLayer);
             if (hit) {
-                var ac = hit.transform.parent.GetComponent<TileController>();
-                HighlightVisual(ac.Loc);
+                if (hit.transform.CompareTag("Chest")) {
+                    if (Input.GetMouseButtonUp(0)) {
+                        hit.transform.GetComponent<Animator>().Play("Wooden");
+                        m_chestUIController.gameObject.SetActive(true);
+                        int chestID = int.Parse(hit.transform.name);
+                        ChestEntity ce = TempData.chests[chestID];
+                        m_chestUIController.SetChestID(chestID);
+                        m_chestUIController.AddContent(LootType.Coin, ce.coin);
+                        foreach (var relic in ce.relicHashes) {
+                            m_chestUIController.AddContent(LootType.Relic, relic);
+                        }
+                    }
+                }
+                else {
+                    var ac = hit.transform.parent.GetComponent<TileController>();
+                    HighlightVisual(ac.Loc);
 
-                if (Input.GetMouseButtonDown(0)) {
-                    MoveToTile(ac.Loc);
+                    if (Input.GetMouseButtonDown(0)) {
+                        MoveToTile(ac.Loc);
+                    }
                 }
             }
             else if (hasHighlighted) {
@@ -66,13 +89,13 @@ namespace Wing.RPGSystem
         private void CameraAdjustment()
         {
             if (Input.mouseScrollDelta.y != 0) {
-                vCamera.m_Lens.OrthographicSize = Mathf.Clamp(areaCamera.orthographicSize - 10 * 
+                vCamera.m_Lens.OrthographicSize = Mathf.Clamp(areaCamera.orthographicSize - 10 *
                     Time.deltaTime * Input.mouseScrollDelta.y, 3, 4);
             }
             float x = Input.GetAxisRaw("Horizontal");
             float y = Input.GetAxisRaw("Vertical");
             Vector2 axis = new Vector2(x, y);
-            viewPin.position = new Vector3(Mathf.Clamp(viewPin.position.x + x * moveSpeed, 96, 138), 
+            viewPin.position = new Vector3(Mathf.Clamp(viewPin.position.x + x * moveSpeed, 96, 138),
                 Mathf.Clamp(viewPin.position.y + y * moveSpeed, 96, 138), 0);
         }
 
@@ -94,12 +117,42 @@ namespace Wing.RPGSystem
                 Location stopLoc = delta > 0 ?
                     player.Loc.GetLocationWithGivenStep(loc, player.Loc.Distance(loc) - delta) : loc;
                 player.MoveToLocation(stopLoc, false, false);
-                BattleManager.Instance.PrepareBattle(RemainedCreatures[spawnLoc]);
+                BattleManager.Instance.NewBattle(RemainedCreatures[spawnLoc]);
                 RemainedCreatures.Remove(spawnLoc);
                 InBatlleCreatureSets.Add(spawnLoc);
+                MoveCheck = false;
                 return;
             }
             player.MoveToLocation(loc, false, false);
+        }
+
+        private void InstantiateCreatures()
+        {
+            foreach (var spawnLoc in TempData.creatureSetHashDic.Keys) {
+                List<int> creatureHashes = new List<int>();
+                foreach (var ce in TempData.creatureSetHashDic[spawnLoc].GetCreatureSet().creatures) {
+                    var cc = Instantiate(creaturePrefab, creatureHolder).GetComponent<CreatureController>();
+                    cc.InitCreature(ce.tCreature, ce.pattern + spawnLoc);
+                    creatureHashes.Add(cc.Hash);
+                    SetEntityHash(cc.Loc, cc.Hash);
+                }
+                RemainedCreatures.Add(spawnLoc, creatureHashes);
+            }
+        }
+
+        private void InstantiateAbotics()
+        {
+            // Init Chests
+            if (TempData.chests.Count != 0) {
+                for (int i = 0; i < TempData.chests.Count; i++) {
+                    Instantiate(chestPrefab, chestHolder).name = (i).ToString();
+                }
+            }
+        }
+
+        private void SaveAreaInfo()
+        {
+            AreaInfo.SaveToDatabase(ChunkIndex, TempData);
         }
 
         private void HighlightVisual(Location loc)
@@ -118,47 +171,60 @@ namespace Wing.RPGSystem
 
         }
 
-        public void SetMovable(bool isMovable)
+        public void SetMoveCheck(bool isCheck)
         {
-            this.IsMovable = isMovable;
+            MoveCheck = isCheck;
         }
 
-        public void InitArea(Location areaLoc,Location spawnLoc)
+        public void InitArea(Location areaLoc, Location spawnLoc)
         {
             CurrentAreaLoc = areaLoc;
             CurrentAreaIndex = WorldData.ActiveData.worldMap.IndexOf(CurrentAreaLoc);
             ChunkIndex = CurrentAreaIndex / Database.AreaChunkSize;
             TempData = AreaInfo.GetActiveAreaInfo(ChunkIndex, CurrentAreaLoc);
+
+            if (chestHolder) Destroy(chestHolder.gameObject);
+            if (creatureHolder) Destroy(creatureHolder.gameObject);
+            chestHolder = new GameObject("Chest Holder").transform;
+            creatureHolder = new GameObject("Creature Holder").transform;
+
             RemainedCreatures = new Dictionary<Location, List<int>>();
             InBatlleCreatureSets = new List<Location>();
+            EntityManager.Instance.ResetEntityDicionary();
+            RandomedSkillHashes = new List<int>();
 
             player.InitPlayer(WorldData.ActiveData.attribute);
             player.MoveToTile(spawnLoc, true);
 
-            BattleManager.Instance.Init();
-            InstantiateCreature();
+            BattleManager.Instance.PrepareBattle();
+            InstantiateCreatures();
+            InstantiateAbotics();
         }
 
-        public void InstantiateCreature()
+        public void LeaveArea()
         {
-            if (creatureHolder) Destroy(creatureHolder.gameObject);
-            creatureHolder = new GameObject("Creature Holder").transform;
+            player.Loc.GetTileController().OnEntityLeaving();
+            SaveAreaInfo();
+        }
 
-            foreach (var spawnLoc in TempData.creatureSetHashDic.Keys) {
-                List<int> creatureHashes = new List<int>();
-                foreach (var ce in TempData.creatureSetHashDic[spawnLoc].GetCreatureSet().creatures) {
-                    var cc = Instantiate(creaturePrefab, creatureHolder).GetComponent<CreatureController>();
-                    cc.InitCreature(ce.tCreature, ce.pattern + spawnLoc);
-                    creatureHashes.Add(cc.Hash);
-                    SetEntityHash(cc.Loc, cc.Hash);
+        public void CompleteBattle()
+        {
+            int coin = 0, exp = 0;
+            foreach (var setID in InBatlleCreatureSets) {
+                CreatureSet set = TempData.creatureSetHashDic[setID].GetCreatureSet();
+                TempData.creatureSetHashDic.Remove(setID);
+                coin += set.coin;
+                exp += set.exp;
+                if (set.chest != null) {
+                    Instantiate(chestPrefab, chestHolder).name = (TempData.chests.Count + 1).ToString();
+                    TempData.chests.Add(new ChestEntity(setID, set.chest));
                 }
-                RemainedCreatures.Add(spawnLoc, creatureHashes);
-            } 
-        }
+                m_lootUIController.AddContent(LootType.Skill, 1);
+            }
+            m_lootUIController.AddContent(LootType.Coin, coin);
+            m_lootUIController.AddContent(LootType.Exp, exp);
+            m_lootUIController.gameObject.SetActive(true);
 
-        public void SaveAreaInfo()
-        {
-            AreaInfo.SaveToDatabase(ChunkIndex, TempData);
         }
 
         public void SetEntityHash(Location loc, int hash)
@@ -171,6 +237,36 @@ namespace Wing.RPGSystem
         {
             TempData.map[loc.x, loc.y].stayEntityHash = 0;
             TempData.map[loc.x, loc.y].isEmpty = true;
+        }
+
+        public void PrepareChooseSkill()
+        {
+            RandomedSkillHashes.Clear();
+            for (int i = 0; i < 3; i++) {
+                RandomedSkillHashes.Add(skills[skills.Length.Random()].Hash);
+            }
+            m_battleUIController.ShowSkillLearningPage(true);
+        }
+
+        public void Button_ChooseSkill(int id)
+        {
+            Database.Instance.LearnASkill(RandomedSkillHashes[id]);
+            m_battleUIController.ShowSkillLearningPage(false);
+            m_lootUIController.CloseCheck();         
+        }
+
+        public void RemoveChestCoin(int chestID)
+        {
+            Debug.Log("Before: " + TempData.chests[chestID].coin);
+            TempData.chests[chestID].RemoveCoin();
+            Debug.Log("After: " + TempData.chests[chestID].coin);
+            SaveAreaInfo();
+        }
+
+        public void RemoveChestRelic(int chestID, int relicHash)
+        {
+            TempData.chests[chestID].relicHashes.Remove(relicHash);
+            SaveAreaInfo();
         }
     }
 }

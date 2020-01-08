@@ -15,7 +15,8 @@ namespace Wing.RPGSystem
         Amulet
     }
 
-    [CreateAssetMenu(fileName = "Equipment", menuName = "Wing/Scriptable Equipments/BaseEquipment", order = 50)]
+    // Obsolute
+    //[CreateAssetMenu(fileName = "Equipment", menuName = "Wing/Scriptable Equipments/BaseEquipment", order = 50)]
     public class BaseEquipment : ScriptableObject
     {
         [Header("Basic Parameters")]

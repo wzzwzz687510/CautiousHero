@@ -8,25 +8,31 @@ namespace Wing.RPGSystem
     {
         public static EntityManager Instance { get; private set; }
 
-        public Dictionary<int, Entity> entityDic = new Dictionary<int, Entity>();
+        public Dictionary<int, Entity> EntityDic { get; private set; }
 
         private void Awake()
         {
             if (!Instance)
                 Instance = this;
+            EntityDic = new Dictionary<int, Entity>();
+        }
+
+        public void ResetEntityDicionary()
+        {
+            EntityDic.Clear();
         }
 
         public int AddEntity(Entity entity)
         {
-            var hash = (entity.EntityName+ entityDic.Count).GetStableHashCode();
-            if (!entityDic.ContainsKey(hash))
-                entityDic.Add(hash, entity);
+            var hash = (entity.EntityName+ EntityDic.Count).GetStableHashCode();
+            if (!EntityDic.ContainsKey(hash))
+                EntityDic.Add(hash, entity);
             return hash;
         }
 
         public bool TryGetEntity(int hash,out Entity entity)
         {
-            return entityDic.TryGetValue(hash, out entity);
+            return EntityDic.TryGetValue(hash, out entity);
         }
     }
 }

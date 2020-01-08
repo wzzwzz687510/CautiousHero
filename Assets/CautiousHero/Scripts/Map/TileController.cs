@@ -32,7 +32,7 @@ namespace Wing.RPGSystem
         public bool isExplored;
         public bool isEmpty;
         public int stayEntityHash;
-        public bool Blocked => isObstacle || !isEmpty;
+        public bool IsBlocked => isObstacle || !isEmpty;
 
         public TileInfo(int tTileHash)
         {
@@ -127,7 +127,7 @@ namespace Wing.RPGSystem
                     SetStayEntityOutline(Color.black);
                     break;
                 case TileState.MoveSelected:
-                    if(!Info.Blocked) SetCoverColor(moveColor.SetAlpha(0.7f));
+                    if(!Info.IsBlocked) SetCoverColor(moveColor.SetAlpha(0.7f));
                     else SetCoverColor(unreachableColor.SetAlpha(0.7f));
                     break;
                 case TileState.CastSelected:

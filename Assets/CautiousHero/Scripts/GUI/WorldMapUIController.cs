@@ -25,6 +25,7 @@ namespace Wing.RPGSystem
         public Text playerName;
         public Text hpText;
         public Text coinText;
+        public Text expText;
 
         [Header("Pages")]
         public GameObject loadingPage;
@@ -37,6 +38,8 @@ namespace Wing.RPGSystem
         {
             if (!Instance)
                 Instance = this;
+
+            Database.Instance.WorldDataChangedEvent.AddListener(UpdateUI);
         }
 
         public void UpdateUI()
@@ -44,6 +47,7 @@ namespace Wing.RPGSystem
             playerName.text = ActivePlayerData.name;
             hpText.text = ActiveWorldData.HealthPoints + "/" + ActiveWorldData.attribute.maxHealth;
             coinText.text = ActiveWorldData.coins.ToString();
+            expText.text = ActiveWorldData.exp.ToString();
         }
 
         public void SetLoadingPage(bool isShow)
@@ -64,7 +68,7 @@ namespace Wing.RPGSystem
                 SetLoadingPage(false);
                 worldView.gameObject.SetActive(false);
                 worldViewBG.gameObject.SetActive(false);
-                AreaManager.Instance.SetMovable(true);
+                AreaManager.Instance.SetMoveCheck(true);
             });
         }
 

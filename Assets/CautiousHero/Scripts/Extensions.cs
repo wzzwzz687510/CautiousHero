@@ -87,10 +87,12 @@ namespace Wing.RPGSystem
         public static CreatureSet GetCreatureSet(this int hash) => CreatureSet.Dict[hash];
 
         public static Entity GetEntity(this int hash) {
-            if (!EntityManager.Instance.entityDic.TryGetValue(hash, out Entity entity))
+            if (!EntityManager.Instance.EntityDic.TryGetValue(hash, out Entity entity))
                 Debug.LogError("Entity manager do not have given hash: " + hash + " entity.");
             return entity;
         }
+
+        public static BaseRelic GetRelic(this int hash) => BaseRelic.Dict[hash];
 
         public static Color SetAlpha(this Color c, float a)
         {

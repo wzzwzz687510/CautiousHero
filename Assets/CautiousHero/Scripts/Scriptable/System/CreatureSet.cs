@@ -23,7 +23,7 @@ namespace Wing.RPGSystem
         public int difficulty;
         public int coin;
         public int exp;
-        public BaseLoot loot;
+        public BaseChest chest;
 
         static Dictionary<int, CreatureSet> cache;
         public static Dictionary<int, CreatureSet> Dict {

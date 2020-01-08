@@ -311,8 +311,9 @@ namespace Wing.RPGSystem
                     info.map[x, y].SetTemplate(config.tileSet.entranceTile);
                     info.entranceDic.Add(Location.Up, new Location(x, y));
                     y--;
-                    while (info.map[x, y].tTileHash.GetTTile().type != TileType.Accessible) {
+                    while (info.map[x, y].IsBlocked) {
                         info.map[x, y].tTileHash = config.tileSet.defaultTile.Hash;
+                        info.map[x, y].isObstacle = false;
                         y--;
                     }
                 }
@@ -321,8 +322,9 @@ namespace Wing.RPGSystem
                     info.map[x, y].SetTemplate(config.tileSet.entranceTile);
                     info.entranceDic.Add(Location.Down, new Location(x, y));
                     y++;
-                    while (info.map[x, y].tTileHash.GetTTile().type != TileType.Accessible) {
+                    while (info.map[x, y].IsBlocked) {
                         info.map[x, y].tTileHash = config.tileSet.defaultTile.Hash;
+                        info.map[x, y].isObstacle = false;
                         y++;
                     }
                 }
@@ -331,8 +333,9 @@ namespace Wing.RPGSystem
                     info.map[x, y].SetTemplate(config.tileSet.entranceTile);
                     info.entranceDic.Add(Location.Left, new Location(x, y));
                     x++;
-                    while (info.map[x, y].tTileHash.GetTTile().type != TileType.Accessible) {
+                    while (info.map[x, y].IsBlocked) {
                         info.map[x, y].tTileHash = config.tileSet.defaultTile.Hash;
+                        info.map[x, y].isObstacle = false;
                         x++;
                     }
                 }
@@ -341,8 +344,9 @@ namespace Wing.RPGSystem
                     info.map[x, y].SetTemplate(config.tileSet.entranceTile);
                     info.entranceDic.Add(Location.Right, new Location(x, y));
                     x--;
-                    while (info.map[x, y].tTileHash.GetTTile().type != TileType.Accessible) {
+                    while (info.map[x, y].IsBlocked) {
                         info.map[x, y].tTileHash = config.tileSet.defaultTile.Hash;
+                        info.map[x, y].isObstacle = false;
                         x--;
                     }
                 }

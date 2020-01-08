@@ -77,13 +77,13 @@ public class BattleManager : MonoBehaviour
         //GetComponent<BattleUIController>()?.Init();
     }
 
-    public void Init()
+    public void PrepareBattle()
     {
         m_battleUIController.EnterAreaAnim();
         GridManager.Instance.LoadMap();
     }
 
-    public void PrepareBattle(List<int> battleSet)
+    public void NewBattle(List<int> battleSet)
     {
         AnimationManager.Instance.OnAnimCompleted.AddListener(OnAnimCompleted);
         AIManager.Instance.Init(battleSet);
@@ -93,7 +93,7 @@ public class BattleManager : MonoBehaviour
 
     private void OnAnimCompleted()
     {
-        if (GameConditionCheck())
+        if (!IsInBattle || GameConditionCheck())
             return;
 
         if (State == BattleState.PlayerAnim) {
@@ -411,9 +411,8 @@ public class BattleManager : MonoBehaviour
 
     private void BattleVictory()
     {
-        ChangeState(BattleState.End);
-        // To do
-        win.SetActive(true);
+        ChangeState(BattleState.FreeMove);
+        AreaManager.Instance.CompleteBattle();
         Debug.Log("You win");
     }
 

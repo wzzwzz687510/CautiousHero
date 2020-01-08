@@ -74,7 +74,7 @@ public class GridManager : MonoBehaviour
             for (int y = 0; y < 32; y++) {
                 Location loc = new Location(x, y);
                 TileDic[loc].UpdateSprite();
-                Nav.SetTileWeight(loc, TileDic[loc].Info.Blocked ? 0 : 1);
+                Nav.SetTileWeight(loc, TileDic[loc].Info.IsBlocked ? 0 : 1);
             }
         }
     }
