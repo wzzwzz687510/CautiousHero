@@ -197,15 +197,14 @@ namespace Wing.RPGSystem
             MoveCheck = isCheck;
         }
 
-        public void InitArea(Location from, Location to)
+        public void InitArea(Location to, Location directionPattern)
         {
-            if (from == to) return;
             // Fetch world data
             CurrentAreaLoc = to;
             CurrentAreaIndex = WorldData.ActiveData.worldMap.IndexOf(CurrentAreaLoc);
             ChunkIndex = CurrentAreaIndex / Database.AreaChunkSize;
             TempData = AreaInfo.GetActiveAreaInfo(ChunkIndex, CurrentAreaLoc);
-            Location spawnLoc = TempData.entranceDic[from - to];
+            Location spawnLoc = TempData.entranceDic[directionPattern];
 
             // Reset holders
             if (chestHolder) Destroy(chestHolder.gameObject);

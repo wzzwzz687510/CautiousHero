@@ -143,9 +143,10 @@ namespace Wing.RPGSystem
         {
             if (!AreaDic.ContainsKey(areaLoc) || areaLoc == new Location(4, 0)) return;
             IsWorldView = false;
-            m_worldUIController.SwitchToAreaView();          
-            AreaManager.Instance.InitArea(currentLoc, areaLoc);
-            
+            m_worldUIController.SwitchToAreaView();
+            if (areaLoc != currentLoc) {                
+                AreaManager.Instance.InitArea(areaLoc, Nav.GetDirectionPattern(currentLoc, areaLoc));
+            }
             currentLoc = areaLoc;
         }
 

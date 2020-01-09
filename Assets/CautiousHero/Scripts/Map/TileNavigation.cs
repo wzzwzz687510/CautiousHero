@@ -36,6 +36,11 @@ namespace Wing.RPGSystem
             return new AStarSearch(grid, from, to).cameFrom.ContainsKey(to);
         }
 
+        public Location GetDirectionPattern(Location from, Location to)
+        {
+            return new AStarSearch(grid, from, to).cameFrom[to] - to;
+        }
+
         public Location GetLocationWithGivenStep(Location from, Location to, int step)
         {
             Location destination = to;
