@@ -426,6 +426,7 @@ public class BattleManager : MonoBehaviour
 
     private void BattleVictory()
     {
+        AnimationManager.Instance.Clear();
         ChangeState(BattleState.FreeMove);
         AreaManager.Instance.CompleteBattle();
         Debug.Log("You win");
