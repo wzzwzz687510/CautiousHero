@@ -15,6 +15,7 @@ public class GridManager : MonoBehaviour
     public Dictionary<Location, TileController> TileDic { get; private set; }
 
     private List<Location> changedTies;
+    private List<Location> exploredTiles;
 
     private void Awake()
     {
@@ -23,6 +24,7 @@ public class GridManager : MonoBehaviour
 
         TileDic = new Dictionary<Location, TileController>();
         changedTies = new List<Location>();
+        exploredTiles = new List<Location>();
         Nav = new TileNavigation(32, 32, 1);
 
         for (int x = 0; x < 32; x++) {
@@ -70,15 +72,28 @@ public class GridManager : MonoBehaviour
 
     public void LoadMap()
     {
+        exploredTiles.Clear();
         for (int x = 0; x < 32; x++) {
             for (int y = 0; y < 32; y++) {
                 Location loc = new Location(x, y);
                 TileDic[loc].UpdateSprite();
+                if (TileDic[loc].Info.isExplored) exploredTiles.Add(loc);
                 Nav.SetTileWeight(loc, TileDic[loc].Info.IsBlocked ? 0 : 1);
             }
         }
     }
 
+    public bool CheckEntrance(Location loc)
+    {
+        return exploredTiles.Contains(loc);
+    }
+
+    public void SaveExplorationState()
+    {
+        foreach (var tile in exploredTiles) {
+            AreaManager.Instance.SetExploration(tile);
+        }
+    }
 
     public void ResetAllTiles()
     {

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using Cinemachine;
+using UnityEngine.EventSystems;
 
 namespace Wing.RPGSystem
 {
@@ -18,7 +19,7 @@ namespace Wing.RPGSystem
         [Header("Components")]
         public LayerMask tileLayer;
         public PlayerController player;
-        public BattleUIController m_battleUIController;
+        public AreaUIController m_areaUIController;
         public RewardUIController m_lootUIController;
         public RewardUIController m_chestUIController;
         public GameObject creaturePrefab;
@@ -54,6 +55,7 @@ namespace Wing.RPGSystem
         {
             CameraAdjustment();
             if (!MoveCheck || BattleManager.Instance.IsInBattle || WorldMapManager.Instance.IsWorldView) return;
+            if (EventSystem.current.IsPointerOverGameObject()) return;
             var ray = areaCamera.ViewportPointToRay(new Vector3(Input.mousePosition.x / Screen.width,
             Input.mousePosition.y / Screen.height, Input.mousePosition.z));
             var hit = Physics2D.Raycast(ray.origin, ray.direction, 20, tileLayer);
@@ -176,26 +178,33 @@ namespace Wing.RPGSystem
             MoveCheck = isCheck;
         }
 
-        public void InitArea(Location areaLoc, Location spawnLoc)
+        public void InitArea(Location from, Location to)
         {
-            CurrentAreaLoc = areaLoc;
+            if (from == to) return;
+            // Fetch world data
+            CurrentAreaLoc = to;
             CurrentAreaIndex = WorldData.ActiveData.worldMap.IndexOf(CurrentAreaLoc);
             ChunkIndex = CurrentAreaIndex / Database.AreaChunkSize;
             TempData = AreaInfo.GetActiveAreaInfo(ChunkIndex, CurrentAreaLoc);
+            Location spawnLoc = TempData.entranceDic[from - to];
 
+            // Reset holders
             if (chestHolder) Destroy(chestHolder.gameObject);
             if (creatureHolder) Destroy(creatureHolder.gameObject);
             chestHolder = new GameObject("Chest Holder").transform;
             creatureHolder = new GameObject("Creature Holder").transform;
 
+            // Reset lists and dictionaries
             RemainedCreatures = new Dictionary<Location, List<int>>();
             InBatlleCreatureSets = new List<Location>();
             EntityManager.Instance.ResetEntityDicionary();
             RandomedSkillHashes = new List<int>();
 
+            // Init player
             player.InitPlayer(WorldData.ActiveData.attribute);
             player.MoveToTile(spawnLoc, true);
 
+            // Init battle system
             BattleManager.Instance.PrepareBattle();
             InstantiateCreatures();
             InstantiateAbotics();
@@ -209,6 +218,7 @@ namespace Wing.RPGSystem
 
         public void CompleteBattle()
         {
+            m_areaUIController.SetSkillsUnknown();
             AudioManager.Instance.PlayPeacefulClip();
             int coin = 0, exp = 0;
             foreach (var setID in InBatlleCreatureSets) {
@@ -226,6 +236,22 @@ namespace Wing.RPGSystem
             m_lootUIController.AddContent(LootType.Exp, exp);
             m_lootUIController.gameObject.SetActive(true);
             SaveAreaInfo();
+        }
+
+        public void CompleteExploration()
+        {
+            GridManager.Instance.SaveExplorationState();
+            foreach (var dp in TempData.entranceDic.Keys) {
+                if(GridManager.Instance.CheckEntrance(TempData.entranceDic[dp])) {
+                    WorldMapManager.Instance.DiscoverArea(TempData.loc + dp);
+                }
+            }
+            WorldMapManager.Instance.CompleteAnArea();
+        }
+
+        public void SetExploration(Location loc)
+        {
+            TempData.map[loc.x, loc.y].isExplored = true;
         }
 
         public void SetEntityHash(Location loc, int hash)
@@ -246,13 +272,13 @@ namespace Wing.RPGSystem
             for (int i = 0; i < 3; i++) {
                 RandomedSkillHashes.Add(skills[skills.Length.Random()].Hash);
             }
-            m_battleUIController.ShowSkillLearningPage(true);
+            m_areaUIController.ShowSkillLearningPage(true);
         }
 
         public void Button_ChooseSkill(int id)
         {
             Database.Instance.LearnASkill(RandomedSkillHashes[id]);
-            m_battleUIController.ShowSkillLearningPage(false);
+            m_areaUIController.ShowSkillLearningPage(false);
             m_lootUIController.CloseCheck();         
         }
 

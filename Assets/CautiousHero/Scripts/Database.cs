@@ -272,11 +272,35 @@ namespace Wing.RPGSystem
             return sr.Next(min, max);
         }
 
+        public List<Location> GetDiscoveredAreaLocs()
+        {
+            List<Location> locs = new List<Location>();
+            foreach (var chunk in AreaChunks) {
+                foreach (var ai in chunk.areaInfo.Values) {
+                    if (ai.discovered) locs.Add(ai.loc);
+                }
+            }
+
+            return locs;
+        }
+
+        public void SetAreaDiscovered(Location loc)
+        {
+            foreach (var chunk in AreaChunks) {
+                if (chunk.areaInfo.ContainsKey(loc)) {
+                    AreaInfo ai = chunk.areaInfo[loc];
+                    ai.discovered = true;
+                    chunk.areaInfo[loc] = ai;
+                    break;
+                }
+            }
+        }
+
         public bool TryGetAreaInfo(Location key, out AreaInfo areaInfo)
         {
             foreach (var chunk in AreaChunks) {
                 if (chunk.areaInfo.ContainsKey(key)) {
-                    areaInfo = chunk.areaInfo[key];
+                    chunk.areaInfo.TryGetValue(key,out areaInfo);
                     return true;
                 }
             }

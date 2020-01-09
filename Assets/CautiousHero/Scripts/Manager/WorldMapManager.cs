@@ -66,6 +66,19 @@ namespace Wing.RPGSystem
             }
         }
 
+        public void DiscoverArea(Location loc)
+        {
+            AreaDic[loc].Init(loc);
+            Database.Instance.SetAreaDiscovered(loc);
+            Debug.Log(string.Format("Area {0} discover: {1}",loc.ToString(),AreaDic[loc].AreaInfo.discovered));
+        }
+
+        public void CompleteAnArea()
+        {
+            IsWorldView = true;
+            m_worldUIController.SwitchToWorldView();
+        }
+
         public void ContinueGame()
         {
             AudioManager.Instance.PlayPeacefulClip();
@@ -74,14 +87,31 @@ namespace Wing.RPGSystem
 
             // Init map visual
             Location bound = WorldData.ActiveData.worldBound;
-            Nav = new TileNavigation(bound.x, bound.y, 0);
-            RelocateAreaPosition();
-            currentLoc = new Location(4,0);
-            AreaDic[currentLoc].Init(currentLoc);
-            ExploreArea(currentLoc);
+            Nav = new TileNavigation(bound.x, bound.y, 0);            
+            InitAreas();
+
+            //ExploreArea(currentLoc);
 
             // Init player
             StartCoroutine(DelayInitPlayer(1));
+        }
+
+        private void InitAreas()
+        {
+            RelocateAreaPosition();
+            currentLoc = new Location(4, 0);
+
+            List<Location> locs = Database.Instance.GetDiscoveredAreaLocs();
+            if (locs.Count == 0) {
+                DiscoverArea(currentLoc);
+                foreach (var dp in AreaDic[currentLoc].AreaInfo.entranceDic.Keys) {
+                    DiscoverArea(dp + currentLoc);
+                }
+            }
+
+            foreach (var loc in locs) {
+                AreaDic[loc].Init(loc);
+            }
         }
 
         private IEnumerator DelayInitPlayer(float time)
@@ -92,12 +122,12 @@ namespace Wing.RPGSystem
             player.EntitySprite.DOFade(1, 0.5f);
         }
 
-        private void ExploreArea(Location areaLoc)
-        {
-            foreach (var dp in AreaDic[areaLoc].AreaInfo.entranceDic.Keys) {
-                AreaDic[dp + areaLoc].Init(dp + areaLoc);
-            }
-        }
+        //private void ExploreArea(Location areaLoc)
+        //{
+        //    foreach (var dp in AreaDic[areaLoc].AreaInfo.entranceDic.Keys) {
+        //        AreaDic[dp + areaLoc].Init(dp + areaLoc);
+        //    }
+        //}
 
         private void MoveToArea(Location areaLoc)
         {
@@ -109,12 +139,12 @@ namespace Wing.RPGSystem
             
         }
 
-        private void EnterArea(Location areaLoc)
+        public void EnterArea(Location areaLoc)
         {
-            if (areaLoc == WorldData.ActiveData.worldMap[0]) return;
+            if (!AreaDic.ContainsKey(areaLoc) || areaLoc == new Location(4, 0)) return;
             IsWorldView = false;
             m_worldUIController.SwitchToAreaView();
-            AreaManager.Instance.InitArea(areaLoc, AreaDic[areaLoc].AreaInfo.entranceDic[currentLoc - areaLoc]);
+            AreaManager.Instance.InitArea(currentLoc, areaLoc);
             currentLoc = areaLoc;
         }
 
@@ -224,7 +254,7 @@ namespace Wing.RPGSystem
             foreach (var config in stage.specialConfigs) {
                 types.Add(config.type);
             }
-            for (int i = 1,j=0; i < stageAreaLocs.Count; i++) {
+            for (int i = 1, j = 0; i < stageAreaLocs.Count; i++) {
                 int areaIndex = stageAreaLocs.Count - i;
                 PreAreaInfo info = preDic[stageAreaLocs[areaIndex]];
                 while (info.connectionDP.Count != 4 && 100.Random() < stage.complexity) {
@@ -236,10 +266,11 @@ namespace Wing.RPGSystem
                     int randomType = types.Count.Random();
                     AddAreaInfo(i, dirs[dirs.Count.Random()], info.loc, randomType);
                     types.RemoveAt(randomType);
-                    j++;                    
+                    j++;
                 }
                 yield return null;
             }
+
 
             // Generate each area's map
             for (int i = 0; i < stageAreaLocs.Count; i++) {
@@ -259,7 +290,7 @@ namespace Wing.RPGSystem
 
         private void SaveToDatabase(PreAreaInfo preInfo,AreaConfig config)
         {
-            SubAreaSet sets = config.subAreaSets;           
+            SubAreaSet sets = config.subAreaSets;
             SubAreaArray[,] arrays = new SubAreaArray[4, 4];
             for (int x = 0; x < 4; x++) {
                 for (int y = 0; y < 4; y++) {

@@ -41,6 +41,7 @@ namespace Wing.RPGSystem
     public struct AreaInfo
     {
         public int templateHash;
+        public bool discovered;
         public Location loc;
         // Generate map after area generation
         public TileInfo[,] map;
@@ -51,6 +52,7 @@ namespace Wing.RPGSystem
         public AreaInfo(int templateHash, Location loc)
         {
             this.templateHash = templateHash;
+            discovered = false;
             this.loc = loc;
             map = new TileInfo[32, 32];
             entranceDic = new Dictionary<Location, Location>();

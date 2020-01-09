@@ -60,12 +60,24 @@ namespace Wing.RPGSystem
 
         }
 
+        public void SwitchToWorldView()
+        {
+            //SetLoadingPage(true);
+            worldView.gameObject.SetActive(true);
+            worldViewBG.gameObject.SetActive(true);
+            worldView.DOFade(1, switchTime);
+            worldViewBG.DOFade(1, switchTime).OnComplete(() => {
+                //SetLoadingPage(false);                
+                AreaManager.Instance.SetMoveCheck(true);
+            });
+        }
+
         public void SwitchToAreaView()
         {
-            SetLoadingPage(true);
+            //SetLoadingPage(true);
             worldView.DOFade(0, switchTime);
             worldViewBG.DOFade(0, switchTime).OnComplete(() => {
-                SetLoadingPage(false);
+                //SetLoadingPage(false);
                 worldView.gameObject.SetActive(false);
                 worldViewBG.gameObject.SetActive(false);
                 AreaManager.Instance.SetMoveCheck(true);

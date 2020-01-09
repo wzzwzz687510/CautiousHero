@@ -6,7 +6,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using Wing.RPGSystem;
 
-public class BattleUIController : MonoBehaviour
+public class AreaUIController : MonoBehaviour
 {
     public PlayerController player;
     public GameObject battleUI;
@@ -97,7 +97,6 @@ public class BattleUIController : MonoBehaviour
 
     private void Start()
     {
-        endTurnButton.gameObject.SetActive(false);
         BindEvent();
     }
 
@@ -196,6 +195,8 @@ public class BattleUIController : MonoBehaviour
         for (int i = 0; i < player.defaultSkillCount; i++) {
             skills[i].sprite = unknownSkill;
         }
+
+        endTurnButton.gameObject.SetActive(false);
     }
 
     private void CastPreviewEvent(int skillID)
@@ -288,6 +289,16 @@ public class BattleUIController : MonoBehaviour
     public void Button_CastSkill(int skillID)
     {
         BattleManager.Instance.CastSkill(skillID);
+    }
+
+    public void Button_WorldMap()
+    {
+        if (WorldMapManager.Instance.IsWorldView) {
+            WorldMapManager.Instance.EnterArea(AreaManager.Instance.CurrentAreaLoc);
+        }
+        else {
+            AreaManager.Instance.CompleteExploration();
+        }       
     }
 
     public void Gameover()

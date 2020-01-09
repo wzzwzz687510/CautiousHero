@@ -4,6 +4,7 @@ using UnityEngine;
 using Wing.RPGSystem;
 using UnityEngine.Events;
 using System;
+using UnityEngine.EventSystems;
 
 public enum BattleState
 {
@@ -29,7 +30,7 @@ public class BattleManager : MonoBehaviour
     public LayerMask tileLayer;
     public LayerMask entityLayer;
     public PlayerController player;
-    public BattleUIController m_battleUIController;
+    public AreaUIController m_battleUIController;
     public Camera battleCamera;
 
     public BattleState State { get; private set; }
@@ -186,6 +187,7 @@ public class BattleManager : MonoBehaviour
             MovePreviewEvent?.Invoke(0);
         }
 
+        if (EventSystem.current.IsPointerOverGameObject()) return;
         var ray = battleCamera.ViewportPointToRay(new Vector3(Input.mousePosition.x / Screen.width,
             Input.mousePosition.y / Screen.height, Input.mousePosition.z));
         Debug.DrawRay(ray.origin,10* ray.direction,Color.red,10);
