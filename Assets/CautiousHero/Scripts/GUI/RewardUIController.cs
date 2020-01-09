@@ -72,8 +72,12 @@ namespace Wing.RPGSystem
             if (contentHolder.childCount == 1) {
                 gameObject.SetActive(false);
                 AreaManager.Instance.SetMoveCheck(true);
-            }
-                
+            }               
+        }
+
+        public void Button_RemoveSkillContent()
+        {
+            Destroy(contentHolder.GetChild(0).gameObject);
         }
 
         private void OnDisable()
