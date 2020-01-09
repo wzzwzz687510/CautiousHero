@@ -228,8 +228,8 @@ namespace Wing.RPGSystem
                     var movePathClip = clip as MovePathAnimClip;
                     if (!EntityManager.Instance.TryGetEntity(movePathClip.entityHash, out entity))
                         break;
-                    //var pathLoc = (Location)movePathClip.path[movePathClip.path.Length - 1];
-                    entity.transform.DOPath(entity.MovePath, movePathClip.duration * entity.MovePath.Length * animRate);
+                    float duration = movePathClip.duration * entity.MovePath.Length * animRate;
+                    entity.transform.DOPath(movePathClip.path, duration);
                     for (int i = 0; i < movePathClip.path.Length; i++) {
                         var pathLoc = isWorldView ? movePathClip.path[i].WorldViewToLocation() : movePathClip.path[i].AreaViewToLocation();
                         yield return new WaitForSeconds(clip.duration * animRate);
