@@ -225,7 +225,7 @@ namespace Wing.RPGSystem
             m_lootUIController.AddContent(LootType.Coin, coin);
             m_lootUIController.AddContent(LootType.Exp, exp);
             m_lootUIController.gameObject.SetActive(true);
-
+            SaveAreaInfo();
         }
 
         public void SetEntityHash(Location loc, int hash)

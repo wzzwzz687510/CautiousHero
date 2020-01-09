@@ -427,6 +427,9 @@ public class BattleManager : MonoBehaviour
         ChangeState(BattleState.FreeMove);
         AreaManager.Instance.CompleteBattle();
         Debug.Log("You win");
+
+        selectedCreatureID = 0;
+        CreatureBoardEvent?.Invoke(-1, true);
     }
 
     private void InformLackAP()
