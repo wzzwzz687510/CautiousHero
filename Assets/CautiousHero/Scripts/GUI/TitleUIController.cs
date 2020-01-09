@@ -11,6 +11,7 @@ namespace Wing.RPGSystem
         public Button continueButton;     
         public Text saveName;
         public Image slotIcon;
+        public Button saveButton;
         public Sprite[] iconSprites;
         public InputField nameInputField;
         public Button infoConfirmButton;
@@ -32,7 +33,6 @@ namespace Wing.RPGSystem
         public GameObject talentCover;
         public GameObject classCover;
         public SaveSlot[] saveSlots;
-        public GameObject saveIcon;
 
         private int selectClassID;
         private int selectRaceID;
@@ -40,7 +40,7 @@ namespace Wing.RPGSystem
         private void Start()
         {
             if (Database.Instance.SelectSlot != -1) {
-                saveIcon.SetActive(true);
+                saveButton.gameObject.SetActive(true);
                 continueButton.interactable = !Database.Instance.ActivePlayerData.isNewGame;
                 selectRaceID = 0;
                 selectClassID = 0;
@@ -74,7 +74,7 @@ namespace Wing.RPGSystem
                 saveName.text = nameInputField.text;
                 nameInputPage.SetActive(false);
                 savePage.SetActive(false);
-                saveIcon.SetActive(true);
+                saveButton.gameObject.SetActive(true);
                 continueButton.interactable = !Database.Instance.ActivePlayerData.isNewGame;
                 selectRaceID = 0;
                 selectClassID = 0;
