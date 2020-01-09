@@ -274,7 +274,7 @@ namespace Wing.RPGSystem
             }
 
             
-            return isInstance ? 1 : MovePath.Length;
+            return isInstance ? 0 : MovePath.Length;
         }
 
         public virtual bool CastSkill(int skillID, Location castLoc)

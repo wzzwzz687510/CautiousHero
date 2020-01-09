@@ -27,8 +27,7 @@ namespace Wing.RPGSystem
             EntityName = "Player";
             Hash = EntityManager.Instance.AddEntity(this);            
             BuffManager = new BuffManager(Hash);
-            InitSkillDeck();
-
+            //SkillDeck = new List<int>();
             HealthPoints = MaxHealthPoints;
         }
 

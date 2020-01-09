@@ -56,6 +56,8 @@ public class BattleManager : MonoBehaviour
 
     public delegate void MovePreview(int steps);
     public MovePreview MovePreviewEvent;
+    public delegate void CastPreview(int skillID);
+    public CastPreview CastPreviewEvent;
 
     [HideInInspector] public UnityEvent BattleEndEvent;
 
@@ -87,6 +89,9 @@ public class BattleManager : MonoBehaviour
     {
         AnimationManager.Instance.OnAnimCompleted.AddListener(OnAnimCompleted);
         AIManager.Instance.Init(battleSet);
+        AudioManager.Instance.PlayBattleClip();
+        player.InitSkillDeck();
+        //m_battleUIController.UpdateSkillSprites();
         m_battleUIController.BattleStartAnim();
         StartNewTurn(true);
     }
@@ -363,20 +368,23 @@ public class BattleManager : MonoBehaviour
                 }
             }
             currentSelected.Clear();
+            MovePreviewEvent?.Invoke(0);
         }
 
         if (tileZone.Contains(loc)) {
             if (stateZone == TileState.MoveZone) {
-                PreviewMovement(tile);               
+                               
             }
 
             currentSelected.Add(loc);
             switch (stateZone) {
                 case TileState.MoveZone:
                     tile.ChangeTileState(stateZone + 1);
+                    PreviewMovement(tile);
                     break;
                 case TileState.CastZone:
                     HighlightAffectPoints(loc);
+                    PreviewCast();
                     break;
                 default:
                     break;
@@ -396,6 +404,11 @@ public class BattleManager : MonoBehaviour
     {
         SetVisualPlayer(tile.Archor, tile.SortOrder + 64);
         MovePreviewEvent?.Invoke(player.Loc.Distance(tile.Loc));
+    }
+
+    private void PreviewCast()
+    {
+        CastPreviewEvent?.Invoke(selectedSkillID);
     }
 
     private void Gameover()

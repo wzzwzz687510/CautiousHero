@@ -14,7 +14,9 @@ namespace Wing.RPGSystem
         public Image frame;
         public Color selectColour;
 
-    public delegate void SkillBoard(int id, bool isExit);
+        public bool isActive { get; private set; }
+
+        public delegate void SkillBoard(int id, bool isExit);
         public SkillBoard SkillBoardEvent;
 
         public void OnPointerEnter(PointerEventData eventData)

@@ -79,6 +79,7 @@ namespace Wing.RPGSystem
                 infoConfirmButton.onClick.RemoveAllListeners();
                 infoPage.SetActive(false);
                 SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+                AudioManager.Instance.PlayTitleClip();
             });
             infoText.text = "Progress is automatically saved.";
             infoPage.SetActive(true);

@@ -209,6 +209,7 @@ namespace Wing.RPGSystem
 
         public void CompleteBattle()
         {
+            AudioManager.Instance.PlayPeacefulClip();
             int coin = 0, exp = 0;
             foreach (var setID in InBatlleCreatureSets) {
                 CreatureSet set = TempData.creatureSetHashDic[setID].GetCreatureSet();

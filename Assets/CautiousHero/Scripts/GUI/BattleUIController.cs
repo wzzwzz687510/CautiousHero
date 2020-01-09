@@ -101,8 +101,8 @@ public class BattleUIController : MonoBehaviour
     }
 
     public void EnterAreaAnim()
-    {  
-        UpdateSkillSprites();
+    {
+        SetSkillsUnknown();
 
         PlayerHPChangeAnimation(0, 0);
         PlayerHPChangeAnimation(1, 2);
@@ -129,6 +129,7 @@ public class BattleUIController : MonoBehaviour
         BattleManager.Instance.OnTurnSwitched += OnTurnSwitched;
         BattleManager.Instance.CreatureBoardEvent += OnCreatureBoardEvent;
         BattleManager.Instance.MovePreviewEvent += MovePreviewEvent;
+        BattleManager.Instance.CastPreviewEvent += CastPreviewEvent;
         AnimationManager.Instance.OnGameoverEvent.AddListener(Gameover);
     }
 
@@ -177,7 +178,7 @@ public class BattleUIController : MonoBehaviour
     private void OnPlayerAPChanged()
     {
         for (int i = 0; i < 8; i++) {
-            aps[i].isOn = i + 1 <= player.ActionPoints;
+            aps[i].isOn = i < player.ActionPoints;
         }
     }
 
@@ -189,8 +190,30 @@ public class BattleUIController : MonoBehaviour
         }
     }
 
+    public void SetSkillsUnknown()
+    {
+        for (int i = 0; i < player.defaultSkillCount; i++) {
+            skills[i].sprite = unknownSkill;
+        }
+    }
+
+    private void CastPreviewEvent(int skillID)
+    {
+        for (int i = 0; i < player.ActionPoints; i++) {
+            aps[i].isOn = i < player.ActionPoints - player.SkillHashes[skillID].GetBaseSkill().actionPointsCost;
+        }
+        skills[0].sprite = unknownSkill;
+        for (int i = 1; i < skills.Length; i++) {
+            skills[i].sprite = player.SkillHashes[i - (skillID >= i ? 1 : 0)].GetBaseSkill().sprite;
+        }
+    }
+
     private void MovePreviewEvent(int steps)
     {
+        for (int i = 0; i < player.ActionPoints; i++) {
+            aps[i].isOn = i < player.ActionPoints - steps;
+        }
+
         for (int i = 0; i < steps; i++) {
             if (i >= skills.Length) return;
             skills[i].sprite = unknownSkill;

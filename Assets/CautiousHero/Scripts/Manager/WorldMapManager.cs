@@ -68,6 +68,7 @@ namespace Wing.RPGSystem
 
         public void ContinueGame()
         {
+            AudioManager.Instance.PlayPeacefulClip();
             m_worldUIController.gameObject.SetActive(true);
             m_worldUIController.UpdateUI();
 
