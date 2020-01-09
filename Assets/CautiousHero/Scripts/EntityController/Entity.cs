@@ -237,7 +237,6 @@ namespace Wing.RPGSystem
             if (targetLoc == Loc) {
                 return 0;
             }
-
             if (!isInstance) {
                 Stack<Location> path = GridManager.Instance.Nav.GetPath(Loc, targetLoc);
 
@@ -297,6 +296,11 @@ namespace Wing.RPGSystem
         public virtual void ChangeOutlineColor(Color c)
         {
             m_glowEffect.GlowColor = c;
+        }
+
+        public virtual void SetVisual(bool isVisible)
+        {
+            gameObject.SetActive(isVisible);
         }
 
         public virtual void SetActiveCollider(bool bl)
