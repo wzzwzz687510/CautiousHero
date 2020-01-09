@@ -14,21 +14,27 @@ namespace Wing.RPGSystem
         public Image frame;
         public Color selectColour;
 
-        public bool isActive { get; private set; }
-
-        public delegate void SkillBoard(int id, bool isExit);
-        public SkillBoard SkillBoardEvent;
+        public bool IsActive { get; private set; }
+        public UnityEvent CheckSlotState;
 
         public void OnPointerEnter(PointerEventData eventData)
         {
-            SkillBoardEvent?.Invoke(slotID, false);
+            IsActive = true;
+            CheckSlotState?.Invoke();
             frame.DOColor(selectColour, 0.1f);
         }
 
         public void OnPointerExit(PointerEventData eventData)
         {
-            SkillBoardEvent?.Invoke(-1, true);
+            IsActive = false;
+            CheckSlotState?.Invoke();
             frame.DOColor(Color.white, 0.1f);
+        }
+
+        private void OnDisable()
+        {
+            IsActive = false;
+            CheckSlotState?.Invoke();
         }
     }
 }

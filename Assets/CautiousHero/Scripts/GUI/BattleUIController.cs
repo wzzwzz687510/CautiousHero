@@ -51,16 +51,17 @@ public class BattleUIController : MonoBehaviour
     public SkillSlot[] skillSlots;
     public Color[] colors;
     public Image skillNameBg;
-    private int selectSkillID=-1;
+    private int selectSlot = -1;
+    private int selectSkillHash;
     private bool isSkillBoardDisplayed;
 
     [Header("Skill Learning Page")]
     public Image[] skillLearningImages;
     public GameObject skillLearningPage;
-    public SkillSlot[] skillStudySlots;
+    public SkillSlot[] skillLearningSlots;
 
     private float timer;
-    private bool startCount;
+    private bool startTimer;
 
     [Header("Creature Board")]
     public Transform creatureBoard;
@@ -76,10 +77,10 @@ public class BattleUIController : MonoBehaviour
 
     private void FixedUpdate()
     {
-        if (startCount && !isSkillBoardDisplayed && !isCreatureBoardDisplayed) {
+        if (startTimer && !isSkillBoardDisplayed && !isCreatureBoardDisplayed) {
             timer += Time.deltaTime;
             if (timer > waitDuration) {
-                if (selectSkillID != -1) {
+                if (selectSlot != -1) {
                     ShowSkillBoard();
                     isSkillBoardDisplayed = true;
                 }
@@ -89,7 +90,7 @@ public class BattleUIController : MonoBehaviour
                 }
             }
         }
-        else if (!startCount && timer > 0) {
+        else if (!startTimer && timer > 0) {
             timer -= Time.deltaTime;
         }
     }
@@ -120,10 +121,10 @@ public class BattleUIController : MonoBehaviour
         player.ssAnimEvent += PlayerSkillShiftAnimation;
         player.OnAPChanged.AddListener(OnPlayerAPChanged);
         for (int i = 0; i < skillSlots.Length; i++) {
-            skillSlots[i].SkillBoardEvent += OnSkillBoardEvent;
+            skillSlots[i].CheckSlotState.AddListener(OnSkillBoardEvent);
         }
-        for (int i = 0; i < skillStudySlots.Length; i++) {
-            skillStudySlots[i].SkillBoardEvent += OnSkillBoardEvent;
+        for (int i = 0; i < skillLearningSlots.Length; i++) {
+            skillLearningSlots[i].CheckSlotState.AddListener(OnLearnSkillPageEvent);
         }
 
         BattleManager.Instance.OnTurnSwitched += OnTurnSwitched;
@@ -296,18 +297,41 @@ public class BattleUIController : MonoBehaviour
         image_blackBG.raycastTarget = true;
     }
 
-    public void OnSkillBoardEvent(int id, bool isExit)
+    public void OnSkillBoardEvent()
     {
-        if (selectSkillID == id && !isExit)
-            return;
-        selectSkillID = id;
-        startCount = !isExit;
-        isSkillBoardDisplayed &= false;
-        if (!isExit && timer > waitDuration) {
-            ShowSkillBoard();
+        if (player.SkillHashes.Count < player.defaultSkillCount) return;
+        startTimer = false;
+        for (int i = 0; i < skillSlots.Length; i++) {
+            if (skillSlots[i].IsActive) {
+                startTimer = true;
+                selectSlot = i;
+                selectSkillHash = player.SkillHashes[i];
+                if(timer > waitDuration) ShowSkillBoard();
+            }
         }
-        else if (isExit) {
+        if (startTimer == false) {
             skillBoard.position = new Vector3(-300, 0, 0);
+            isSkillBoardDisplayed = false;
+            selectSlot = -1;
+        }
+    }
+
+    public void OnLearnSkillPageEvent()
+    {
+        startTimer = false;
+        for (int i = 0; i < skillLearningSlots.Length; i++) {
+            if (skillLearningSlots[i].IsActive) {
+                startTimer = true;
+                selectSlot = i;
+                selectSkillHash = AreaManager.Instance.RandomedSkillHashes[i];
+                if (timer > waitDuration) ShowSkillBoard();
+            }
+        }
+
+        if (startTimer == false) {
+            skillBoard.position = new Vector3(-300, 0, 0);
+            isSkillBoardDisplayed = false;
+            selectSlot = -1;
         }
     }
 
@@ -316,32 +340,32 @@ public class BattleUIController : MonoBehaviour
         if (selectCreatureID == hash && !isExit)
             return;
         selectCreatureID = hash;
-        startCount = !isExit;
-        isCreatureBoardDisplayed &= false;
+        startTimer = !isExit;
         if (!isExit && timer > waitDuration) {
             ShowCreatureBoard();
         }
-        else if (isExit) {
+        else if (isExit) {            
+            isCreatureBoardDisplayed = false;
             creatureBoard.position = new Vector3(-300, 0, 0);
         }
     }
 
     public void ShowSkillBoard()
     {
-        var skill = player.SkillHashes[selectSkillID].GetBaseSkill() as BaseSkill;
+        var skill = selectSkillHash.GetBaseSkill() as BaseSkill;
         skillName.text = skill.skillName;
         skillCost.text = skill.actionPointsCost.ToString();
         //skillValue.text = skill.baseValue.ToString() + " + <color=#ffa500ff>" + player.Intelligence * skill.attributeCof * skill.baseValue +"</color>";
         switch (skill.damageType) {
             case DamageType.Physical:
                 skillNameBg.color = colors[0];
-                skillType.text = "物理";
+                skillType.text = "Physical";
                 break;
             case DamageType.Magical:
-                skillType.text = "魔法";
+                skillType.text = "Magical";
                 break;
             case DamageType.Pure:
-                skillType.text = "纯粹";
+                skillType.text = "Pure";
                 skillNameBg.color = colors[1];
                 break;
             default:
@@ -349,30 +373,30 @@ public class BattleUIController : MonoBehaviour
         }
         switch (skill.skillElement) {
             case SkillElement.None:
-                skillElement.text = "无";
+                skillElement.text = "None";
                 break;
             case SkillElement.Fire:
-                skillElement.text = "火";
+                skillElement.text = "Fire";
                 skillNameBg.color = colors[2];
                 break;
             case SkillElement.Water:
-                skillElement.text = "水";
+                skillElement.text = "Water";
                 skillNameBg.color = colors[3];
                 break;
             case SkillElement.Earth:
-                skillElement.text = "地";
+                skillElement.text = "Earth";
                 skillNameBg.color = colors[4];
                 break;
             case SkillElement.Air:
-                skillElement.text = "气";
+                skillElement.text = "Air";
                 skillNameBg.color = colors[5];
                 break;
             case SkillElement.Light:
-                skillElement.text = "光";
+                skillElement.text = "Light";
                 skillNameBg.color = colors[6];
                 break;
             case SkillElement.Dark:
-                skillElement.text = "暗";
+                skillElement.text = "Dark";
                 skillNameBg.color = colors[7];
                 break;
             default:
@@ -380,15 +404,15 @@ public class BattleUIController : MonoBehaviour
         }
         switch (skill.castType) {
             case CastType.Instant:
-                skillCastType.text = "瞬间";
+                skillCastType.text = "Instant";
                 break;
             case CastType.Trajectory:
-                skillCastType.text = "弹道";
+                skillCastType.text = "Trajectory";
                 break;
             default:
                 break;
         }
-        skillBoard.position = skillSlots[selectSkillID].transform.position + new Vector3(0, 150, 0);
+        skillBoard.position = skillSlots[selectSlot].transform.position + new Vector3(0, 150, 0);
     }
 
     public void ShowCreatureBoard()
@@ -401,29 +425,29 @@ public class BattleUIController : MonoBehaviour
                 creatureHP.text = cc.attribute.maxHealth.ToString();
                 creatureAP.text = cc.attribute.actionPerTurn.ToString();
                 if(cc.skills.Length==0)
-                    creatureResistance.text = "无";
+                    creatureResistance.text = "None";
                 else
                 switch (cc.skills[0].skillElement) {
                     case SkillElement.None:
-                        creatureResistance.text = "无";
+                        creatureResistance.text = "None";
                         break;
                     case SkillElement.Fire:
-                        creatureResistance.text = "火";
+                        creatureResistance.text = "Fire";
                         break;
                     case SkillElement.Water:
-                        creatureResistance.text = "水";
+                        creatureResistance.text = "Water";
                         break;
                     case SkillElement.Earth:
-                        creatureResistance.text = "地";
+                        creatureResistance.text = "Earth";
                         break;
                     case SkillElement.Air:
-                        creatureResistance.text = "气";
+                        creatureResistance.text = "Air";
                         break;
                     case SkillElement.Light:
-                        creatureResistance.text = "光";
+                        creatureResistance.text = "Light";
                         break;
                     case SkillElement.Dark:
-                        creatureResistance.text = "暗";
+                        creatureResistance.text = "Dark";
                         break;
                     default:
                         break;
@@ -438,14 +462,13 @@ public class BattleUIController : MonoBehaviour
                 creatureElement.text = "?";
             }
 
-            creatureBoard.position = Input.mousePosition +
-                new Vector3((Input.mousePosition.x > Screen.width - 360 ? -360 : 60), (Input.mousePosition.y < 360 ? 360 : 0), 0);
+            creatureBoard.position = new Vector3(Screen.width - 310, Screen.height - 110, 0);
         }
     }
 
     public void ShowSkillLearningPage(bool isActive)
     {
-        for (int i = 0; i < skillStudySlots.Length; i++) {
+        for (int i = 0; i < skillLearningSlots.Length; i++) {
             skillLearningImages[i].sprite = AreaManager.Instance.RandomedSkillHashes[i].GetBaseSkill().sprite;
         }
         skillLearningPage.SetActive(isActive);
