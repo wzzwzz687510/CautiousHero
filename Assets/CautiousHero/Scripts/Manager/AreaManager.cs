@@ -15,6 +15,8 @@ namespace Wing.RPGSystem
 
         [Header("Test")]
         public BaseSkill[] skills;
+        public int enemyViewDistance = 3;
+        public int playerViewDistance = 5;
 
         [Header("Components")]
         public LayerMask tileLayer;
@@ -92,7 +94,7 @@ namespace Wing.RPGSystem
         {
             if (Input.mouseScrollDelta.y != 0) {
                 vCamera.m_Lens.OrthographicSize = Mathf.Clamp(areaCamera.orthographicSize - 10 *
-                    Time.deltaTime * Input.mouseScrollDelta.y, 3, 4);
+                    Time.deltaTime * Input.mouseScrollDelta.y, 3, 6);
             }
             float x = Input.GetAxisRaw("Horizontal");
             float y = Input.GetAxisRaw("Vertical");
@@ -101,31 +103,48 @@ namespace Wing.RPGSystem
                 Mathf.Clamp(viewPin.position.y + y * moveSpeed, 96, 138), 0);
         }
 
+        private IEnumerator WaitForMoveAnim()
+        {
+            while (AnimationManager.Instance.IsPlaying) {
+                yield return null;
+            }
+            
+            yield return new WaitForSeconds(0.1f);
+            CompleteExploration();
+        }
+
         private void MoveToTile(Location tileLoc)
         {
             if (!tileLoc.IsValid()) return;
-
-            //player.MoveToLocation(tileLoc, false, false);
             viewPin.localPosition = Vector3.zero;
-            BattleCheck(tileLoc);
+            GridManager.Instance.DiscoverTiles(BattleCheck(tileLoc));
+            if (TempData.map[tileLoc.x, tileLoc.y].GetTileType() == TileType.Entrance)
+                StartCoroutine(WaitForMoveAnim());
         }
 
-        private void BattleCheck(Location loc)
+        private Location BattleCheck(Location loc)
         {
-            foreach (var spawnLoc in TempData.creatureSetHashDic.Keys) {
-                int delta = 4 - spawnLoc.Distance(loc);
-                // TODO: improve trigger condition
-                if (delta < 0) continue;
-                Location stopLoc = delta > 0 ?
-                    player.Loc.GetLocationWithGivenStep(loc, player.Loc.Distance(loc) - delta) : loc;
-                player.MoveToLocation(stopLoc, false, false);
-                BattleManager.Instance.NewBattle(RemainedCreatures[spawnLoc]);
-                RemainedCreatures.Remove(spawnLoc);
-                InBatlleCreatureSets.Add(spawnLoc);
-                MoveCheck = false;
-                return;
+            foreach (var spawnLoc in RemainedCreatures.Keys) {
+                foreach (var creatureHash in RemainedCreatures[spawnLoc]) {
+                    Entity creature = creatureHash.GetEntity();
+                    int distance = loc.Distance(creature.Loc);
+                    creature.SetVisual(distance <= playerViewDistance);
+                    int delta = enemyViewDistance - distance;
+                    // TODO: improve trigger condition
+                    if (delta < 0) continue;
+                    Location stopLoc = delta > 0 ?
+                        player.Loc.GetLocationWithGivenStep(loc, player.Loc.Distance(loc) - delta) : loc;
+                    player.MoveToLocation(stopLoc, false, false);
+                    foreach (var hash in RemainedCreatures[spawnLoc]) hash.GetEntity().SetVisual(true);
+                    BattleManager.Instance.NewBattle(RemainedCreatures[spawnLoc]);
+                    RemainedCreatures.Remove(spawnLoc);
+                    InBatlleCreatureSets.Add(spawnLoc);
+                    MoveCheck = false;
+                    return stopLoc;
+                }
             }
             player.MoveToLocation(loc, false, false);
+            return loc;
         }
 
         private void InstantiateCreatures()
@@ -196,13 +215,14 @@ namespace Wing.RPGSystem
 
             // Reset lists and dictionaries
             RemainedCreatures = new Dictionary<Location, List<int>>();
-            InBatlleCreatureSets = new List<Location>();
-            EntityManager.Instance.ResetEntityDicionary();
+            InBatlleCreatureSets = new List<Location>();           
             RandomedSkillHashes = new List<int>();
+            EntityManager.Instance.ResetEntityDicionary();
 
             // Init player
-            player.InitPlayer(WorldData.ActiveData.attribute);
-            player.MoveToTile(spawnLoc, true);
+            player.InitPlayer("AreaPlayer",WorldData.ActiveData.attribute);
+            player.MoveToLocation(spawnLoc,false, true);
+            player.transform.position = spawnLoc.ToAreaView();
 
             // Init battle system
             BattleManager.Instance.PrepareBattle();
@@ -279,7 +299,7 @@ namespace Wing.RPGSystem
         {
             Database.Instance.LearnASkill(RandomedSkillHashes[id]);
             m_areaUIController.ShowSkillLearningPage(false);
-            m_lootUIController.CloseCheck();         
+            m_lootUIController.CloseCheck();
         }
 
         public void RemoveChestCoin(int chestID)

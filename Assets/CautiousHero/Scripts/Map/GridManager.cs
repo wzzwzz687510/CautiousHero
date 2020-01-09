@@ -88,6 +88,27 @@ public class GridManager : MonoBehaviour
         return exploredTiles.Contains(loc);
     }
 
+
+    public void AddExploredTile(Location loc)
+    {
+        if (!exploredTiles.Contains(loc)) exploredTiles.Add(loc);
+    }
+
+    public void DiscoverTiles(Location loc)
+    {
+        int heuristic = 0;
+        int viewDistance = AreaManager.Instance.playerViewDistance;
+        for (int x = -viewDistance; x < viewDistance + 1; x++) {
+            for (int y = -viewDistance; y < viewDistance + 1; y++) {
+                heuristic = Mathf.Abs(x) + Mathf.Abs(y);
+                if (heuristic <= viewDistance) {
+                    Location tmp = new Location(loc.x + x, loc.y + y);
+                    if(TileDic.ContainsKey(tmp)) AddExploredTile(tmp);                    
+                }
+            }
+        }
+    }
+
     public void SaveExplorationState()
     {
         foreach (var tile in exploredTiles) {

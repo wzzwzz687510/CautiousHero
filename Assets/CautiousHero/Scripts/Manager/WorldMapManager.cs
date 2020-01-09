@@ -29,7 +29,6 @@ namespace Wing.RPGSystem
         private Location currentLoc;
         private Location highlightArea;
         private bool hasHighlighted;
-        
 
         private Dictionary<Location, PreAreaInfo> preDic;
         private List<Location> stageAreaLocs;
@@ -70,7 +69,7 @@ namespace Wing.RPGSystem
         {
             AreaDic[loc].Init(loc);
             Database.Instance.SetAreaDiscovered(loc);
-            Debug.Log(string.Format("Area {0} discover: {1}",loc.ToString(),AreaDic[loc].AreaInfo.discovered));
+            //Debug.Log(string.Format("Area {0} discover: {1}",loc.ToString(),AreaDic[loc].AreaInfo.discovered));
         }
 
         public void CompleteAnArea()
@@ -117,24 +116,25 @@ namespace Wing.RPGSystem
         private IEnumerator DelayInitPlayer(float time)
         {
             yield return new WaitForSeconds(time);
-            player.InitPlayer(WorldData.ActiveData.attribute);
+            player.InitPlayer("WorldPlayer",WorldData.ActiveData.attribute);
             player.MoveToLocation(currentLoc, true, true);
             player.EntitySprite.DOFade(1, 0.5f);
         }
 
-        //private void ExploreArea(Location areaLoc)
-        //{
-        //    foreach (var dp in AreaDic[areaLoc].AreaInfo.entranceDic.Keys) {
-        //        AreaDic[dp + areaLoc].Init(dp + areaLoc);
-        //    }
-        //}
+        private IEnumerator WaitForMoveAnim(Location areaLoc)
+        {
+            while (AnimationManager.Instance.IsPlaying) {
+                yield return null;
+            }
+            yield return new WaitForSeconds(0.1f);
+            EnterArea(areaLoc);
+        }
 
         private void MoveToArea(Location areaLoc)
         {
             if (!AreaDic.ContainsKey(areaLoc) || !AreaDic[areaLoc].IsExplored) return;
             player.MoveToLocation(areaLoc, true, false);
-            EnterArea(areaLoc);
-
+            StartCoroutine(WaitForMoveAnim(areaLoc));
             //ExploreArea(loc);
             
         }
@@ -143,8 +143,9 @@ namespace Wing.RPGSystem
         {
             if (!AreaDic.ContainsKey(areaLoc) || areaLoc == new Location(4, 0)) return;
             IsWorldView = false;
-            m_worldUIController.SwitchToAreaView();
+            m_worldUIController.SwitchToAreaView();          
             AreaManager.Instance.InitArea(currentLoc, areaLoc);
+            
             currentLoc = areaLoc;
         }
 

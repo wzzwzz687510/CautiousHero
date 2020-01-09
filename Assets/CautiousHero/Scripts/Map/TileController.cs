@@ -54,6 +54,11 @@ namespace Wing.RPGSystem
             stayEntityHash = 0;
         }
 
+        public TileType GetTileType()
+        {
+            return tTileHash.GetTTile().type;
+        }
+
         public void SetMana(ElementMana mana)
         {
             this.mana = mana;
