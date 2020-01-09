@@ -20,6 +20,7 @@ namespace Wing.RPGSystem
         public void ResetEntityDicionary()
         {
             EntityDic.Clear();
+            AddEntity(WorldMapManager.Instance.player);
         }
 
         public int AddEntity(Entity entity)
@@ -32,6 +33,7 @@ namespace Wing.RPGSystem
 
         public bool TryGetEntity(int hash,out Entity entity)
         {
+            if(!EntityDic.ContainsKey(hash)) Debug.LogError("hash don not exist!");
             return EntityDic.TryGetValue(hash, out entity);
         }
     }
