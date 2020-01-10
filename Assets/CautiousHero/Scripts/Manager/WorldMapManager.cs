@@ -11,7 +11,7 @@ namespace Wing.RPGSystem
 
         [Header("Control")]
         public Camera worldCamera;
-        public PlayerController player;
+        public PlayerController character;
 
         [Header("Area Elements")]
         public LayerMask areaLayer;
@@ -39,7 +39,7 @@ namespace Wing.RPGSystem
             if (!Instance)
                 Instance = this;
             AreaDic = new Dictionary<Location, AreaController>();
-            player.EntitySprite.DOFade(0, 0);
+            character.EntitySprite.DOFade(0, 0);
             IsWorldView = true;
         }
 
@@ -76,6 +76,7 @@ namespace Wing.RPGSystem
         {
             IsWorldView = true;
             m_worldUIController.SwitchToWorldView();
+            Database.Instance.SaveCharacterLocation(currentLoc);
         }
 
         public void ContinueGame()
@@ -116,9 +117,9 @@ namespace Wing.RPGSystem
         private IEnumerator DelayInitPlayer(float time)
         {
             yield return new WaitForSeconds(time);
-            player.InitPlayer("WorldPlayer",WorldData.ActiveData.attribute);
-            player.MoveToLocation(currentLoc, true, true);
-            player.EntitySprite.DOFade(1, 0.5f);
+            character.InitPlayer("WorldCharacter",WorldData.ActiveData.attribute);
+            character.MoveToLocation(WorldData.ActiveData.characterLocation, true, true);
+            character.EntitySprite.DOFade(1, 0.5f);
         }
 
         private IEnumerator WaitForMoveAnim(Location areaLoc)
@@ -133,7 +134,7 @@ namespace Wing.RPGSystem
         private void MoveToArea(Location areaLoc)
         {
             if (!AreaDic.ContainsKey(areaLoc) || !AreaDic[areaLoc].IsExplored) return;
-            player.MoveToLocation(areaLoc, true, false);
+            character.MoveToLocation(areaLoc, true, false);
             StartCoroutine(WaitForMoveAnim(areaLoc));
             //ExploreArea(loc);
             

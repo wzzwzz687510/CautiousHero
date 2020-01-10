@@ -55,6 +55,7 @@ namespace Wing.RPGSystem
         public long exp;
         public List<int> learnedSkills;
         public List<Location> worldMap;
+        public Location characterLocation;
         public Location worldBound;
 
         public static WorldData ActiveData => Database.Instance.ActiveWorldData;
@@ -136,6 +137,12 @@ namespace Wing.RPGSystem
             AreaChunks[chunkID].areaInfo[info.loc] = info;
             SaveData("GameData_MapChunk" + chunkID, AreaChunks[chunkID]);
             AreaDataChangedEvent?.Invoke();
+        }
+
+        public void SaveCharacterLocation(Location loc)
+        {
+            m_activeWorldData.characterLocation = loc;
+            SaveWorldData();
         }
 
         public void SaveWorldData()
@@ -245,7 +252,8 @@ namespace Wing.RPGSystem
                 attribute = attribute,
                 HealthPoints = attribute.maxHealth,
                 learnedSkills = skillDeck,
-                worldMap = new List<Location>()
+                worldMap = new List<Location>(),
+                characterLocation = new Location(4, 0)
             };
             AreaChunks = new AreaData[0];
 
