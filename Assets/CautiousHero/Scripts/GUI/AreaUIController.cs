@@ -11,6 +11,10 @@ public class AreaUIController : MonoBehaviour
     public PlayerController player;
     public GameObject battleUI;
 
+    [Header("Buttons")]
+    public Button endStageButton;
+    public Button endTurnButton;
+
     [Header("HP Visual")]
     public Slider playerHPBar;
     public Text playerHpText;
@@ -41,7 +45,6 @@ public class AreaUIController : MonoBehaviour
     [Header("Skill Board")]
     public float waitDuration;
     public Transform skillBoard;
-    public Button endTurnButton;
     public Text skillName;
     public Text skillCost;
     public Text skillValue;
@@ -53,7 +56,7 @@ public class AreaUIController : MonoBehaviour
     public Image skillNameBg;
     private int selectSlot = -1;
     private int selectSkillHash;
-    private bool isSkillBoardDisplayed;
+    private bool isSkillBoardDisplayed;    
 
     [Header("Skill Learning Page")]
     public Image[] skillLearningImages;
@@ -103,6 +106,7 @@ public class AreaUIController : MonoBehaviour
     public void EnterAreaAnim()
     {
         SetSkillsUnknown();
+        endStageButton.gameObject.SetActive(false);
 
         PlayerHPChangeAnimation(0, 0);
         PlayerHPChangeAnimation(1, 2);
@@ -239,36 +243,23 @@ public class AreaUIController : MonoBehaviour
 
     public IEnumerator TurnSwitchAnimation(bool isPlayerTurn)
     {
-        while (AnimationManager.Instance.IsPlaying) {
-            yield return null;
-        }
-        string text;
-        if (isPlayerTurn) {
-            text = "Your Turn";
-        }
-        else {
-            text = "Enemy Turn";
-        }
-
-        turnText.text = text;
-        turnText.color = Color.white;
-        turnBG.fillAmount = 0;
-        turnBG.color = Color.white;
-        DOTween.To(() => turnBG.fillAmount, ratio => turnBG.fillAmount = ratio, 1f, 0.5f);
-        yield return new WaitForSeconds(0.5f);
-        DOTween.ToAlpha(() => turnText.color, color => turnText.color = color, 1f, 0.5f);
-        yield return new WaitForSeconds(0.5f);
-        DOTween.ToAlpha(() => turnBG.color, color => turnBG.color = color, 0f, 0.5f);
-        DOTween.ToAlpha(() => turnText.color, color => turnText.color = color, 0f, 0.5f);
-        yield return new WaitForSeconds(0.5f);
+        yield return StartCoroutine(DisplayInfo(isPlayerTurn ? "Your Turn" : "Enemy Turn"));
 
         BattleManager.Instance.StartNewTurn(isPlayerTurn);
     }
 
     public IEnumerator BattleStart()
     {
-        yield return new WaitForSeconds(1f);
-        turnText.text = "Battle Start";
+        yield return StartCoroutine(DisplayInfo("Battle Start"));
+    }
+
+    public IEnumerator DisplayInfo(string text)
+    {
+        while (AnimationManager.Instance.IsPlaying) {
+            yield return null;
+        }
+
+        turnText.text = text;
         turnText.color = Color.white;
         turnBG.fillAmount = 0;
         turnBG.color = Color.white;
@@ -284,6 +275,11 @@ public class AreaUIController : MonoBehaviour
     public void Button_EndTurn()
     {
         BattleManager.Instance.EndTurn();
+    }
+
+    public void Button_EndStage()
+    {
+
     }
 
     public void Button_CastSkill(int skillID)

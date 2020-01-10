@@ -62,6 +62,11 @@ namespace Wing.RPGSystem
             chests = new List<ChestEntity>();
         }
 
+        public AreaType GetAreaInfoType()
+        {
+            return templateHash.GetAreaConfig().type;
+        }
+
         public static AreaInfo GetActiveAreaInfo(int chunkID, Location loc)
             => Database.Instance.AreaChunks[chunkID].areaInfo[loc];
         public static void SaveToDatabase(int chunkID, AreaInfo info)

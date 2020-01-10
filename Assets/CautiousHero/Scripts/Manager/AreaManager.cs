@@ -164,6 +164,10 @@ namespace Wing.RPGSystem
                 }
                 RemainedCreatures.Add(spawnLoc, creatureHashes);
             }
+
+            if(RemainedCreatures.Count == 0 && TempData.GetAreaInfoType() == AreaType.Boss) {
+                m_areaUIController.endStageButton.gameObject.SetActive(true);
+            }
         }
 
         private void InstantiateAbotics()
@@ -261,6 +265,11 @@ namespace Wing.RPGSystem
             m_lootUIController.AddContent(LootType.Exp, exp);
             m_lootUIController.gameObject.SetActive(true);
             SaveAreaInfo();
+
+            if (RemainedCreatures.Count == 0 && TempData.GetAreaInfoType() == AreaType.Boss) {
+                m_areaUIController.DisplayInfo("Stage Clear");
+                m_areaUIController.endStageButton.gameObject.SetActive(true);
+            }
         }
 
         public void CompleteExploration()
