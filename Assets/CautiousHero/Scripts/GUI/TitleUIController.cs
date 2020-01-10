@@ -59,8 +59,11 @@ namespace Wing.RPGSystem
 
         public void ResetUI()
         {
+            startPage.SetActive(true);
+            createPage.SetActive(false);
             nameInputPage.SetActive(false);
             savePage.SetActive(false);
+
             saveButton.gameObject.SetActive(true);
             continueButton.interactable = !Database.Instance.ActivePlayerData.isNewGame;
             selectRaceID = 0;

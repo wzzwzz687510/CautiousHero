@@ -243,17 +243,17 @@ public class AreaUIController : MonoBehaviour
 
     public IEnumerator TurnSwitchAnimation(bool isPlayerTurn)
     {
-        yield return StartCoroutine(DisplayInfo(isPlayerTurn ? "Your Turn" : "Enemy Turn"));
+        yield return StartCoroutine(DisplayInfoAnim(isPlayerTurn ? "Your Turn" : "Enemy Turn"));
 
         BattleManager.Instance.StartNewTurn(isPlayerTurn);
     }
 
     public IEnumerator BattleStart()
     {
-        yield return StartCoroutine(DisplayInfo("Battle Start"));
+        yield return StartCoroutine(DisplayInfoAnim("Battle Start"));
     }
 
-    public IEnumerator DisplayInfo(string text)
+    private IEnumerator DisplayInfoAnim(string text)
     {
         while (AnimationManager.Instance.IsPlaying) {
             yield return null;
@@ -270,6 +270,11 @@ public class AreaUIController : MonoBehaviour
         DOTween.ToAlpha(() => turnBG.color, color => turnBG.color = color, 0f, 0.5f);
         DOTween.ToAlpha(() => turnText.color, color => turnText.color = color, 0f, 0.5f);
         yield return new WaitForSeconds(0.5f);
+    }
+
+    public void DisplayInfo(string text)
+    {
+        StartCoroutine(DisplayInfoAnim(text));
     }
 
     public void Button_EndTurn()
