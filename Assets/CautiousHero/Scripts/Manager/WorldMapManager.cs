@@ -193,7 +193,7 @@ namespace Wing.RPGSystem
                 Nav.SetTileWeight(loc, 1);
                 AreaController ac = areaHolder.GetChild(i).GetComponent<AreaController>();
                 ac.transform.position = new Vector3(0.524f * (loc.y-loc.x), 0.262f * (loc.x + loc.y), 0);
-                //ac.Init_SpriteRenderer(loc);
+                ac.m_animator.Play("default");
                 AreaDic.Add(loc, ac);
             }
         }

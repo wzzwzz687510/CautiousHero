@@ -136,7 +136,6 @@ namespace Wing.RPGSystem
                         SetCoverColor(moveColor.SetAlpha(0.7f));
                     }
                     else {
-                        Debug.Log(string.Format("isEmpty {0}, isObstacle {1}", Info.isEmpty, Info.isObstacle));
                         SetCoverColor(unreachableColor.SetAlpha(0.7f));
                     }
                     break;

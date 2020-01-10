@@ -226,7 +226,7 @@ namespace Wing.RPGSystem
 
         private IEnumerator PlayAnimation(BaseAnimClip clip)
         {
-            //Debug.Log(clip.type);
+            Debug.Log(clip.type);
             Entity entity;
             switch (clip.type) {
                 case AnimType.MovePath:
@@ -253,15 +253,15 @@ namespace Wing.RPGSystem
                 case AnimType.Cast:
                     var castClip = clip as CastAnimClip;
                     if (castClip.skillHash.GetBaseSkill().castEffect.effectName == null) break;
+                    CastEffect ce = castClip.skillHash.GetBaseSkill().castEffect;
                     GameObject effect;
                     Vector3 endPosition = effectOffset + (isWorldView ? 
                         castClip.end.ToWorldView() : castClip.end.ToAreaView());
                     switch (castClip.castType) {
                         case CastType.Instant:                            
-                            effect = Instantiate(skillPrefab, endPosition, Quaternion.identity, effectHolder);
-                            if (effect.TryGetComponent(out Animator instantAnim))
-                                instantAnim?.Play(castClip.skillHash.GetBaseSkill().castEffect.effectName, 0);
-
+                            effect = Instantiate(skillPrefab, endPosition, Quaternion.identity, effectHolder);                           
+                            effect.GetComponent<Animator>().Play(ce.effectName, 0);
+                            effect.GetComponent<AudioSource>().PlayOneShot(ce.sound);
                             //yield return StartCoroutine(PlayAnimation(clips.Dequeue()));
                             StartCoroutine(DelayDestory(effect, castClip.duration * animRate));
                             break;
@@ -269,8 +269,8 @@ namespace Wing.RPGSystem
                             Vector3 startPosition = effectOffset + (isWorldView ? 
                                 castClip.start.ToWorldView() : castClip.start.ToAreaView());
                             effect = Instantiate(skillPrefab, startPosition, Quaternion.identity, effectHolder);
-                            if (effect.TryGetComponent(out Animator trajectoryAnim))
-                                trajectoryAnim?.Play(castClip.skillHash.GetBaseSkill().castEffect.effectName, 0);
+                            effect.GetComponent<Animator>().Play(ce.effectName, 0);
+                            effect.GetComponent<AudioSource>().PlayOneShot(ce.sound);
                             int distance = AStarSearch.Heuristic(castClip.start, castClip.end);
                             effect.transform.DOMove(endPosition, castClip.duration * distance * animRate)
                                   .OnComplete(() => Destroy(effect));

@@ -64,6 +64,7 @@ namespace Wing.RPGSystem
     {
         public string effectName;
         public float animDuration;
+        public AudioClip sound;
     }
 
     //[CreateAssetMenu(fileName = "Skill", menuName = "ScriptableSkills/BaseSkill", order = 1)]
