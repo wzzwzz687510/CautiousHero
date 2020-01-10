@@ -80,8 +80,9 @@ public class BattleManager : MonoBehaviour
         //GetComponent<BattleUIController>()?.Init();
     }
 
-    public void PrepareBattle()
+    public void Init()
     {
+        ChangeState(BattleState.FreeMove);
         m_battleUIController.EnterAreaAnim();
         GridManager.Instance.LoadMap();
     }

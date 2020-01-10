@@ -27,6 +27,12 @@ namespace Wing.RPGSystem
             Hash = EntityManager.Instance.AddEntity(this);
             BuffManager = new BuffManager(Hash);
             HealthPoints = hp;
+            PhysicalArmourPoints = 0;
+            MagicalArmourPoints = 0;
+            ActionPoints = 0;
+            IsDeath = false;
+
+            m_collider.enabled = true;
         }
 
         public void InitSkillDeck()

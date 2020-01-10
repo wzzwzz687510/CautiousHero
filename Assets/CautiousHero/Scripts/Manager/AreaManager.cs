@@ -238,7 +238,7 @@ namespace Wing.RPGSystem
             character.transform.position = spawnLoc.ToAreaView();
 
             // Init battle system
-            BattleManager.Instance.PrepareBattle();
+            BattleManager.Instance.Init();
             InstantiateCreatures();
             InstantiateAbotics();
             //SaveAreaInfo();

@@ -35,8 +35,6 @@ namespace Wing.RPGSystem
 
         public GameObject creaturePrefab;
 
-        private GameObject creatureHolder;
-
         public PlayerController player;
         public List<CreatureController> Creatures { get; private set; }
         public bool isCalculating { get; private set; }
@@ -54,9 +52,6 @@ namespace Wing.RPGSystem
 
         public void Init(List<int> battleSet)
         {
-            if (creatureHolder)
-                Destroy(creatureHolder);
-            creatureHolder = new GameObject("Creature Holder");
             Creatures = new List<CreatureController>();
 
             // Obsolute

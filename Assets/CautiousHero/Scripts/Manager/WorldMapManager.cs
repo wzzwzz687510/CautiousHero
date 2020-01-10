@@ -106,7 +106,9 @@ namespace Wing.RPGSystem
             InitAreas();
 
             // Init player
-            StartCoroutine(DelayInitCharacter(1));
+            character.InitCharacter("WorldCharacter", WorldData.ActiveData.attribute);
+            character.MoveToLocation(currentLoc, true, true);
+            StartCoroutine(DelayShowCharacter(1));
         }
 
         public void EnterNextStage()
@@ -145,16 +147,16 @@ namespace Wing.RPGSystem
             foreach (var loc in locs) {
                 AreaDic[loc].Init(loc);
             }
-            if(!WorldData.ActiveData .stageLocations.Contains(currentLoc))
+            if(!WorldData.ActiveData.stageLocations.Contains(currentLoc)) {
+                IsWorldView = false;
                 AreaManager.Instance.InitArea(currentLoc, WorldData.ActiveData.enterAreaDirection);
-
+                IsWorldView = true;
+            }               
         }
 
-        private IEnumerator DelayInitCharacter(float time)
+        private IEnumerator DelayShowCharacter(float time)
         {
             yield return new WaitForSeconds(time);
-            character.InitCharacter("WorldCharacter",WorldData.ActiveData.attribute);
-            character.MoveToLocation(currentLoc, true, true);
             character.EntitySprite.DOFade(1, 0.5f);
         }
 
@@ -206,7 +208,7 @@ namespace Wing.RPGSystem
         #region Generate New World
         public void StartNewGame()
         {
-            m_worldUIController.gameObject.SetActive(true);
+            character.EntitySprite.DOFade(0, 0);
             StartCoroutine(GenerateNewWorld());
         }
 
