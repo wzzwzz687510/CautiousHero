@@ -21,8 +21,9 @@ MonoBehaviour:
   castType: 0
   labels: 
   castEffect:
-    prefab: {fileID: 0}
-    animDuration: 0
+    effectName: armour
+    animDuration: 1
+    sound: {fileID: 8300000, guid: b659b22549aaf6e4db2c2f2b4184a4b7, type: 3}
   tCastPatterns:
     type: 0
     size: 1

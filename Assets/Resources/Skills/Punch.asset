@@ -22,7 +22,8 @@ MonoBehaviour:
   labels: 06000000
   castEffect:
     effectName: hit
-    animDuration: 0.3
+    animDuration: 1
+    sound: {fileID: 8300000, guid: 5b7eb015d49a4c442bbd0acca76e5db5, type: 3}
   tCastPatterns:
     type: 0
     size: 2

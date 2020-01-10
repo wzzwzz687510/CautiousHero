@@ -22,7 +22,8 @@ MonoBehaviour:
   labels: 06000000
   castEffect:
     effectName: fire
-    animDuration: 0.3
+    animDuration: 1
+    sound: {fileID: 8300000, guid: 47796a84d51db3a49a4d3dab901636a0, type: 3}
   tCastPatterns:
     type: 0
     size: 4
