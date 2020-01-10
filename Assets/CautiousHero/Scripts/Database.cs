@@ -58,6 +58,7 @@ namespace Wing.RPGSystem
         public List<Location> stageLocations;
         public int currentStage;
         public Location characterLocation;
+        public Location enterAreaDirection;
         public Location worldBound;
 
         public static WorldData ActiveData => Database.Instance.ActiveWorldData;
@@ -255,6 +256,7 @@ namespace Wing.RPGSystem
                 stageLocations = new List<Location>(),
                 currentStage = 0,
                 characterLocation = new Location(4, 0),
+                enterAreaDirection = Location.Up,
                 worldBound = new Location(8, -1)
             };
             AreaChunks = new AreaData[0];
@@ -313,6 +315,11 @@ namespace Wing.RPGSystem
             SaveAreaChunks();
         }
 
+        public void SetEnterAreaDirection(Location dir)
+        {
+            m_activeWorldData.enterAreaDirection = dir;
+        }
+
         public bool TryGetAreaInfo(Location key, out AreaInfo areaInfo)
         {
             foreach (var chunk in AreaChunks) {
@@ -339,6 +346,13 @@ namespace Wing.RPGSystem
         {
             m_playerData[SelectSlot].isNewGame = true;
             SavePlayerData();
+        }
+
+        public void SetCharacterData(int hp,EntityAttribute attribute)
+        {
+            m_activeWorldData.HealthPoints = hp;
+            m_activeWorldData.attribute = attribute;
+            WorldDataChangedEvent?.Invoke();
         }
 
         public void ApplyResourceChange(int coin, int exp,bool isIncrease)

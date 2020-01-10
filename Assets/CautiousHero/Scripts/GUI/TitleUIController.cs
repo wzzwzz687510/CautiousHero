@@ -105,6 +105,8 @@ namespace Wing.RPGSystem
 
         public void Button_StartNewGame()
         {
+            startPage.SetActive(true);
+            createPage.SetActive(false);
             gameObject.SetActive(false);
             Database.Instance.CreateNewGame(selectRaceID, selectClassID);
             WorldMapManager.Instance.StartNewGame();

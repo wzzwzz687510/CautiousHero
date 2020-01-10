@@ -20,13 +20,13 @@ namespace Wing.RPGSystem
         public delegate void SkillShiftAnimation(float duration);
         public SkillShiftAnimation ssAnimEvent;
 
-        public void InitCharacter(string name, EntityAttribute attributes)
+        public void InitCharacter(string name, EntityAttribute attributes, int hp = 100)
         {
             m_attribute = attributes;
             EntityName = name;
             Hash = EntityManager.Instance.AddEntity(this);
             BuffManager = new BuffManager(Hash);
-            HealthPoints = MaxHealthPoints;
+            HealthPoints = hp;
         }
 
         public void InitSkillDeck()

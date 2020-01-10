@@ -59,7 +59,7 @@ namespace Wing.RPGSystem
 
         public void SwitchToWorldView()
         {
-            //SetLoadingPage(true);
+            WorldMapManager.Instance.SetWorldView(true);
             worldView.gameObject.SetActive(true);
             worldViewBG.gameObject.SetActive(true);
             worldView.DOFade(1, switchTime);
@@ -71,7 +71,7 @@ namespace Wing.RPGSystem
 
         public void SwitchToAreaView()
         {
-            //SetLoadingPage(true);
+            WorldMapManager.Instance.SetWorldView(false);
             worldView.DOFade(0, switchTime);
             worldViewBG.DOFade(0, switchTime).OnComplete(() => {
                 //SetLoadingPage(false);
@@ -96,10 +96,11 @@ namespace Wing.RPGSystem
         public void Button_System()
         {
             infoConfirmButton.onClick.AddListener(() => {
+                SwitchToWorldView();
                 Database.Instance.SaveAll();
                 infoConfirmButton.onClick.RemoveAllListeners();
                 infoPage.SetActive(false);
-                //SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+                
                 AudioManager.Instance.PlayTitleClip();
                 titlePage.SetActive(true);
             });

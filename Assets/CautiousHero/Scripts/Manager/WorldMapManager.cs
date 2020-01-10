@@ -65,13 +65,19 @@ namespace Wing.RPGSystem
             }
         }
 
+        public void SetWorldView(bool isWorldView)
+        {
+            IsWorldView = isWorldView;
+        }
+
         public void EnterArea(Location areaLoc)
         {
             if (!AreaDic.ContainsKey(areaLoc) || areaLoc == new Location(4, 0)) return;
-            IsWorldView = false;
             m_worldUIController.SwitchToAreaView();
             if (areaLoc != currentLoc) {
-                AreaManager.Instance.InitArea(areaLoc, Nav.GetDirectionPattern(currentLoc, areaLoc));
+                Location dir = Nav.GetDirectionPattern(currentLoc, areaLoc);
+                Database.Instance.SetEnterAreaDirection(dir);
+                AreaManager.Instance.InitArea(areaLoc, dir);
             }
             currentLoc = areaLoc;
         }
@@ -85,7 +91,6 @@ namespace Wing.RPGSystem
 
         public void CompleteAnArea()
         {
-            IsWorldView = true;
             m_worldUIController.SwitchToWorldView();
             Database.Instance.CompleteAnArea(currentLoc);
         }
@@ -109,6 +114,7 @@ namespace Wing.RPGSystem
 
         public void EnterNextStage()
         {
+            m_worldUIController.SwitchToWorldView();
             if (WorldData.ReachLastStage) {
                 WorldClear();
                 return;
@@ -142,6 +148,9 @@ namespace Wing.RPGSystem
             foreach (var loc in locs) {
                 AreaDic[loc].Init(loc);
             }
+            if(!WorldData.ActiveData .stageLocations.Contains(currentLoc))
+                AreaManager.Instance.InitArea(currentLoc, WorldData.ActiveData.enterAreaDirection);
+
         }
 
         private IEnumerator DelayInitCharacter(float time)

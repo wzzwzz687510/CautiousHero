@@ -180,9 +180,11 @@ namespace Wing.RPGSystem
             }
         }
 
-        private void SaveAreaInfo()
+        private void SaveData()
         {
+            Database.Instance.SetCharacterData(character.HealthPoints, character.Attribute);
             AreaInfo.SaveToDatabase(ChunkIndex, TempData);
+            Database.Instance.SaveWorldData();
         }
 
         private void HighlightVisual(Location loc)
@@ -228,7 +230,7 @@ namespace Wing.RPGSystem
             EntityManager.Instance.ResetEntityDicionary();
 
             // Init player
-            character.InitCharacter("AreaPlayer",WorldData.ActiveData.attribute);
+            character.InitCharacter("AreaPlayer",WorldData.ActiveData.attribute, WorldData.ActiveData.HealthPoints);
             character.MoveToLocation(spawnLoc,false, true);
             character.transform.position = spawnLoc.ToAreaView();
 
@@ -242,7 +244,7 @@ namespace Wing.RPGSystem
         public void LeaveArea()
         {
             character.Loc.GetTileController().OnEntityLeaving();
-            SaveAreaInfo();
+            SaveData();
         }
 
         public void CompleteBattle()
@@ -264,7 +266,7 @@ namespace Wing.RPGSystem
             m_lootUIController.AddContent(LootType.Coin, coin);
             m_lootUIController.AddContent(LootType.Exp, exp);
             m_lootUIController.gameObject.SetActive(true);
-            SaveAreaInfo();
+            SaveData();
 
             if (RemainedCreatures.Count == 0 && TempData.GetAreaInfoType() == AreaType.Boss) {
                 m_areaUIController.DisplayInfo("Stage Clear");
@@ -321,13 +323,13 @@ namespace Wing.RPGSystem
             Debug.Log("Before: " + TempData.chests[chestID].coin);
             TempData.chests[chestID].RemoveCoin();
             Debug.Log("After: " + TempData.chests[chestID].coin);
-            SaveAreaInfo();
+            SaveData();
         }
 
         public void RemoveChestRelic(int chestID, int relicHash)
         {
             TempData.chests[chestID].relicHashes.Remove(relicHash);
-            SaveAreaInfo();
+            SaveData();
         }
     }
 }
