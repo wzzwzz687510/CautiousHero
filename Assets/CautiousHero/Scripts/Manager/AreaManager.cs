@@ -151,11 +151,16 @@ namespace Wing.RPGSystem
         {
             foreach (var spawnLoc in TempData.creatureSetHashDic.Keys) {
                 List<int> creatureHashes = new List<int>();
+                int rotTimes = TempData.creatureSetRotTimesDic[spawnLoc];
+                int cosine = (int)Mathf.Cos(rotTimes * 90 * Mathf.Deg2Rad);
+                int sine = (int)Mathf.Sin(rotTimes * 90 * Mathf.Deg2Rad);
+                int patternX, patternY;
                 foreach (var ce in TempData.creatureSetHashDic[spawnLoc].GetCreatureSet().creatures) {
                     var cc = Instantiate(creaturePrefab, creatureHolder).GetComponent<CreatureController>();
-                    cc.InitCreature(ce.tCreature, ce.pattern + spawnLoc);
+                    patternX = ce.pattern.x * cosine + ce.pattern.y * sine;
+                    patternY = -ce.pattern.x * sine + ce.pattern.y * cosine;
+                    cc.InitCreature(ce.tCreature, new Location(patternX, patternY) + spawnLoc);
                     creatureHashes.Add(cc.Hash);
-                    SetEntityHash(cc.Loc, cc.Hash);
                 }
                 RemainedCreatures.Add(spawnLoc, creatureHashes);
             }
@@ -227,7 +232,7 @@ namespace Wing.RPGSystem
             BattleManager.Instance.PrepareBattle();
             InstantiateCreatures();
             InstantiateAbotics();
-            SaveAreaInfo();
+            //SaveAreaInfo();
         }
 
         public void LeaveArea()

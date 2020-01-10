@@ -145,7 +145,7 @@ namespace Wing.RPGSystem
         }
 
         public void SetStayEntityOutline(Color c)
-        {
+        {            
             if (!IsEmpty) {
                 StayEntity.ChangeOutlineColor(c);
             }

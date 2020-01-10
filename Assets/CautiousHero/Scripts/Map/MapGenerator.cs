@@ -407,6 +407,7 @@ namespace Wing.RPGSystem
         public static Location Right => new Location(1, 0);
         public static Location Zero  => new Location(0, 0);
         public static Location One   => new Location(1, 1);
+        public static Location[] ClockDirections = { Up, Left, Right, Down, Right };
 
         public Location(Location loc)
         {

@@ -400,6 +400,7 @@ namespace Wing.RPGSystem
                     patternY = -ce.pattern.x * sine + ce.pattern.y * cosine;
                     info.map[setLoc.x + patternX, setLoc.y + patternY].isEmpty = false;
                 }
+                info.creatureSetRotTimesDic.Add(setLoc, rotTimes);
             }
                             
             int chunkIndex = WorldData.ActiveData.worldMap.Count / Database.AreaChunkSize;

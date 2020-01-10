@@ -47,6 +47,7 @@ namespace Wing.RPGSystem
         public TileInfo[,] map;
         public Dictionary<Location, Location> entranceDic;// First location is direction pattern
         public Dictionary<Location, int> creatureSetHashDic;
+        public Dictionary<Location, int> creatureSetRotTimesDic;// Second location is direction pattern
         public List<ChestEntity> chests;
 
         public AreaInfo(int templateHash, Location loc)
@@ -57,6 +58,7 @@ namespace Wing.RPGSystem
             map = new TileInfo[32, 32];
             entranceDic = new Dictionary<Location, Location>();
             creatureSetHashDic = new Dictionary<Location, int>();
+            creatureSetRotTimesDic = new Dictionary<Location, int>();
             chests = new List<ChestEntity>();
         }
 
