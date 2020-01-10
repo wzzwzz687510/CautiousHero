@@ -15,7 +15,6 @@ namespace Wing.RPGSystem
         {
             System.Random r = new System.Random();
             axis = new Vector3(r.Next(-100, 100) / 100.0f, r.Next(-100, 100) / 100.0f, r.Next(-100, 100) / 100.0f);
-            Debug.Log(axis.ToString());
         }
 
         private void LateUpdate()
