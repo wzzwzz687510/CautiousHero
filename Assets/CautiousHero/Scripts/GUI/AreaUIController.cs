@@ -8,7 +8,7 @@ using Wing.RPGSystem;
 
 public class AreaUIController : MonoBehaviour
 {
-    public PlayerController player;
+    public PlayerController character;
     public GameObject battleUI;
 
     [Header("Buttons")]
@@ -108,21 +108,21 @@ public class AreaUIController : MonoBehaviour
         SetSkillsUnknown();
         endStageButton.gameObject.SetActive(false);
 
-        PlayerHPChangeAnimation(0, 0);
-        PlayerHPChangeAnimation(1, 2);
-        PlayerArmourPointsChangeAnimation(true, player.PhysicalArmourPoints);
-        PlayerArmourPointsChangeAnimation(false, player.MagicalArmourPoints);
+        CharacterHPChangeAnimation(0, 1, 0);
+        CharacterHPChangeAnimation(character.HealthPoints,character.MaxHealthPoints, 2);
+        CharacterArmourPointsChangeAnimation(true, character.PhysicalArmourPoints);
+        CharacterArmourPointsChangeAnimation(false, character.MagicalArmourPoints);
     }
 
     private void BindEvent()
     {
-        player.OnMovedEvent += OnPlayerMovedEvent;
-        player.HPChangeAnimation += PlayerHPChangeAnimation;
-        player.ArmourPointsChangeAnimation += PlayerArmourPointsChangeAnimation;
-        player.OnCancelArmourEvent.AddListener(OnPlayerCancelArmourEvent);
+        character.OnMovedEvent += OnPlayerMovedEvent;
+        character.HPChangeAnimation += CharacterHPChangeAnimation;
+        character.ArmourPointsChangeAnimation += CharacterArmourPointsChangeAnimation;
+        character.OnCancelArmourEvent.AddListener(OnCharacterCancelArmourEvent);
 
-        player.ssAnimEvent += PlayerSkillShiftAnimation;
-        player.OnAPChanged.AddListener(OnPlayerAPChanged);
+        character.ssAnimEvent += CharacterSkillShiftAnimation;
+        character.OnAPChanged.AddListener(OnCharacterAPChanged);
         for (int i = 0; i < skillSlots.Length; i++) {
             skillSlots[i].CheckSlotState.AddListener(OnSkillBoardEvent);
         }
@@ -141,12 +141,12 @@ public class AreaUIController : MonoBehaviour
     {
     }
 
-    private void PlayerSkillShiftAnimation(float duration)
+    private void CharacterSkillShiftAnimation(float duration)
     {
         UpdateSkillSprites();
     }
 
-    private void OnPlayerCancelArmourEvent()
+    private void OnCharacterCancelArmourEvent()
     {
         physicalArmourFill.DOFade(0, 0.5f);
         magicalArmourFill.DOFade(0, 0.5f);
@@ -154,7 +154,7 @@ public class AreaUIController : MonoBehaviour
         magicalArmourText.text = "0";
     }
 
-    private void PlayerArmourPointsChangeAnimation(bool isPhysical, int remainedNumber)
+    private void CharacterArmourPointsChangeAnimation(bool isPhysical, int remainedNumber)
     {
         if (isPhysical) {
             physicalArmourFill.DOFade(remainedNumber != 0 ? 1 : 0, 0.5f);
@@ -166,8 +166,10 @@ public class AreaUIController : MonoBehaviour
         }
     }
 
-    private void PlayerHPChangeAnimation(float hpRatio, float duration)
+    private void CharacterHPChangeAnimation(int hp,int maxHP, float duration)
     {
+        maxHP = maxHP == 0 ? 1 : maxHP;
+        float hpRatio = 1.0f * hp / maxHP;
         if(hpRatio< playerHPBar.value) {
             hpFill.fillAmount = hpRatio;
         }
@@ -175,28 +177,27 @@ public class AreaUIController : MonoBehaviour
             DOTween.To(() => hpFill.fillAmount, ratio => hpFill.fillAmount = ratio, hpRatio, duration);
         }
         DOTween.To(() => playerHPBar.value, ratio => playerHPBar.value = ratio, hpRatio, duration);
-        //hpFill.color = hpRatio > 0.2f ? new Color(0.5f, 1, 0.4f) : Color.red;
-        playerHpText.text = ((int)(hpRatio * player.MaxHealthPoints)).ToString() + "/" + player.MaxHealthPoints.ToString();
+        playerHpText.text = hp.ToString() + "/" + maxHP.ToString();
     }
 
-    private void OnPlayerAPChanged()
+    private void OnCharacterAPChanged()
     {
         for (int i = 0; i < 8; i++) {
-            aps[i].isOn = i < player.ActionPoints;
+            aps[i].isOn = i < character.ActionPoints;
         }
     }
 
     public void UpdateSkillSprites()
     {
-        if (player.SkillHashes.Count < player.defaultSkillCount) return;
-        for (int i = 0; i < player.defaultSkillCount; i++) {
-            skills[i].sprite = player.SkillHashes[i].GetBaseSkill().sprite;
+        if (character.SkillHashes.Count < character.defaultSkillCount) return;
+        for (int i = 0; i < character.defaultSkillCount; i++) {
+            skills[i].sprite = character.SkillHashes[i].GetBaseSkill().sprite;
         }
     }
 
     public void SetSkillsUnknown()
     {
-        for (int i = 0; i < player.defaultSkillCount; i++) {
+        for (int i = 0; i < character.defaultSkillCount; i++) {
             skills[i].sprite = unknownSkill;
         }
 
@@ -205,19 +206,19 @@ public class AreaUIController : MonoBehaviour
 
     private void CastPreviewEvent(int skillID)
     {
-        for (int i = 0; i < player.ActionPoints; i++) {
-            aps[i].isOn = i < player.ActionPoints - player.SkillHashes[skillID].GetBaseSkill().actionPointsCost;
+        for (int i = 0; i < character.ActionPoints; i++) {
+            aps[i].isOn = i < character.ActionPoints - character.SkillHashes[skillID].GetBaseSkill().actionPointsCost;
         }
         skills[0].sprite = unknownSkill;
         for (int i = 1; i < skills.Length; i++) {
-            skills[i].sprite = player.SkillHashes[i - (skillID >= i ? 1 : 0)].GetBaseSkill().sprite;
+            skills[i].sprite = character.SkillHashes[i - (skillID >= i ? 1 : 0)].GetBaseSkill().sprite;
         }
     }
 
     private void MovePreviewEvent(int steps)
     {
-        for (int i = 0; i < player.ActionPoints; i++) {
-            aps[i].isOn = i < player.ActionPoints - steps;
+        for (int i = 0; i < character.ActionPoints; i++) {
+            aps[i].isOn = i < character.ActionPoints - steps;
         }
 
         for (int i = 0; i < steps; i++) {
@@ -226,7 +227,7 @@ public class AreaUIController : MonoBehaviour
         }
 
         for (int i = steps; i < skills.Length; i++) {
-            skills[i].sprite = player.SkillHashes[i- steps].GetBaseSkill().sprite;
+            skills[i].sprite = character.SkillHashes[i- steps].GetBaseSkill().sprite;
         }
     }
 
@@ -311,13 +312,13 @@ public class AreaUIController : MonoBehaviour
 
     public void OnSkillBoardEvent()
     {
-        if (player.SkillHashes.Count < player.defaultSkillCount) return;
+        if (character.SkillHashes.Count < character.defaultSkillCount) return;
         startTimer = false;
         for (int i = 0; i < skillSlots.Length; i++) {
             if (skillSlots[i].IsActive) {
                 startTimer = true;
                 selectSlot = i;
-                selectSkillHash = player.SkillHashes[i];
+                selectSkillHash = character.SkillHashes[i];
                 if(timer > waitDuration) ShowSkillBoard();
             }
         }
@@ -433,7 +434,7 @@ public class AreaUIController : MonoBehaviour
             var cc = (entity as CreatureController).Template;
             creatureSprite.sprite = cc.sprite;
             creatureName.text = cc.creatureName;
-            if (entity.Intelligence <= player.Intelligence) {
+            if (entity.Intelligence <= character.Intelligence) {
                 creatureHP.text = cc.attribute.maxHealth.ToString();
                 creatureAP.text = cc.attribute.actionPerTurn.ToString();
                 if(cc.skills.Length==0)

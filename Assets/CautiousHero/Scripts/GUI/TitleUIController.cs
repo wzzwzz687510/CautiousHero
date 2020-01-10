@@ -80,6 +80,9 @@ namespace Wing.RPGSystem
                 nameInputPage.SetActive(true);
             }
             else {
+                Database.Instance.SavePlayerData();
+                Database.Instance.LoadAll();
+                continueButton.interactable = !Database.Instance.ActivePlayerData.isNewGame;
                 savePage.SetActive(false);
                 saveName.text = Database.Instance.GetPlayerData(slotID).name;
                 slotIcon.sprite = iconSprites[slotID];

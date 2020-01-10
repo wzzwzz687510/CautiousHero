@@ -52,7 +52,7 @@ namespace Wing.RPGSystem {
             MoveToTile(loc, true);
 
             hpBar.enabled = true;
-            CreatureHpChangeAnimation(1,1);
+            CreatureHpChangeAnimation(MaxHealthPoints, MaxHealthPoints, 1);
         }
 
         public void SetNextSkillTarget(int hash)
@@ -79,13 +79,13 @@ namespace Wing.RPGSystem {
             mask_hp.backSortingOrder = sortingOrder + 2;
         }
 
-        private void CreatureHpChangeAnimation(float hpRatio, float duraion)
+        private void CreatureHpChangeAnimation(int hp,int maxHP, float duraion)
         {
-            if (hpRatio == 0) {
+            if (hp == 0) {
                 DeathAnim();
                 return;
             }
-
+            float hpRatio = 1.0f * hp / maxHP;
             if (1 - mask_hp.alphaCutoff > hpRatio) {
                 mask_hp.alphaCutoff = 1 - hpRatio;
                 DOTween.To(() => mask_hpEffect.alphaCutoff, alpha => mask_hpEffect.alphaCutoff = alpha, 1 - hpRatio, 1);

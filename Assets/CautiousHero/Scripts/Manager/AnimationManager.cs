@@ -80,13 +80,15 @@ namespace Wing.RPGSystem
     public class HPChangeAnimClip : BaseAnimClip
     {
         public int entityHash;
-        public float ratio;
+        public int hp;
+        public int maxHP;
 
-        public HPChangeAnimClip(int entityHash, float ratio, float duration = 0.5f)
+        public HPChangeAnimClip(int entityHash, int hp,int maxHP, float duration = 0.5f)
             : base(AnimType.HPChange, duration)
         {
             this.entityHash = entityHash;
-            this.ratio = ratio;
+            this.hp = hp;
+            this.maxHP = maxHP;
         }
     }
 
@@ -281,7 +283,7 @@ namespace Wing.RPGSystem
                     var hpChangeClip = clip as HPChangeAnimClip;
                     if (!EntityManager.Instance.TryGetEntity(hpChangeClip.entityHash, out entity))
                         break;
-                    entity.HPChangeAnimation?.Invoke(hpChangeClip.ratio, hpChangeClip.duration * animRate);
+                    entity.HPChangeAnimation?.Invoke(hpChangeClip.hp, hpChangeClip.maxHP, hpChangeClip.duration * animRate);
                     yield return new WaitForSeconds(hpChangeClip.duration * animRate);
                     break;
                 case AnimType.ArmourPChange:

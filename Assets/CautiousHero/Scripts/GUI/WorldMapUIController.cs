@@ -42,6 +42,7 @@ namespace Wing.RPGSystem
                 Instance = this;
 
             Database.Instance.WorldDataChangedEvent.AddListener(UpdateUI);
+            AreaManager.Instance.character.OnHPChanged.AddListener(UpdateHP);
         }
 
         public void UpdateUI()
@@ -50,6 +51,11 @@ namespace Wing.RPGSystem
             hpText.text = ActiveWorldData.HealthPoints + "/" + ActiveWorldData.attribute.maxHealth;
             coinText.text = ActiveWorldData.coins.ToString();
             expText.text = ActiveWorldData.exp.ToString();
+        }
+
+        public void UpdateHP()
+        {
+            hpText.text = AreaManager.Instance.character.HealthPoints + "/" + AreaManager.Instance.character.MaxHealthPoints;
         }
 
         public void SetLoadingPage(bool isShow)

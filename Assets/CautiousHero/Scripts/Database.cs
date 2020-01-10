@@ -134,14 +134,14 @@ namespace Wing.RPGSystem
         public void SaveAreaInfo(int chunkID, AreaInfo info)
         {
             AreaChunks[chunkID].areaInfo[info.loc] = info;
-            SaveData("GameData_MapChunk" + chunkID, AreaChunks[chunkID]);
+            SaveData("GameData_" + ActivePlayerData.name + "_MapChunk" + chunkID, AreaChunks[chunkID]);
             AreaDataChangedEvent?.Invoke();
         }
 
         public void SaveAreaChunks()
         {
             for (int i = 0; i < AreaChunks.Length; i++) {
-                SaveData("GameData_MapChunk" + i, AreaChunks[i]);
+                SaveData("GameData_"+ ActivePlayerData.name+"_MapChunk" + i, AreaChunks[i]);
             }
         }
 
@@ -201,7 +201,7 @@ namespace Wing.RPGSystem
             LoadData(filePath, ref m_activeWorldData);
             AreaChunks = new AreaData[m_activeWorldData.mapFileCnt];
             for (int i = 0; i < m_activeWorldData.mapFileCnt; i++) {
-                filePath = GetFilePath("GameData_MapChunk" + i);
+                filePath = GetFilePath("GameData_" + ActivePlayerData.name + "_MapChunk" + i);
                 LoadData(filePath, ref AreaChunks[i]);
             }
 

@@ -188,7 +188,7 @@ namespace Wing.RPGSystem
         public delegate void IntDelegate(int value);
         public IntDelegate OnMovedEvent;
         public IntDelegate OnSortingOrderChanged;
-        public delegate void PointsChange(float ratio, float duraion);
+        public delegate void PointsChange(int hp,int maxHP, float duraion);
         public PointsChange HPChangeAnimation;
         public delegate void ArmourChange(bool isPhysical,int remainedNumber);
         public ArmourChange ArmourPointsChangeAnimation;
@@ -374,7 +374,7 @@ namespace Wing.RPGSystem
             //Debug.Log("Entity: "+EntityName+", HP: " + HealthPoints);
             int tmpHP = HealthPoints;
             HealthPoints = Mathf.Clamp(HealthPoints + (damage ? -1 : 1) * value, 0, MaxHealthPoints);
-            AnimationManager.Instance.AddAnimClip(new HPChangeAnimClip(Hash, 1.0f * HealthPoints / MaxHealthPoints));
+            AnimationManager.Instance.AddAnimClip(new HPChangeAnimClip(Hash, HealthPoints,MaxHealthPoints));
             if (BattleManager.Instance.IsPlayerTurn)
                 AnimationManager.Instance.PlayOnce(false);
 
