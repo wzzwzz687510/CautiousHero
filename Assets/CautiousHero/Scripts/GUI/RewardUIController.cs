@@ -13,7 +13,7 @@ namespace Wing.RPGSystem
         public GameObject expPrefab;
         public GameObject relicPrefab;
 
-        private int selectChestID;
+        private int selectChestID = -1;
 
         public void AddContent(LootType type, int number)
         {
