@@ -43,7 +43,7 @@ namespace Wing.RPGSystem
             }
 
             serializedObject.ApplyModifiedProperties();
-            if (GUILayout.Button("Create")) {
+            if (GUILayout.Button("Save")) {
                 t.Button_CreateAsset();
             }
             if (GUILayout.Button("Load")) {
