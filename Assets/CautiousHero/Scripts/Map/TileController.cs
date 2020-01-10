@@ -132,8 +132,13 @@ namespace Wing.RPGSystem
                     SetStayEntityOutline(Color.black);
                     break;
                 case TileState.MoveSelected:
-                    if(!Info.IsBlocked) SetCoverColor(moveColor.SetAlpha(0.7f));
-                    else SetCoverColor(unreachableColor.SetAlpha(0.7f));
+                    if (!Info.IsBlocked) {
+                        SetCoverColor(moveColor.SetAlpha(0.7f));
+                    }
+                    else {
+                        Debug.Log(string.Format("isEmpty {0}, isObstacle {1}", Info.isEmpty, Info.isObstacle));
+                        SetCoverColor(unreachableColor.SetAlpha(0.7f));
+                    }
                     break;
                 case TileState.CastSelected:
                     SetCoverColor(castColor.SetAlpha(0.7f));

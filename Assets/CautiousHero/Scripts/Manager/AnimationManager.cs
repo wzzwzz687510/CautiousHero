@@ -132,7 +132,10 @@ namespace Wing.RPGSystem
     {
         public static AnimationManager Instance { get; private set; }
 
+        [Header("Setting")]
         public float animRate = 1.0f;
+        public Vector3 effectOffset;
+        public GameObject skillPrefab;
 
         public bool IsPlaying { get; private set; }
         public int Count { get { return clips.Count; } }
@@ -249,26 +252,25 @@ namespace Wing.RPGSystem
                     break;
                 case AnimType.Cast:
                     var castClip = clip as CastAnimClip;
-                    if (castClip.skillHash.GetBaseSkill().castEffect.prefab == null) break;
+                    if (castClip.skillHash.GetBaseSkill().castEffect.effectName == null) break;
                     GameObject effect;
-                    Vector3 endPosition = new Vector3(0, 0.5f, 0) + 
-                        (isWorldView ? castClip.end.ToWorldView() : castClip.end.ToAreaView());
+                    Vector3 endPosition = effectOffset + (isWorldView ? 
+                        castClip.end.ToWorldView() : castClip.end.ToAreaView());
                     switch (castClip.castType) {
                         case CastType.Instant:                            
-                            effect = Instantiate(castClip.skillHash.GetBaseSkill().castEffect.prefab,
-                                endPosition, Quaternion.identity, effectHolder);
-
-                            effect.TryGetComponent(out Animator anim);
-                            anim?.Play(effect.name.Replace("(Clone)",""), 0);
+                            effect = Instantiate(skillPrefab, endPosition, Quaternion.identity, effectHolder);
+                            if (effect.TryGetComponent(out Animator instantAnim))
+                                instantAnim?.Play(castClip.skillHash.GetBaseSkill().castEffect.effectName, 0);
 
                             //yield return StartCoroutine(PlayAnimation(clips.Dequeue()));
                             StartCoroutine(DelayDestory(effect, castClip.duration * animRate));
                             break;
                         case CastType.Trajectory:
-                            Vector3 startPosition = new Vector3(0, 0.5f, 0) + 
-                                (isWorldView ? castClip.start.ToWorldView() : castClip.start.ToAreaView());
-                            effect = Instantiate(castClip.skillHash.GetBaseSkill().castEffect.prefab,
-                                startPosition, Quaternion.identity, effectHolder);
+                            Vector3 startPosition = effectOffset + (isWorldView ? 
+                                castClip.start.ToWorldView() : castClip.start.ToAreaView());
+                            effect = Instantiate(skillPrefab, startPosition, Quaternion.identity, effectHolder);
+                            if (effect.TryGetComponent(out Animator trajectoryAnim))
+                                trajectoryAnim?.Play(castClip.skillHash.GetBaseSkill().castEffect.effectName, 0);
                             int distance = AStarSearch.Heuristic(castClip.start, castClip.end);
                             effect.transform.DOMove(endPosition, castClip.duration * distance * animRate)
                                   .OnComplete(() => Destroy(effect));

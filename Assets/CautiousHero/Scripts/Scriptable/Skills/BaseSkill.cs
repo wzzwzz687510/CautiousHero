@@ -62,7 +62,7 @@ namespace Wing.RPGSystem
     [System.Serializable]
     public struct CastEffect
     {
-        public GameObject prefab;
+        public string effectName;
         public float animDuration;
     }
 

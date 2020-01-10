@@ -21,7 +21,7 @@ MonoBehaviour:
   castType: 0
   labels: 06000000
   castEffect:
-    prefab: {fileID: 512518814946393455, guid: 86b43715846ca91448fb1cd7d2235955, type: 3}
+    effectName: hit
     animDuration: 0.3
   tCastPatterns:
     type: 0
