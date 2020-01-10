@@ -315,9 +315,12 @@ namespace Wing.RPGSystem
             SaveAreaChunks();
         }
 
-        public void SetEnterAreaDirection(Location dir)
-        {
+        public void EnterAnArea(Location loc,Location dir)
+        {           
+            m_activeWorldData.characterLocation = loc;
             m_activeWorldData.enterAreaDirection = dir;
+            SaveWorldData();
+            SaveAreaChunks();
         }
 
         public bool TryGetAreaInfo(Location key, out AreaInfo areaInfo)

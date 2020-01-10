@@ -210,6 +210,9 @@ namespace Wing.RPGSystem
 
         public void InitArea(Location to, Location directionPattern)
         {
+            // Save enter info
+            Database.Instance.EnterAnArea(to, directionPattern);
+
             // Fetch world data
             CurrentAreaLoc = to;
             CurrentAreaIndex = WorldData.ActiveData.worldMap.IndexOf(CurrentAreaLoc);

@@ -76,7 +76,6 @@ namespace Wing.RPGSystem
             m_worldUIController.SwitchToAreaView();
             if (areaLoc != currentLoc) {
                 Location dir = Nav.GetDirectionPattern(currentLoc, areaLoc);
-                Database.Instance.SetEnterAreaDirection(dir);
                 AreaManager.Instance.InitArea(areaLoc, dir);
             }
             currentLoc = areaLoc;
@@ -105,8 +104,6 @@ namespace Wing.RPGSystem
             Location bound = WorldData.ActiveData.worldBound;
             Nav = new TileNavigation(bound.x, bound.y, 0);          
             InitAreas();
-
-            //ExploreArea(currentLoc);
 
             // Init player
             StartCoroutine(DelayInitCharacter(1));
