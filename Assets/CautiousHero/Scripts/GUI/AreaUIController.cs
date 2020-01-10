@@ -423,7 +423,7 @@ public class AreaUIController : MonoBehaviour
             default:
                 break;
         }
-        skillBoard.position = skillSlots[selectSlot].transform.position + new Vector3(0, 150, 0);
+        skillBoard.position = skillSlots[selectSlot].transform.position + new Vector3(0, 170, 0);
     }
 
     public void ShowCreatureBoard()
@@ -473,7 +473,7 @@ public class AreaUIController : MonoBehaviour
                 creatureElement.text = "?";
             }
 
-            creatureBoard.position = new Vector3(Screen.width - 310, Screen.height - 110, 0);
+            creatureBoard.position = new Vector3(Screen.width - 310, Screen.height - 130, 0);
         }
     }
 

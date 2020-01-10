@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   creatureName: Slime
   description: A secret creature
-  sprite: {fileID: -5961837970618009984, guid: fc61ce768a0396f4a9d3663e9f4ce162, type: 3}
+  sprite: {fileID: 21300000, guid: cb90e14741a1a13408bcacd170b5f2ba, type: 3}
   attribute:
     maxHealth: 20
     maxAction: 6

@@ -227,6 +227,7 @@ namespace Wing.RPGSystem
             BattleManager.Instance.PrepareBattle();
             InstantiateCreatures();
             InstantiateAbotics();
+            SaveAreaInfo();
         }
 
         public void LeaveArea()
