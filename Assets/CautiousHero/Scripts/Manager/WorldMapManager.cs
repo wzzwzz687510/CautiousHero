@@ -94,6 +94,13 @@ namespace Wing.RPGSystem
             Database.Instance.CompleteAnArea(currentLoc);
         }
 
+        public void CompleteWorld()
+        {
+            Database.Instance.SetNewGame();
+            AudioManager.Instance.PlayTitleClip();
+            titleUIController.ResetUI();
+        }
+
         public void ContinueGame()
         {
             AudioManager.Instance.PlayPeacefulClip();

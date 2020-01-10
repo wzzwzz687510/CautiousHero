@@ -94,10 +94,9 @@ namespace Wing.RPGSystem
 
         public void Button_CompleteAWorld()
         {
-            Database.Instance.SetNewGame();
-            endPage.SetActive(false);
-            AudioManager.Instance.PlayTitleClip();
+            endPage.SetActive(false);           
             titlePage.SetActive(true);
+            WorldMapManager.Instance.CompleteWorld();
         }
 
         public void Button_System()
