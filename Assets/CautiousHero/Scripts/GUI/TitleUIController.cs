@@ -40,16 +40,32 @@ namespace Wing.RPGSystem
         private void Start()
         {
             if (Database.Instance.SelectSlot != -1) {
-                saveButton.gameObject.SetActive(true);
-                continueButton.interactable = !Database.Instance.ActivePlayerData.isNewGame;
-                selectRaceID = 0;
-                selectClassID = 0;
-                slotIcon.sprite = iconSprites[Database.Instance.SelectSlot];
                 saveName.text = Database.Instance.ActivePlayerData.name;
+                ResetUI();               
             }
             else {
                 Button_DisplaySaveSlot();
             }
+        }
+
+        private void Update()
+        {
+            if (Input.GetMouseButtonDown(1)) {
+                savePage.SetActive(false);
+                createPage.SetActive(false);
+                startPage.SetActive(true);
+            }
+        }
+
+        public void ResetUI()
+        {
+            nameInputPage.SetActive(false);
+            savePage.SetActive(false);
+            saveButton.gameObject.SetActive(true);
+            continueButton.interactable = !Database.Instance.ActivePlayerData.isNewGame;
+            selectRaceID = 0;
+            selectClassID = 0;
+            slotIcon.sprite = iconSprites[Database.Instance.SelectSlot];
         }
 
         public void Button_SelectSlot(int slotID)
@@ -71,14 +87,8 @@ namespace Wing.RPGSystem
         {
             if (nameInputField.text != null) {
                 Database.Instance.CreateNewPlayer(nameInputField.text);
-                saveName.text = nameInputField.text;
-                nameInputPage.SetActive(false);
-                savePage.SetActive(false);
-                saveButton.gameObject.SetActive(true);
-                continueButton.interactable = !Database.Instance.ActivePlayerData.isNewGame;
-                selectRaceID = 0;
-                selectClassID = 0;
-                slotIcon.sprite = iconSprites[Database.Instance.SelectSlot];
+                saveName.text = nameInputField.text;                
+                ResetUI();
             }          
         }
 

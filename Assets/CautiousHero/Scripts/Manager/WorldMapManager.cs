@@ -65,6 +65,17 @@ namespace Wing.RPGSystem
             }
         }
 
+        public void EnterArea(Location areaLoc)
+        {
+            if (!AreaDic.ContainsKey(areaLoc) || areaLoc == new Location(4, 0)) return;
+            IsWorldView = false;
+            m_worldUIController.SwitchToAreaView();
+            if (areaLoc != currentLoc) {
+                AreaManager.Instance.InitArea(areaLoc, Nav.GetDirectionPattern(currentLoc, areaLoc));
+            }
+            currentLoc = areaLoc;
+        }
+
         public void DiscoverArea(Location loc)
         {
             AreaDic[loc].Init(loc);
@@ -76,7 +87,7 @@ namespace Wing.RPGSystem
         {
             IsWorldView = true;
             m_worldUIController.SwitchToWorldView();
-            Database.Instance.SaveCharacterLocation(currentLoc);
+            Database.Instance.CompleteAnArea(currentLoc);
         }
 
         public void ContinueGame()
@@ -87,19 +98,37 @@ namespace Wing.RPGSystem
 
             // Init map visual
             Location bound = WorldData.ActiveData.worldBound;
-            Nav = new TileNavigation(bound.x, bound.y, 0);            
+            Nav = new TileNavigation(bound.x, bound.y, 0);          
             InitAreas();
 
             //ExploreArea(currentLoc);
 
             // Init player
-            StartCoroutine(DelayInitPlayer(1));
+            StartCoroutine(DelayInitCharacter(1));
+        }
+
+        public void EnterNextStage()
+        {
+            if (WorldData.ReachLastStage) {
+                WorldClear();
+                return;
+            }                
+
+            Database.Instance.SetCurrentStage(WorldData.ActiveData.currentStage + 1);
+            currentLoc = WorldData.ActiveData.stageLocations[WorldData.ActiveData.currentStage];
+            DiscoverArea(currentLoc);
+            m_worldUIController.SwitchToWorldView();
+            character.MoveToLocation(currentLoc, true, true);
+            foreach (var dp in AreaDic[currentLoc].AreaInfo.entranceDic.Keys) {
+                DiscoverArea(dp + currentLoc);
+            }
+            Database.Instance.SaveAreaChunks();
         }
 
         private void InitAreas()
         {
             RelocateAreaPosition();
-            currentLoc = new Location(4, 0);
+            currentLoc = WorldData.ActiveData.characterLocation;
 
             List<Location> locs = Database.Instance.GetDiscoveredAreaLocs();
             if (locs.Count == 0) {
@@ -107,6 +136,7 @@ namespace Wing.RPGSystem
                 foreach (var dp in AreaDic[currentLoc].AreaInfo.entranceDic.Keys) {
                     DiscoverArea(dp + currentLoc);
                 }
+                Database.Instance.SaveAreaChunks();
             }
 
             foreach (var loc in locs) {
@@ -114,11 +144,11 @@ namespace Wing.RPGSystem
             }
         }
 
-        private IEnumerator DelayInitPlayer(float time)
+        private IEnumerator DelayInitCharacter(float time)
         {
             yield return new WaitForSeconds(time);
-            character.InitPlayer("WorldCharacter",WorldData.ActiveData.attribute);
-            character.MoveToLocation(WorldData.ActiveData.characterLocation, true, true);
+            character.InitCharacter("WorldCharacter",WorldData.ActiveData.attribute);
+            character.MoveToLocation(currentLoc, true, true);
             character.EntitySprite.DOFade(1, 0.5f);
         }
 
@@ -140,19 +170,9 @@ namespace Wing.RPGSystem
             
         }
 
-        public void EnterArea(Location areaLoc)
-        {
-            if (!AreaDic.ContainsKey(areaLoc) || areaLoc == new Location(4, 0)) return;
-            IsWorldView = false;
-            m_worldUIController.SwitchToAreaView();
-            if (areaLoc != currentLoc) {                
-                AreaManager.Instance.InitArea(areaLoc, Nav.GetDirectionPattern(currentLoc, areaLoc));
-            }
-            currentLoc = areaLoc;
-        }
-
         private void RelocateAreaPosition()
         {
+            AreaDic.Clear();
             int cnt = WorldData.ActiveData.worldMap.Count ;
             if (cnt - areaHolder.childCount > 0) {
                 for (int i = 0; i < cnt - areaHolder.childCount; i++) {
@@ -170,6 +190,12 @@ namespace Wing.RPGSystem
             }
         }
 
+        private void WorldClear()
+        {
+            // TODO: Add score statistics to unlock content and for player review
+            Database.Instance.SetNewGame();
+            m_worldUIController.DisplayEndPage();
+        }
 
         #region Generate New World
         public void StartNewGame()
@@ -199,8 +225,9 @@ namespace Wing.RPGSystem
         private IEnumerator GenerateStage(AdventureStage stage)
         {
             Location dir = Location.Up;
-            Location loc = new Location(4,0);
-            
+            Location loc = new Location(4, WorldData.ActiveData.worldBound.y + 1);
+            WorldData.ActiveData.stageLocations.Add(loc);
+
             preDic = new Dictionary<Location, PreAreaInfo>();
             stageAreaLocs = new List<Location> {
                 loc

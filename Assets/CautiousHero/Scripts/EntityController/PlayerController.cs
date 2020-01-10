@@ -20,7 +20,7 @@ namespace Wing.RPGSystem
         public delegate void SkillShiftAnimation(float duration);
         public SkillShiftAnimation ssAnimEvent;
 
-        public void InitPlayer(string name, EntityAttribute attributes)
+        public void InitCharacter(string name, EntityAttribute attributes)
         {
             m_attribute = attributes;
             EntityName = name;

@@ -28,8 +28,10 @@ namespace Wing.RPGSystem
         public Text expText;
 
         [Header("Pages")]
+        public GameObject titlePage;
         public GameObject loadingPage;
         public GameObject infoPage;
+        public GameObject endPage;
 
         public PlayerData ActivePlayerData => Database.Instance.ActivePlayerData;
         public WorldData ActiveWorldData => Database.Instance.ActiveWorldData;
@@ -53,11 +55,6 @@ namespace Wing.RPGSystem
         public void SetLoadingPage(bool isShow)
         {
             loadingPage.SetActive(isShow);
-        }
-
-        public void ShowAreaInteractionBoard()
-        {
-
         }
 
         public void SwitchToWorldView()
@@ -84,14 +81,27 @@ namespace Wing.RPGSystem
             });
         }
 
+        public void DisplayEndPage()
+        {
+            endPage.SetActive(true);
+        }
+
+        public void Button_CompleteAWorld()
+        {
+            endPage.SetActive(false);
+            AudioManager.Instance.PlayTitleClip();
+            titlePage.SetActive(true);
+        }
+
         public void Button_System()
         {
             infoConfirmButton.onClick.AddListener(() => {
                 Database.Instance.SaveAll();
                 infoConfirmButton.onClick.RemoveAllListeners();
                 infoPage.SetActive(false);
-                SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+                //SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
                 AudioManager.Instance.PlayTitleClip();
+                titlePage.SetActive(true);
             });
             infoText.text = "Progress is automatically saved.";
             infoPage.SetActive(true);

@@ -279,7 +279,7 @@ public class AreaUIController : MonoBehaviour
 
     public void Button_EndStage()
     {
-
+        WorldMapManager.Instance.EnterNextStage();
     }
 
     public void Button_CastSkill(int skillID)

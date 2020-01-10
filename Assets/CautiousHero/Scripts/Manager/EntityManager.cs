@@ -20,7 +20,7 @@ namespace Wing.RPGSystem
         public void ResetEntityDicionary()
         {
             EntityDic.Clear();
-            AddEntity(WorldMapManager.Instance.character);
+            EntityDic.Add(WorldMapManager.Instance.character.Hash, WorldMapManager.Instance.character);
         }
 
         public int AddEntity(Entity entity)

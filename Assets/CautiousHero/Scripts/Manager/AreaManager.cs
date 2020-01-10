@@ -20,7 +20,7 @@ namespace Wing.RPGSystem
 
         [Header("Components")]
         public LayerMask tileLayer;
-        public PlayerController player;
+        public PlayerController character;
         public AreaUIController m_areaUIController;
         public RewardUIController m_lootUIController;
         public RewardUIController m_chestUIController;
@@ -115,7 +115,7 @@ namespace Wing.RPGSystem
 
         private void MoveToTile(Location tileLoc)
         {
-            if (!tileLoc.IsValid()) return;
+            if (!tileLoc.IsValid() || AnimationManager.Instance.IsPlaying) return;
             viewPin.localPosition = Vector3.zero;
             GridManager.Instance.DiscoverTiles(BattleCheck(tileLoc));
             if (TempData.map[tileLoc.x, tileLoc.y].GetTileType() == TileType.Entrance)
@@ -133,8 +133,8 @@ namespace Wing.RPGSystem
                     // TODO: improve trigger condition
                     if (delta < 0) continue;
                     Location stopLoc = delta > 0 ?
-                        player.Loc.GetLocationWithGivenStep(loc, player.Loc.Distance(loc) - delta) : loc;
-                    player.MoveToLocation(stopLoc, false, false);
+                        character.Loc.GetLocationWithGivenStep(loc, character.Loc.Distance(loc) - delta) : loc;
+                    character.MoveToLocation(stopLoc, false, false);
                     foreach (var hash in RemainedCreatures[spawnLoc]) hash.GetEntity().SetVisual(true);
                     BattleManager.Instance.NewBattle(RemainedCreatures[spawnLoc]);
                     RemainedCreatures.Remove(spawnLoc);
@@ -143,7 +143,7 @@ namespace Wing.RPGSystem
                     return stopLoc;
                 }
             }
-            player.MoveToLocation(loc, false, false);
+            character.MoveToLocation(loc, false, false);
             return loc;
         }
 
@@ -228,9 +228,9 @@ namespace Wing.RPGSystem
             EntityManager.Instance.ResetEntityDicionary();
 
             // Init player
-            player.InitPlayer("AreaPlayer",WorldData.ActiveData.attribute);
-            player.MoveToLocation(spawnLoc,false, true);
-            player.transform.position = spawnLoc.ToAreaView();
+            character.InitCharacter("AreaPlayer",WorldData.ActiveData.attribute);
+            character.MoveToLocation(spawnLoc,false, true);
+            character.transform.position = spawnLoc.ToAreaView();
 
             // Init battle system
             BattleManager.Instance.PrepareBattle();
@@ -241,7 +241,7 @@ namespace Wing.RPGSystem
 
         public void LeaveArea()
         {
-            player.Loc.GetTileController().OnEntityLeaving();
+            character.Loc.GetTileController().OnEntityLeaving();
             SaveAreaInfo();
         }
 

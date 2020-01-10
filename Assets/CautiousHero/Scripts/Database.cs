@@ -55,10 +55,13 @@ namespace Wing.RPGSystem
         public long exp;
         public List<int> learnedSkills;
         public List<Location> worldMap;
+        public List<Location> stageLocations;
+        public int currentStage;
         public Location characterLocation;
         public Location worldBound;
 
         public static WorldData ActiveData => Database.Instance.ActiveWorldData;
+        public static bool ReachLastStage => ActiveData.currentStage == ActiveData.stageLocations.Count - 1;
     }
 
     [System.Serializable]
@@ -124,12 +127,7 @@ namespace Wing.RPGSystem
         {
             SavePlayerData();
             SaveWorldData();
-
-            for (int i = 0; i < AreaChunks.Length; i++) {
-                SaveData("GameData_MapChunk" + i, AreaChunks[i]);
-            }
-
-           
+            SaveAreaChunks();
         }
 
         public void SaveAreaInfo(int chunkID, AreaInfo info)
@@ -139,10 +137,11 @@ namespace Wing.RPGSystem
             AreaDataChangedEvent?.Invoke();
         }
 
-        public void SaveCharacterLocation(Location loc)
+        public void SaveAreaChunks()
         {
-            m_activeWorldData.characterLocation = loc;
-            SaveWorldData();
+            for (int i = 0; i < AreaChunks.Length; i++) {
+                SaveData("GameData_MapChunk" + i, AreaChunks[i]);
+            }
         }
 
         public void SaveWorldData()
@@ -253,7 +252,10 @@ namespace Wing.RPGSystem
                 HealthPoints = attribute.maxHealth,
                 learnedSkills = skillDeck,
                 worldMap = new List<Location>(),
-                characterLocation = new Location(4, 0)
+                stageLocations = new List<Location>(),
+                currentStage = 0,
+                characterLocation = new Location(4, 0),
+                worldBound = new Location(8, -1)
             };
             AreaChunks = new AreaData[0];
 
@@ -304,6 +306,13 @@ namespace Wing.RPGSystem
             }
         }
 
+        public void CompleteAnArea(Location loc)
+        {
+            m_activeWorldData.characterLocation = loc;
+            SaveWorldData();
+            SaveAreaChunks();
+        }
+
         public bool TryGetAreaInfo(Location key, out AreaInfo areaInfo)
         {
             foreach (var chunk in AreaChunks) {
@@ -319,6 +328,17 @@ namespace Wing.RPGSystem
         public void SetWorldBound(int x,int y)
         {
             m_activeWorldData.worldBound = new Location(x, y);
+        }
+
+        public void SetCurrentStage(int id)
+        {
+            m_activeWorldData.currentStage = id;
+        }
+
+        public void SetNewGame()
+        {
+            m_playerData[SelectSlot].isNewGame = true;
+            SavePlayerData();
         }
 
         public void ApplyResourceChange(int coin, int exp,bool isIncrease)
