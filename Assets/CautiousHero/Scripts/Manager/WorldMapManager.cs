@@ -167,12 +167,13 @@ namespace Wing.RPGSystem
             character.EntitySprite.DOFade(1, 0.5f);
         }
 
-        private IEnumerator WaitForMoveAnim(Location areaLoc)
+        private IEnumerator EnterAreaAfterAnim(Location areaLoc)
         {
             while (AnimationManager.Instance.IsPlaying) {
                 yield return null;
             }
             yield return new WaitForSeconds(0.1f);
+            AudioManager.Instance.PlayEnterClip();
             EnterArea(areaLoc);
         }
 
@@ -180,7 +181,7 @@ namespace Wing.RPGSystem
         {
             if (!AreaDic.ContainsKey(areaLoc) || !AreaDic[areaLoc].IsExplored) return;
             character.MoveToLocation(areaLoc, true, false);
-            StartCoroutine(WaitForMoveAnim(areaLoc));
+            StartCoroutine(EnterAreaAfterAnim(areaLoc));
             //ExploreArea(loc);
             
         }

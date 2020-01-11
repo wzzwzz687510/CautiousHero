@@ -20,3 +20,4 @@ MonoBehaviour:
   tileSet: {fileID: 11400000, guid: f6afb31ccaf00d54babc8f09f37c5e97, type: 2}
   creatureSets: {fileID: 11400000, guid: 1486a5ac808674444b8e3201adca00dd, type: 2}
   abioticSets: []
+  bgm: {fileID: 8300000, guid: f0d35aece0694d44ab69d380244c4c8c, type: 3}

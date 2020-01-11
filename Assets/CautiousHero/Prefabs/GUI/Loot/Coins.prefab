@@ -89,6 +89,7 @@ GameObject:
   - component: {fileID: 5666665852906116503}
   - component: {fileID: 5666665852906116488}
   - component: {fileID: 5666665852906116489}
+  - component: {fileID: 8027397663873785683}
   m_Layer: 5
   m_Name: Coins
   m_TagString: Untagged
@@ -143,8 +144,8 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 7c9f8445d801add438ad23264e36c802, type: 3}
-  m_Type: 1
+  m_Sprite: {fileID: 21300000, guid: ffd09b019db99c84da74433904f764e3, type: 3}
+  m_Type: 2
   m_PreserveAspect: 0
   m_FillCenter: 1
   m_FillMethod: 4
@@ -171,7 +172,7 @@ MonoBehaviour:
     m_SelectOnDown: {fileID: 0}
     m_SelectOnLeft: {fileID: 0}
     m_SelectOnRight: {fileID: 0}
-  m_Transition: 1
+  m_Transition: 2
   m_Colors:
     m_NormalColor: {r: 1, g: 1, b: 1, a: 1}
     m_HighlightedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
@@ -181,10 +182,11 @@ MonoBehaviour:
     m_ColorMultiplier: 1
     m_FadeDuration: 0.1
   m_SpriteState:
-    m_HighlightedSprite: {fileID: 0}
-    m_PressedSprite: {fileID: 0}
-    m_SelectedSprite: {fileID: 0}
-    m_DisabledSprite: {fileID: 0}
+    m_HighlightedSprite: {fileID: 21300000, guid: 35b1e4b096a50f24ba615395e0e15b00,
+      type: 3}
+    m_PressedSprite: {fileID: 21300000, guid: 35b1e4b096a50f24ba615395e0e15b00, type: 3}
+    m_SelectedSprite: {fileID: 21300000, guid: 35b1e4b096a50f24ba615395e0e15b00, type: 3}
+    m_DisabledSprite: {fileID: 21300000, guid: 7b434a1e41006d84498bc870ab4286f7, type: 3}
   m_AnimationTriggers:
     m_NormalTrigger: Normal
     m_HighlightedTrigger: Highlighted
@@ -196,6 +198,21 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &8027397663873785683
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5666665852906116491}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 561845dfabece1949bc0815b4bc16075, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  clickClip: {fileID: 8300000, guid: df0dbd5f687739748bb568c645bf4eb7, type: 3}
+  highlightClip: {fileID: 8300000, guid: 20fe082d2d29b65438c3ec9cbbd967de, type: 3}
+  source: {fileID: 0}
 --- !u!1 &5823814960400309043
 GameObject:
   m_ObjectHideFlags: 0

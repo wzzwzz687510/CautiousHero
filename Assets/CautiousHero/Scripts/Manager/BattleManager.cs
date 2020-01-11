@@ -91,6 +91,7 @@ public class BattleManager : MonoBehaviour
     {
         AnimationManager.Instance.OnAnimCompleted.AddListener(OnAnimCompleted);
         AIManager.Instance.Init(battleSet);
+        AudioManager.Instance.PlayMeetClip();
         AudioManager.Instance.PlayBattleClip();
         character.InitSkillDeck();
         //m_battleUIController.UpdateSkillSprites();
@@ -427,6 +428,8 @@ public class BattleManager : MonoBehaviour
 
     private void BattleVictory()
     {
+        m_battleUIController.DisplayInfo("Victory");
+        AudioManager.Instance.PlayVictoryClip();
         AnimationManager.Instance.Clear();
         ChangeState(BattleState.FreeMove);
         AreaManager.Instance.CompleteBattle();
@@ -438,7 +441,7 @@ public class BattleManager : MonoBehaviour
 
     private void InformLackAP()
     {
-
+        AudioManager.Instance.PlayErrorClip();
     }
 
     public void HighlightAffectPoints(Location castLoc)

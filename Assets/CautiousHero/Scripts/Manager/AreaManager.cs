@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Cinemachine;
 using UnityEngine.EventSystems;
+using DG.Tweening;
 
 namespace Wing.RPGSystem
 {
@@ -103,13 +104,38 @@ namespace Wing.RPGSystem
                 Mathf.Clamp(viewPin.position.y + y * moveSpeed, 96, 138), 0);
         }
 
-        private IEnumerator WaitForMoveAnim()
+        private IEnumerator CompleteBattleAfterAnim()
+        {
+            while (AnimationManager.Instance.IsPlaying || m_areaUIController.IsDisplayInfoAnim) {
+                yield return null;
+            }
+
+            int coin = 0, exp = 0;
+            foreach (var setID in InBatlleCreatureSets) {
+                CreatureSet set = TempData.creatureSetHashDic[setID].GetCreatureSet();
+                TempData.creatureSetHashDic.Remove(setID);
+                coin += set.coin;
+                exp += set.exp;
+                if (set.chest != null) {
+                    Instantiate(chestPrefab, chestHolder).name = (TempData.chests.Count + 1).ToString();
+                    TempData.chests.Add(new ChestEntity(setID, set.chest));
+                }
+                m_lootUIController.AddContent(LootType.Skill, 1);
+            }
+            m_lootUIController.AddContent(LootType.Coin, coin);
+            m_lootUIController.AddContent(LootType.Exp, exp);
+            m_lootUIController.gameObject.SetActive(true);
+            SaveData();
+        }
+
+        private IEnumerator CompleteExplorationAfterAnim()
         {
             while (AnimationManager.Instance.IsPlaying) {
                 yield return null;
             }
             
             yield return new WaitForSeconds(0.1f);
+            AudioManager.Instance.PlayEnterClip();
             CompleteExploration();
         }
 
@@ -119,7 +145,7 @@ namespace Wing.RPGSystem
             viewPin.localPosition = Vector3.zero;
             GridManager.Instance.DiscoverTiles(BattleCheck(tileLoc));
             if (TempData.map[tileLoc.x, tileLoc.y].GetTileType() == TileType.Entrance)
-                StartCoroutine(WaitForMoveAnim());
+                StartCoroutine(CompleteExplorationAfterAnim());
         }
 
         private Location BattleCheck(Location loc)
@@ -201,12 +227,6 @@ namespace Wing.RPGSystem
                 highlightTile = loc;
                 GridManager.Instance.ChangeTileState(highlightTile, TileState.MoveSelected);
             }
-
-        }
-
-        public void SetMoveCheck(bool isCheck)
-        {
-            MoveCheck = isCheck;
         }
 
         public void InitArea(Location to, Location directionPattern)
@@ -245,37 +265,17 @@ namespace Wing.RPGSystem
             //SaveAreaInfo();
         }
 
-        public void LeaveArea()
-        {
-            character.Loc.GetTileController().OnEntityLeaving();
-            SaveData();
-        }
-
         public void CompleteBattle()
         {
             m_areaUIController.SetSkillsUnknown();
-            AudioManager.Instance.PlayPeacefulClip();
-            int coin = 0, exp = 0;
-            foreach (var setID in InBatlleCreatureSets) {
-                CreatureSet set = TempData.creatureSetHashDic[setID].GetCreatureSet();
-                TempData.creatureSetHashDic.Remove(setID);
-                coin += set.coin;
-                exp += set.exp;
-                if (set.chest != null) {
-                    Instantiate(chestPrefab, chestHolder).name = (TempData.chests.Count + 1).ToString();
-                    TempData.chests.Add(new ChestEntity(setID, set.chest));
-                }
-                m_lootUIController.AddContent(LootType.Skill, 1);
-            }
-            m_lootUIController.AddContent(LootType.Coin, coin);
-            m_lootUIController.AddContent(LootType.Exp, exp);
-            m_lootUIController.gameObject.SetActive(true);
-            SaveData();
+            AudioManager.Instance.ChangeBGM(TempData.templateHash.GetAreaConfig().bgm, 1);
 
             if (RemainedCreatures.Count == 0 && TempData.GetAreaInfoType() == AreaType.Boss) {
                 m_areaUIController.DisplayInfo("Stage Clear");
                 m_areaUIController.endStageButton.gameObject.SetActive(true);
             }
+
+            StartCoroutine(CompleteBattleAfterAnim());
         }
 
         public void CompleteExploration()
@@ -335,5 +335,13 @@ namespace Wing.RPGSystem
             TempData.chests[chestID].relicHashes.Remove(relicHash);
             SaveData();
         }
+
+        public void LeaveArea()
+        {
+            character.Loc.GetTileController().OnEntityLeaving();
+            SaveData();
+        }
+
+        public void SetMoveCheck(bool isCheck) => MoveCheck = isCheck;
     }
 }

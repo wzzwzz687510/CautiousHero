@@ -51,10 +51,7 @@ public class AreaUIController : MonoBehaviour
 
     [Header("Skill Learning Page")]
     public GameObject skillLearningPage;
-    public SkillSlot[] skillLearningSlots;
-
-    private float timer;
-    private bool startTimer;
+    public SkillSlot[] skillLearningSlots; 
 
     [Header("Creature Board")]
     public Transform creatureBoard;
@@ -67,6 +64,10 @@ public class AreaUIController : MonoBehaviour
     public Text creatureElement;
     private int selectCreatureID = -1;
     private bool isCreatureBoardDisplayed;
+
+    public bool IsDisplayInfoAnim { get; private set; }
+    private float timer;
+    private bool startTimer;
 
     private void FixedUpdate()
     {
@@ -239,7 +240,7 @@ public class AreaUIController : MonoBehaviour
 
     public IEnumerator TurnSwitchAnimation(bool isPlayerTurn)
     {
-        yield return StartCoroutine(DisplayInfoAnim(isPlayerTurn ? "Your Turn" : "Enemy Turn"));
+        yield return StartCoroutine(DisplayInfoAnim(isPlayerTurn ? "Your Turn" : "Enemy Turn", AudioManager.Instance.turnChangeClip));
 
         BattleManager.Instance.StartNewTurn(isPlayerTurn);
     }
@@ -249,12 +250,13 @@ public class AreaUIController : MonoBehaviour
         yield return StartCoroutine(DisplayInfoAnim("Battle Start"));
     }
 
-    private IEnumerator DisplayInfoAnim(string text)
+    private IEnumerator DisplayInfoAnim(string text, AudioClip clip = null)
     {
         while (AnimationManager.Instance.IsPlaying) {
             yield return null;
         }
-
+        IsDisplayInfoAnim = true;
+        if (clip) AudioManager.Instance.PlaySEClip(clip);
         turnText.text = text;
         turnText.color = Color.white;
         turnBG.fillAmount = 0;
@@ -266,6 +268,7 @@ public class AreaUIController : MonoBehaviour
         DOTween.ToAlpha(() => turnBG.color, color => turnBG.color = color, 0f, 0.5f);
         DOTween.ToAlpha(() => turnText.color, color => turnText.color = color, 0f, 0.5f);
         yield return new WaitForSeconds(0.5f);
+        IsDisplayInfoAnim = false;
     }
 
     public void DisplayInfo(string text)

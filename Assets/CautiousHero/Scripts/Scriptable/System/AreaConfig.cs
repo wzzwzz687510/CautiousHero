@@ -33,6 +33,7 @@ namespace Wing.RPGSystem
         public TileSet tileSet;
         public CreatureDifficultySet creatureSets;
         public AbioticElement[] abioticSets;
+        public AudioClip bgm;
 
         static Dictionary<int, AreaConfig> cache;
         public static Dictionary<int, AreaConfig> Dict {

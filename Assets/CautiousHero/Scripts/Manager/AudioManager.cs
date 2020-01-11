@@ -8,13 +8,24 @@ namespace Wing.RPGSystem
     {
         public static AudioManager Instance { get; private set; }
 
+        [Header("BGM")]
         public AudioClip[] bgClips;
         public AudioClip loseClip;
         public AudioClip titleClip;
         public AudioClip peacefulClip;
         public AudioClip battleClip;
+        public AudioClip bossClip;
 
-        public AudioSource[] source;
+        [Header("SE")]
+        public AudioClip turnChangeClip;
+        public AudioClip enterClip;
+        public AudioClip meetClip;
+        public AudioClip victoryClip;
+        public AudioClip errorClip;
+
+        [Header("Source")]
+        public AudioSource musicSource;
+        public AudioSource seSource;
         private bool sourceFlag;
 
         private void Awake()
@@ -27,6 +38,32 @@ namespace Wing.RPGSystem
         {
             //StartCoroutine(BlendIntroToLoop());
             PlayTitleClip();
+        }
+
+        public void PlaySEClip(AudioClip clip)
+        {
+            seSource.PlayOneShot(clip);
+        }
+
+        public void PlayErrorClip()
+        {
+            PlaySEClip(errorClip);
+        }
+
+
+        public void PlayEnterClip()
+        {
+            PlaySEClip(enterClip);
+        }
+
+        public void PlayMeetClip()
+        {
+            PlaySEClip(meetClip);
+        }
+
+        public void PlayVictoryClip()
+        {
+            PlaySEClip(victoryClip);
         }
 
         public void PlayTitleClip()
@@ -44,20 +81,29 @@ namespace Wing.RPGSystem
             StartCoroutine(FadeToClip(battleClip));
         }
 
-        private IEnumerator FadeToClip(AudioClip clip)
+        public void PlayBossClip()
         {
-            yield return StartCoroutine(FadeAudio(source[0], 0.2f, 0));
-            source[0].Stop();
-            source[0].volume = 1;
-            source[0].clip = clip;
-            source[0].Play();
+            StartCoroutine(FadeToClip(bossClip));
+        }
+
+        public void ChangeBGM(AudioClip clip, float delay)
+        {
+            StartCoroutine(FadeToClip(clip, delay));
         }
 
         public void Gameover()
         {
-            StartCoroutine(FadeAudio(source[sourceFlag ? 1 : 0], 0.2f, 0));
-            source[sourceFlag ? 0 : 1].Play();
-            sourceFlag = !sourceFlag;
+            StartCoroutine(FadeToClip(loseClip));
+        }
+
+        private IEnumerator FadeToClip(AudioClip clip, float delay=0)
+        {
+            yield return new WaitForSeconds(delay);
+            yield return StartCoroutine(FadeAudio(musicSource, 0.2f, 0));
+            musicSource.Stop();
+            musicSource.volume = 1;
+            musicSource.clip = clip;
+            musicSource.Play();
         }
 
         IEnumerator FadeAudio(AudioSource source, float fadeTime, float sourceVolumeTarget)
