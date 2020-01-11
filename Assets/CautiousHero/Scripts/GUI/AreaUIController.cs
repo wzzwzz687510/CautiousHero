@@ -316,8 +316,9 @@ public class AreaUIController : MonoBehaviour
     public void HideSkillInfoBoard()
     {
         startTimer = false;
+        isSkillBoardDisplayed = false;
         selectSlot = -1;
-        infoBoard.transform.position = new Vector3(Screen.width + 10, 0, 0);
+        infoBoard.transform.position = new Vector3(Screen.width + 260, 0, 0);
     }
 
     public void OnLearnSkillPageEvent()
@@ -356,8 +357,8 @@ public class AreaUIController : MonoBehaviour
 
     public void ShowSkillBoard()
     {
-        var skill = character.SkillHashes[selectSlot].GetBaseSkill() as BaseSkill;
-        
+        infoBoard.transform.position = skillSlots[selectSlot].transform.position + new Vector3(0, 160, 0);
+        infoBoard.UpdateToSkillBoard(character.SkillHashes[selectSlot]);
     }
 
     public void ShowCreatureBoard()

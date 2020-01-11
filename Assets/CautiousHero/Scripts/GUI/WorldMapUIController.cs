@@ -123,14 +123,14 @@ namespace Wing.RPGSystem
 
         public void DisplaySkillInfoBoard(int slotID)
         {
-            float xOffset = Input.mousePosition.x > Screen.width - 580 ? -570 : 70;
+            float xOffset = Input.mousePosition.x > Screen.width - 330 ? -320 : 320;
             infoBoard.transform.position = skillElements[slotID].transform.position + new Vector3(xOffset, 0, 0);
             infoBoard.UpdateToSkillBoard(skillDeck[slotID].Hash);
         }
 
         public void HideSkillInfoBoard()
         {
-            infoBoard.transform.position = new Vector3(Screen.width + 10, 0, 0);
+            infoBoard.transform.position = new Vector3(Screen.width + 260, 0, 0);
         }
 
         public void Button_SkillBook()
