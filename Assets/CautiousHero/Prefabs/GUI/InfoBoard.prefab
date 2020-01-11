@@ -1897,13 +1897,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   colors:
   - {r: 0.5019608, g: 0.5019608, b: 0.5019608, a: 1}
-  - {r: 1, g: 1, b: 1, a: 1}
   - {r: 1, g: 0.0627451, b: 0, a: 1}
   - {r: 0, g: 0.5019608, b: 1, a: 1}
   - {r: 0.29803923, g: 1, b: 0, a: 1}
   - {r: 0.29803923, g: 1, b: 0.69803923, a: 1}
-  - {r: 1, g: 0.9019608, b: 0.5019608, a: 1}
+  - {r: 1, g: 0.90196085, b: 0.5019608, a: 1}
   - {r: 0, g: 0, b: 0, a: 1}
+  - {r: 1, g: 0, b: 0.48485327, a: 1}
   title: {fileID: 9138966802873314983}
   description: {fileID: 914193313943698583}
   header: {fileID: 9138966804444458232}
@@ -2189,7 +2189,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.5283019, g: 0.5283019, b: 0.5283019, a: 1}
+  m_Color: {r: 0.7735849, g: 0.7735849, b: 0.7735849, a: 1}
   m_RaycastTarget: 1
   m_OnCullStateChanged:
     m_PersistentCalls:

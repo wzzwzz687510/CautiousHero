@@ -110,6 +110,13 @@ namespace Wing.RPGSystem
             if (!reset) LoadAll();
         }
 
+        private void Update()
+        {
+            if (Input.GetKeyDown(KeyCode.K)) {
+                AreaManager.Instance.PrepareChooseSkill();
+            }
+        }
+
         private void Start()
         {
             StartCoroutine(LoadScene());
