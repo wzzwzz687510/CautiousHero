@@ -129,7 +129,7 @@ namespace Wing.RPGSystem
                     infoConfirmButton.onClick.RemoveAllListeners();
                     infoPage.SetActive(false);
                 });
-                infoText.text = "Summon will create a new world and delete the old world.";
+                infoText.text = "Summon will create a new world and delete saved data.";
                 infoPage.SetActive(true);
             }
             else Button_ConfirmNewGame();

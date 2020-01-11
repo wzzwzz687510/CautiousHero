@@ -5,6 +5,7 @@ using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using Cinemachine;
 using DG.Tweening;
+using System.Linq;
 
 namespace Wing.RPGSystem
 {
@@ -27,14 +28,24 @@ namespace Wing.RPGSystem
         public Text coinText;
         public Text expText;
 
+        [Header("Skill Book Elements")]
+        //public GameObject infoPrefab;
+        //public Transform contentL;
+        //public Transform contentR;
+        public InfoBoard infoBoard;        
+        public SkillSlot[] skillElements;
+
         [Header("Pages")]
         public GameObject titlePage;
         public GameObject loadingPage;
         public GameObject infoPage;
         public GameObject endPage;
+        public GameObject bookPage;
 
         public PlayerData ActivePlayerData => Database.Instance.ActivePlayerData;
-        public WorldData ActiveWorldData => Database.Instance.ActiveWorldData;
+        public WorldData ActiveWorldData => WorldData.ActiveData;
+
+        private List<BaseSkill> skillDeck;
 
         private void Awake()
         {
@@ -43,6 +54,11 @@ namespace Wing.RPGSystem
 
             Database.Instance.WorldDataChangedEvent.AddListener(UpdateUI);
             AreaManager.Instance.character.OnHPChanged.AddListener(UpdateHP);
+            for (int i = 0; i < skillElements.Length; i++) {
+                skillElements[i].slotID = i;
+                skillElements[i].RegisterDisplayAction(DisplaySkillInfoBoard);
+                skillElements[i].RegisterHideAction(HideSkillInfoBoard);
+            }
         }
 
         public void UpdateUI()
@@ -51,6 +67,19 @@ namespace Wing.RPGSystem
             hpText.text = ActiveWorldData.HealthPoints + "/" + ActiveWorldData.attribute.maxHealth;
             coinText.text = ActiveWorldData.coins.ToString();
             expText.text = ActiveWorldData.exp.ToString();
+
+            skillDeck = (from skillHash in WorldData.ActiveData.learnedSkills select skillHash.GetBaseSkill()).ToList();
+            skillDeck.Sort(BaseSkill.CompareByName);
+            for (int i = 0; i < skillElements.Length; i++) {
+                
+                if(i < skillDeck.Count) {
+                    skillElements[i].gameObject.SetActive(true);
+                    skillElements[i].icon.sprite = skillDeck[i].sprite;
+                }
+                else {
+                    skillElements[i].gameObject.SetActive(false);
+                }
+            }
         }
 
         public void UpdateHP()
@@ -90,6 +119,28 @@ namespace Wing.RPGSystem
         public void DisplayEndPage()
         {
             endPage.SetActive(true);
+        }
+
+        public void DisplaySkillInfoBoard(int slotID)
+        {
+            float xOffset = Input.mousePosition.x > Screen.width - 580 ? -570 : 70;
+            infoBoard.transform.position = skillElements[slotID].transform.position + new Vector3(xOffset, 0, 0);
+            infoBoard.UpdateToSkillBoard(skillDeck[slotID].Hash);
+        }
+
+        public void HideSkillInfoBoard()
+        {
+            infoBoard.transform.position = new Vector3(Screen.width + 10, 0, 0);
+        }
+
+        public void Button_SkillBook()
+        {
+            if (bookPage.activeSelf) {
+                bookPage.SetActive(false);
+            }
+            else {
+                bookPage.SetActive(true);
+            }
         }
 
         public void Button_CompleteAWorld()

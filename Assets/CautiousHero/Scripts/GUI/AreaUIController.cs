@@ -32,7 +32,7 @@ public class AreaUIController : MonoBehaviour
     public Sprite unknownSkill;
 
     [Header("AP Visual")]
-    public Toggle[] aps;
+    public GameObject[] aps;
 
     [Header("Turn Switch Visual")]
     public Image turnBG;
@@ -44,18 +44,9 @@ public class AreaUIController : MonoBehaviour
 
     [Header("Skill Board")]
     public float waitDuration;
-    public Transform skillBoard;
-    public Text skillName;
-    public Text skillCost;
-    public Text skillValue;
-    public Text skillType;
-    public Text skillElement;
-    public Text skillCastType;
     public SkillSlot[] skillSlots;
-    public Color[] colors;
-    public Image skillNameBg;
+    public InfoBoard infoBoard;
     private int selectSlot = -1;
-    private int selectSkillHash;
     private bool isSkillBoardDisplayed;    
 
     [Header("Skill Learning Page")]
@@ -124,11 +115,12 @@ public class AreaUIController : MonoBehaviour
         character.ssAnimEvent += CharacterSkillShiftAnimation;
         character.OnAPChanged.AddListener(OnCharacterAPChanged);
         for (int i = 0; i < skillSlots.Length; i++) {
-            skillSlots[i].CheckSlotState.AddListener(OnSkillBoardEvent);
+            skillSlots[i].RegisterDisplayAction(DisplaySkillInfoBoard);
+            skillSlots[i].RegisterHideAction(HideSkillInfoBoard);
         }
-        for (int i = 0; i < skillLearningSlots.Length; i++) {
-            skillLearningSlots[i].CheckSlotState.AddListener(OnLearnSkillPageEvent);
-        }
+        //for (int i = 0; i < skillLearningSlots.Length; i++) {
+        //    skillLearningSlots[i].CheckSlotState.AddListener(OnLearnSkillPageEvent);
+        //}
 
         BattleManager.Instance.OnTurnSwitched += OnTurnSwitched;
         BattleManager.Instance.CreatureBoardEvent += OnCreatureBoardEvent;
@@ -182,8 +174,8 @@ public class AreaUIController : MonoBehaviour
 
     private void OnCharacterAPChanged()
     {
-        for (int i = 0; i < 8; i++) {
-            aps[i].isOn = i < character.ActionPoints;
+        for (int i = 0; i < aps.Length; i++) {
+            aps[i].SetActive(i < character.ActionPoints);
         }
     }
 
@@ -202,12 +194,15 @@ public class AreaUIController : MonoBehaviour
         }
 
         endTurnButton.gameObject.SetActive(false);
+        for (int i = 0; i < aps.Length; i++) {
+            aps[i].SetActive(false);
+        }
     }
 
     private void CastPreviewEvent(int skillID)
     {
         for (int i = 0; i < character.ActionPoints; i++) {
-            aps[i].isOn = i < character.ActionPoints - character.SkillHashes[skillID].GetBaseSkill().actionPointsCost;
+            aps[i].SetActive(i < character.ActionPoints - character.SkillHashes[skillID].GetBaseSkill().actionPointsCost);
         }
         skills[0].sprite = unknownSkill;
         for (int i = 1; i < skills.Length; i++) {
@@ -218,7 +213,7 @@ public class AreaUIController : MonoBehaviour
     private void MovePreviewEvent(int steps)
     {
         for (int i = 0; i < character.ActionPoints; i++) {
-            aps[i].isOn = i < character.ActionPoints - steps;
+            aps[i].SetActive(i < character.ActionPoints - steps);
         }
 
         for (int i = 0; i < steps; i++) {
@@ -310,42 +305,38 @@ public class AreaUIController : MonoBehaviour
         image_blackBG.raycastTarget = true;
     }
 
-    public void OnSkillBoardEvent()
+    public void DisplaySkillInfoBoard(int slotID)
     {
         if (character.SkillHashes.Count < character.defaultSkillCount) return;
+        startTimer = true;
+        selectSlot = slotID;
+        if (timer > waitDuration) ShowSkillBoard();
+    }
+
+    public void HideSkillInfoBoard()
+    {
         startTimer = false;
-        for (int i = 0; i < skillSlots.Length; i++) {
-            if (skillSlots[i].IsActive) {
-                startTimer = true;
-                selectSlot = i;
-                selectSkillHash = character.SkillHashes[i];
-                if(timer > waitDuration) ShowSkillBoard();
-            }
-        }
-        if (startTimer == false) {
-            skillBoard.position = new Vector3(-300, 0, 0);
-            isSkillBoardDisplayed = false;
-            selectSlot = -1;
-        }
+        selectSlot = -1;
+        infoBoard.transform.position = new Vector3(Screen.width + 10, 0, 0);
     }
 
     public void OnLearnSkillPageEvent()
     {
-        startTimer = false;
-        for (int i = 0; i < skillLearningSlots.Length; i++) {
-            if (skillLearningSlots[i].IsActive) {
-                startTimer = true;
-                selectSlot = i;
-                selectSkillHash = AreaManager.Instance.RandomedSkillHashes[i];
-                if (timer > waitDuration) ShowSkillBoard();
-            }
-        }
+        //startTimer = false;
+        //for (int i = 0; i < skillLearningSlots.Length; i++) {
+        //    if (skillLearningSlots[i].IsActive) {
+        //        startTimer = true;
+        //        selectSlot = i;
+        //        selectSkillHash = AreaManager.Instance.RandomedSkillHashes[i];
+        //        if (timer > waitDuration) ShowSkillBoard();
+        //    }
+        //}
 
-        if (startTimer == false) {
-            skillBoard.position = new Vector3(-300, 0, 0);
-            isSkillBoardDisplayed = false;
-            selectSlot = -1;
-        }
+        //if (startTimer == false) {
+        //    skillBoard.position = new Vector3(-300, 0, 0);
+        //    isSkillBoardDisplayed = false;
+        //    selectSlot = -1;
+        //}
     }
 
     public void OnCreatureBoardEvent(int hash, bool isExit)
@@ -365,67 +356,8 @@ public class AreaUIController : MonoBehaviour
 
     public void ShowSkillBoard()
     {
-        var skill = selectSkillHash.GetBaseSkill() as BaseSkill;
-        skillName.text = skill.skillName;
-        skillCost.text = skill.actionPointsCost.ToString();
-        //skillValue.text = skill.baseValue.ToString() + " + <color=#ffa500ff>" + player.Intelligence * skill.attributeCof * skill.baseValue +"</color>";
-        switch (skill.damageType) {
-            case DamageType.Physical:
-                skillNameBg.color = colors[0];
-                skillType.text = "Physical";
-                break;
-            case DamageType.Magical:
-                skillType.text = "Magical";
-                break;
-            case DamageType.Pure:
-                skillType.text = "Pure";
-                skillNameBg.color = colors[1];
-                break;
-            default:
-                break;
-        }
-        switch (skill.skillElement) {
-            case SkillElement.None:
-                skillElement.text = "None";
-                break;
-            case SkillElement.Fire:
-                skillElement.text = "Fire";
-                skillNameBg.color = colors[2];
-                break;
-            case SkillElement.Water:
-                skillElement.text = "Water";
-                skillNameBg.color = colors[3];
-                break;
-            case SkillElement.Earth:
-                skillElement.text = "Earth";
-                skillNameBg.color = colors[4];
-                break;
-            case SkillElement.Air:
-                skillElement.text = "Air";
-                skillNameBg.color = colors[5];
-                break;
-            case SkillElement.Light:
-                skillElement.text = "Light";
-                skillNameBg.color = colors[6];
-                break;
-            case SkillElement.Dark:
-                skillElement.text = "Dark";
-                skillNameBg.color = colors[7];
-                break;
-            default:
-                break;
-        }
-        switch (skill.castType) {
-            case CastType.Instant:
-                skillCastType.text = "Instant";
-                break;
-            case CastType.Trajectory:
-                skillCastType.text = "Trajectory";
-                break;
-            default:
-                break;
-        }
-        skillBoard.position = skillSlots[selectSlot].transform.position + new Vector3(0, 170, 0);
+        var skill = character.SkillHashes[selectSlot].GetBaseSkill() as BaseSkill;
+        
     }
 
     public void ShowCreatureBoard()

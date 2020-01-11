@@ -197,6 +197,11 @@ namespace Wing.RPGSystem
             }
         }
 
+        public static int CompareByName(BaseSkill s1,BaseSkill s2)
+        {
+            return s1.skillName.CompareTo(s2.name);
+        }
+
         static Dictionary<int, BaseSkill> cache;
         public static Dictionary<int, BaseSkill> Dict {
             get {

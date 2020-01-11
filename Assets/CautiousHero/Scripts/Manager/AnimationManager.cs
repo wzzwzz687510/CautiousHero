@@ -226,7 +226,7 @@ namespace Wing.RPGSystem
 
         private IEnumerator PlayAnimation(BaseAnimClip clip)
         {
-            Debug.Log(clip.type);
+            //Debug.Log(clip.type);
             Entity entity;
             switch (clip.type) {
                 case AnimType.MovePath:
