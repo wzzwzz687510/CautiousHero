@@ -54,8 +54,10 @@ namespace Wing.RPGSystem
 
         public static bool TryGetStayEntity(this Location location, out Entity entity) {
             if(location.TryGetTileController(out TileController tc)) {
-                entity = tc.StayEntity;
-                return true;
+                if (!tc.IsEmpty) {
+                    entity = tc.StayEntity;
+                    return true;
+                }                            
             }
             entity = null;
             return false;
