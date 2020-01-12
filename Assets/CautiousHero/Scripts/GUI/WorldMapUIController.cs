@@ -33,7 +33,7 @@ namespace Wing.RPGSystem
         //public Transform contentL;
         //public Transform contentR;
         public InfoBoard infoBoard;        
-        public SkillSlot[] skillElements;
+        public IconSlot[] skillElements;
 
         [Header("Pages")]
         public GameObject titlePage;

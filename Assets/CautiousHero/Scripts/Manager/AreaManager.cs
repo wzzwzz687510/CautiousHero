@@ -109,7 +109,8 @@ namespace Wing.RPGSystem
             while (AnimationManager.Instance.IsPlaying || m_areaUIController.IsDisplayInfoAnim) {
                 yield return null;
             }
-
+            yield return new WaitForSeconds(0.3f);
+            AudioManager.Instance.ChangeBGM(TempData.templateHash.GetAreaConfig().bgm, 0);
             int coin = 0, exp = 0;
             foreach (var setID in InBatlleCreatureSets) {
                 CreatureSet set = TempData.creatureSetHashDic[setID].GetCreatureSet();
@@ -267,7 +268,6 @@ namespace Wing.RPGSystem
         public void CompleteBattle()
         {
             m_areaUIController.SetSkillsUnknown();
-            AudioManager.Instance.ChangeBGM(TempData.templateHash.GetAreaConfig().bgm, 1);
 
             if (RemainedCreatures.Count == 0 && TempData.GetAreaInfoType() == AreaType.Boss) {
                 m_areaUIController.DisplayInfo("Stage Clear");

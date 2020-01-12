@@ -23,6 +23,7 @@ namespace Wing.RPGSystem
         public SubSkillSet monkSet;
         public SubSkillSet ninjaSet;
         public SubSkillSet lancerSet;
+        public SubSkillSet berserker;
     }
 }
 

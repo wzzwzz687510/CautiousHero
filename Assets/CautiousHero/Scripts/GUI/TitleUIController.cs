@@ -28,7 +28,7 @@ namespace Wing.RPGSystem
         public Text raceDesText;
         public Image[] raceSprites;
         public Text classText;
-        public SkillSlot[] skillSlots;
+        public IconSlot[] skillSlots;
         public InfoBoard infoBoard;
 
         public GameObject talentCover;

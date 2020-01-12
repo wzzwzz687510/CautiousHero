@@ -166,9 +166,10 @@ namespace Wing.RPGSystem
         public Vector3[] MovePath { get; protected set; }
 
         protected EntityAttribute m_attribute;
+        protected EntityAttribute tempAttribute;
         public EntityAttribute Attribute {
             get {
-                return m_attribute + BuffManager.GetAttributeAdjustment();
+                return m_attribute + BuffManager.GetAttributeAdjustment() + tempAttribute;
             }
         }
         public int MaxHealthPoints       => Attribute.maxHealth;
@@ -284,7 +285,13 @@ namespace Wing.RPGSystem
             ImpactActionPoints(tSkill.actionPointsCost,true);
 
             tSkill.ApplyEffect(Hash, castLoc);
+            tempAttribute = new EntityAttribute();
             return true;
+        }
+
+        public virtual void SetTempAttribute(EntityAttribute temp)
+        {
+            tempAttribute = temp;
         }
 
         public virtual void DropAnimation()

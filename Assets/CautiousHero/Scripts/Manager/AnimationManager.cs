@@ -286,6 +286,7 @@ namespace Wing.RPGSystem
                     if (!EntityManager.Instance.TryGetEntity(hpChangeClip.entityHash, out entity))
                         break;
                     entity.HPChangeAnimation?.Invoke(hpChangeClip.hp, hpChangeClip.maxHP, hpChangeClip.duration * animRate);
+                    entity.EntitySprite.DOColor(Color.red, 0.3f).OnComplete(() => entity.EntitySprite.color = Color.white);
                     yield return new WaitForSeconds(hpChangeClip.duration * animRate);
                     break;
                 case AnimType.ArmourPChange:
