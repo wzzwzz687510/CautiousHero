@@ -94,6 +94,7 @@ namespace Wing.RPGSystem
 
         public void SwitchToWorldView()
         {
+            bookPage.SetActive(false);
             WorldMapManager.Instance.SetWorldView(true);
             worldView.gameObject.SetActive(true);
             worldViewBG.gameObject.SetActive(true);
@@ -106,6 +107,7 @@ namespace Wing.RPGSystem
 
         public void SwitchToAreaView()
         {
+            bookPage.SetActive(false);
             WorldMapManager.Instance.SetWorldView(false);
             worldView.DOFade(0, switchTime);
             worldViewBG.DOFade(0, switchTime).OnComplete(() => {
@@ -133,6 +135,13 @@ namespace Wing.RPGSystem
             infoBoard.transform.position = new Vector3(Screen.width + 260, 0, 0);
         }
 
+        public void Button_CompleteAWorld()
+        {
+            endPage.SetActive(false);
+            titlePage.SetActive(true);
+            WorldMapManager.Instance.CompleteWorld();
+        }
+
         public void Button_SkillBook()
         {
             if (bookPage.activeSelf) {
@@ -143,11 +152,19 @@ namespace Wing.RPGSystem
             }
         }
 
-        public void Button_CompleteAWorld()
+        public void Button_WorldMap()
         {
-            endPage.SetActive(false);           
-            titlePage.SetActive(true);
-            WorldMapManager.Instance.CompleteWorld();
+            if (bookPage.activeSelf) {
+                bookPage.SetActive(false);
+                return;
+            }
+
+            if (WorldMapManager.Instance.IsWorldView) {
+                WorldMapManager.Instance.EnterArea(AreaManager.Instance.CurrentAreaLoc);
+            }
+            else {
+                AreaManager.Instance.CompleteExploration();
+            }
         }
 
         public void Button_System()

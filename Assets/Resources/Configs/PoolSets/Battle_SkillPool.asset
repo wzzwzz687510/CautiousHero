@@ -1,0 +1,44 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cf41bd79c3dea624f9772620b6010843, type: 3}
+  m_Name: Battle_SkillPool
+  m_EditorClassIdentifier: 
+  commonSet:
+    defaultSet:
+    - {fileID: 11400000, guid: 0e65bc4a892fa1341b496a64ab32841c, type: 2}
+    - {fileID: 11400000, guid: 7438a386ca6b5f447b020f5829f5cdbc, type: 2}
+    - {fileID: 11400000, guid: 64bde5e8209701a409f8b332188ead94, type: 2}
+    - {fileID: 11400000, guid: 18d6163ba0d59a243bcf2713246b3068, type: 2}
+    - {fileID: 11400000, guid: fa65afbb161c7c644b5a119dec9dcf43, type: 2}
+    - {fileID: 11400000, guid: 394c9b0c5a3201944a815a400f7e5e93, type: 2}
+    lockedSet: []
+  squireSet:
+    defaultSet: []
+    lockedSet: []
+  knightSet:
+    defaultSet: []
+    lockedSet: []
+  rangerSet:
+    defaultSet: []
+    lockedSet: []
+  mageSet:
+    defaultSet: []
+    lockedSet: []
+  monkSet:
+    defaultSet: []
+    lockedSet: []
+  ninjaSet:
+    defaultSet: []
+    lockedSet: []
+  lancerSet:
+    defaultSet: []
+    lockedSet: []

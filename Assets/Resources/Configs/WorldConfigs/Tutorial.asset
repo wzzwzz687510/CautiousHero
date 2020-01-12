@@ -23,3 +23,4 @@ MonoBehaviour:
     bossConfig: {fileID: 11400000, guid: 54adc8f72ff71cf448ff347f3dcf9a30, type: 2}
     mainAreaNumber: 3
     specialConfigs: []
+  randomPool: {fileID: 11400000, guid: 12859766857ad1247bd5147b7d99b154, type: 2}

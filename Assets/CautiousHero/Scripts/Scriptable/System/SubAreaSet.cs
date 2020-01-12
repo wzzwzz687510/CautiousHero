@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Wing.RPGSystem
 {
-    [CreateAssetMenu(fileName = "AreaConfig", menuName = "Wing/Configs/SubAreaSet", order = 6)]
+    [CreateAssetMenu(fileName = "AreaConfig", menuName = "Wing/Configs/SubAreaSet", order = 0)]
     public class SubAreaSet : ScriptableObject
     {
         public CornerArea[] cornerAreas;

@@ -16,6 +16,9 @@ namespace Wing.RPGSystem
         public EntityAttribute attributeEffect;
         public BaseBuff[] buffs;
 
+        [Header("Labels")]
+        public Rarity rarity;
+
         static Dictionary<int, BaseRelic> cache;
         public static Dictionary<int, BaseRelic> Dict {
             get {

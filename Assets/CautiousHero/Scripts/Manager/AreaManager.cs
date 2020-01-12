@@ -40,7 +40,7 @@ namespace Wing.RPGSystem
         public bool MoveCheck { get; private set; }
         public Dictionary<Location, List<int>> RemainedCreatures { get; private set; } // key - spawn point, value - creature set
         public List<Location> InBatlleCreatureSets { get; private set; }
-        public List<int> RandomedSkillHashes { get; private set; }
+        public int[] RandomedSkillHashes { get; private set; }
 
         private Transform creatureHolder;
         private Transform chestHolder;
@@ -249,8 +249,7 @@ namespace Wing.RPGSystem
 
             // Reset lists and dictionaries
             RemainedCreatures = new Dictionary<Location, List<int>>();
-            InBatlleCreatureSets = new List<Location>();           
-            RandomedSkillHashes = new List<int>();
+            InBatlleCreatureSets = new List<Location>();
             EntityManager.Instance.ResetEntityDicionary();
 
             // Init player
@@ -308,10 +307,7 @@ namespace Wing.RPGSystem
 
         public void PrepareChooseSkill()
         {
-            RandomedSkillHashes.Clear();
-            for (int i = 0; i < 3; i++) {
-                RandomedSkillHashes.Add(skills[skills.Length.Random()].Hash);
-            }
+            RandomedSkillHashes = Database.Instance.defaultWorldConfig.RandomBattleSkill(3);
             m_areaUIController.ShowSkillLearningPage(true);
         }
 

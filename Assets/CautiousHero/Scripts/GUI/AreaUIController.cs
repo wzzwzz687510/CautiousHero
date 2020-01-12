@@ -291,16 +291,6 @@ public class AreaUIController : MonoBehaviour
         BattleManager.Instance.CastSkill(skillID);
     }
 
-    public void Button_WorldMap()
-    {
-        if (WorldMapManager.Instance.IsWorldView) {
-            WorldMapManager.Instance.EnterArea(AreaManager.Instance.CurrentAreaLoc);
-        }
-        else {
-            AreaManager.Instance.CompleteExploration();
-        }       
-    }
-
     public void Gameover()
     {
         DOTween.ToAlpha(() => image_blackBG.color, color => image_blackBG.color = color, 0.7f, 0.5f);
@@ -367,25 +357,25 @@ public class AreaUIController : MonoBehaviour
                     creatureResistance.text = "None";
                 else
                 switch (cc.skills[0].skillElement) {
-                    case SkillElement.None:
+                    case ElementType.None:
                         creatureResistance.text = "None";
                         break;
-                    case SkillElement.Fire:
+                    case ElementType.Fire:
                         creatureResistance.text = "Fire";
                         break;
-                    case SkillElement.Water:
+                    case ElementType.Water:
                         creatureResistance.text = "Water";
                         break;
-                    case SkillElement.Earth:
+                    case ElementType.Earth:
                         creatureResistance.text = "Earth";
                         break;
-                    case SkillElement.Air:
+                    case ElementType.Air:
                         creatureResistance.text = "Air";
                         break;
-                    case SkillElement.Light:
+                    case ElementType.Light:
                         creatureResistance.text = "Light";
                         break;
-                    case SkillElement.Dark:
+                    case ElementType.Dark:
                         creatureResistance.text = "Dark";
                         break;
                     default:

@@ -12,7 +12,7 @@ namespace Wing.RPGSystem
         Pure
     }
 
-    public enum SkillElement
+    public enum ElementType
     {
         None,
         Fire,
@@ -52,6 +52,14 @@ namespace Wing.RPGSystem
         Ally
     }
 
+    public enum Rarity
+    {
+        Normal,
+        Uncommon,
+        Rare,
+        Legend
+    }
+
     [System.Serializable]
     public struct EffectPattern
     {
@@ -75,14 +83,14 @@ namespace Wing.RPGSystem
         public string description;
         public Sprite sprite;
         public int actionPointsCost;
-        public int Hash => skillName.GetStableHashCode(); 
+        public int Hash => skillName.GetStableHashCode();
 
         [Header("Labels")]
+        public Rarity rarity;
         public DamageType damageType;
-        public SkillElement skillElement;
+        public ElementType skillElement;
         public CastType castType;
         public List<Label> labels;
-        //public HashSet<Label> hashlabels;
 
         [Header("Point Pattern")]
         public CastEffect castEffect;

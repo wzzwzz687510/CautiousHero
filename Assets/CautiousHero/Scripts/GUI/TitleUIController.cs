@@ -28,7 +28,8 @@ namespace Wing.RPGSystem
         public Text raceDesText;
         public Image[] raceSprites;
         public Text classText;
-        public Image[] classSprites;
+        public SkillSlot[] skillSlots;
+        public InfoBoard infoBoard;
 
         public GameObject talentCover;
         public GameObject classCover;
@@ -39,6 +40,10 @@ namespace Wing.RPGSystem
 
         private void Start()
         {
+            for (int i = 0; i < saveSlots.Length; i++) {
+                skillSlots[i].RegisterDisplayAction(DisplayInfoBoard);
+                skillSlots[i].RegisterHideAction(HideInfoBoard);
+            }
             if (Database.Instance.SelectSlot != -1) {
                 saveName.text = Database.Instance.ActivePlayerData.name;
                 ResetUI();               
@@ -55,6 +60,18 @@ namespace Wing.RPGSystem
                 createPage.SetActive(false);
                 startPage.SetActive(true);
             }
+        }
+
+        private void HideInfoBoard()
+        {
+            infoBoard.transform.position = new Vector3(Screen.width + 260, 0, 0);
+        }
+
+        private void DisplayInfoBoard(int slotID)
+        {
+            TClass tClass = Database.Instance.ActivePlayerData.unlockedClasses[selectClassID].GetTClass();
+            infoBoard.transform.position = skillSlots[slotID].transform.position + new Vector3(0, 110, 0);
+            infoBoard.UpdateToSkillBoard(tClass.skillSet[slotID].Hash);
         }
 
         public void ResetUI()
@@ -144,9 +161,9 @@ namespace Wing.RPGSystem
             raceSprites[1].sprite = tRace.buffSet[1].sprite;
             TClass tClass = Database.Instance.ActivePlayerData.unlockedClasses[selectClassID].GetTClass();
             classText.text = tClass.name;
-            classSprites[0].sprite = tClass.skillSet[0].sprite;
-            classSprites[1].sprite = tClass.skillSet[1].sprite;
-            classSprites[2].sprite = tClass.skillSet[2].sprite;
+            skillSlots[0].icon.sprite = tClass.skillSet[0].sprite;
+            skillSlots[1].icon.sprite = tClass.skillSet[1].sprite;
+            skillSlots[2].icon.sprite = tClass.skillSet[2].sprite;
 
             startPage.SetActive(false);
             createPage.SetActive(true);
@@ -192,9 +209,9 @@ namespace Wing.RPGSystem
             if (selectClassID < Database.Instance.ActivePlayerData.unlockedClasses.Count) {
                 TClass tClass = Database.Instance.ActivePlayerData.unlockedClasses[selectClassID].GetTClass();
                 classText.text = tClass.name;              
-                classSprites[0].sprite = tClass.skillSet[0].sprite;
-                classSprites[1].sprite = tClass.skillSet[1].sprite;
-                classSprites[2].sprite = tClass.skillSet[2].sprite;
+                skillSlots[0].icon.sprite = tClass.skillSet[0].sprite;
+                skillSlots[1].icon.sprite = tClass.skillSet[1].sprite;
+                skillSlots[2].icon.sprite = tClass.skillSet[2].sprite;
 
                 classCover.SetActive(false);
             }

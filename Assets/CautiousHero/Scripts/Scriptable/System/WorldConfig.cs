@@ -18,7 +18,7 @@ namespace Wing.RPGSystem
         public AreaConfig[] specialConfigs;
     }
 
-    [CreateAssetMenu(fileName = "WorldConfig", menuName = "Wing/Configs/WorldConfig", order = 2)]
+    [CreateAssetMenu(fileName = "WorldConfig", menuName = "Wing/Configs/WorldConfig", order = 0)]
     public class WorldConfig : ScriptableObject
     {
         public string configName;
@@ -26,6 +26,24 @@ namespace Wing.RPGSystem
         public int Hash => configName.GetStableHashCode();
 
         public AdventureStage[] stages;
+        public RandomPool randomPool;
+
+        public int[] RandomBattleSkill(int number)
+        {
+            int[] skillHashes = new int[number];
+            int length = randomPool.battle_skillSet.commonSet.defaultSet.Length;
+            if (number > length) return null;
+            HashSet<int> ids = new HashSet<int>();
+            for (int i = 0; i < number; i++) {
+                int r = length.Random();
+                while (ids.Contains(r)) {
+                    r = length.Random();
+                }
+                ids.Add(r);
+                skillHashes[i] = randomPool.battle_skillSet.commonSet.defaultSet[r].Hash;
+            }
+            return skillHashes;
+        }
 
         static Dictionary<int, WorldConfig> cache;
         public static Dictionary<int, WorldConfig> Dict {

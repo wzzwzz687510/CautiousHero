@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Wing.RPGSystem
 {
-    [CreateAssetMenu(fileName = "Creature Set", menuName = "Wing/Configs/CreatureDifficultySet", order = 2)]
+    [CreateAssetMenu(fileName = "Creature Set", menuName = "Wing/Configs/CreatureDifficultySet", order = 1)]
     public class CreatureDifficultySet : ScriptableObject
     {
         public List<CreatureSet> standardSets;
