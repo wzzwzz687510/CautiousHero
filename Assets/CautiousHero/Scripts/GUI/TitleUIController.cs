@@ -24,15 +24,17 @@ namespace Wing.RPGSystem
         public GameObject nameInputPage;
         public GameObject infoPage;
 
+        [Header("CreatePage")]
         public Text raceText;
         public Text raceDesText;
-        public Image[] raceSprites;
         public Text classText;
-        public IconSlot[] skillSlots;
         public InfoBoard infoBoard;
-
         public GameObject talentCover;
         public GameObject classCover;
+        public IconSlot[] talentSlots;
+        public IconSlot[] skillSlots;
+
+        [Header("SavePage")]
         public SaveSlot[] saveSlots;
 
         private int selectClassID;
@@ -40,8 +42,12 @@ namespace Wing.RPGSystem
 
         private void Start()
         {
-            for (int i = 0; i < saveSlots.Length; i++) {
-                skillSlots[i].RegisterDisplayAction(DisplayInfoBoard);
+            for (int i = 0; i < talentSlots.Length; i++) {
+                talentSlots[i].RegisterDisplayAction(DisplayTalentInfoBoard);
+                talentSlots[i].RegisterHideAction(HideInfoBoard);
+            }
+            for (int i = 0; i < skillSlots.Length; i++) {
+                skillSlots[i].RegisterDisplayAction(DisplaySkillInfoBoard);
                 skillSlots[i].RegisterHideAction(HideInfoBoard);
             }
             if (Database.Instance.SelectSlot != -1) {
@@ -67,11 +73,18 @@ namespace Wing.RPGSystem
             infoBoard.transform.position = new Vector3(Screen.width + 260, 0, 0);
         }
 
-        private void DisplayInfoBoard(int slotID)
+        private void DisplaySkillInfoBoard(int slotID)
         {
             TClass tClass = Database.Instance.ActivePlayerData.unlockedClasses[selectClassID].GetTClass();
             infoBoard.transform.position = skillSlots[slotID].transform.position + new Vector3(0, 110, 0);
             infoBoard.UpdateToSkillBoard(tClass.skillSet[slotID].Hash);
+        }
+
+        private void DisplayTalentInfoBoard(int slotID)
+        {
+            TRace tRace = Database.Instance.ActivePlayerData.unlockedRaces[selectRaceID].GetTRace();
+            infoBoard.transform.position = talentSlots[slotID].transform.position + new Vector3(0, 110, 0);
+            infoBoard.UpdateToBuffBoard(tRace.buffSet[slotID].Hash);
         }
 
         public void ResetUI()
@@ -157,8 +170,8 @@ namespace Wing.RPGSystem
             TRace tRace = Database.Instance.ActivePlayerData.unlockedRaces[selectRaceID].GetTRace();
             raceText.text = tRace.name;
             raceDesText.text = tRace.description;
-            raceSprites[0].sprite = tRace.buffSet[0].sprite;
-            raceSprites[1].sprite = tRace.buffSet[1].sprite;
+            talentSlots[0].icon.sprite = tRace.buffSet[0].sprite;
+            talentSlots[1].icon.sprite = tRace.buffSet[1].sprite;
             TClass tClass = Database.Instance.ActivePlayerData.unlockedClasses[selectClassID].GetTClass();
             classText.text = tClass.name;
             skillSlots[0].icon.sprite = tClass.skillSet[0].sprite;
@@ -188,9 +201,9 @@ namespace Wing.RPGSystem
             if (selectRaceID < Database.Instance.ActivePlayerData.unlockedRaces.Count) {
                 TRace tRace = Database.Instance.ActivePlayerData.unlockedRaces[selectRaceID].GetTRace();
                 raceText.text = tRace.name;
-                raceDesText.text = tRace.description; 
-                raceSprites[0].sprite = tRace.buffSet[0].sprite;
-                raceSprites[1].sprite = tRace.buffSet[1].sprite;
+                raceDesText.text = tRace.description;
+                talentSlots[0].icon.sprite = tRace.buffSet[0].sprite;
+                talentSlots[1].icon.sprite = tRace.buffSet[1].sprite;
                 talentCover.SetActive(false);
             }
             else {

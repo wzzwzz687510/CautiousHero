@@ -145,21 +145,26 @@ namespace Wing.RPGSystem
     public class BuffManager
     {
         public int entityHash;
-        public Dictionary<BuffType, Dictionary<int, BuffHandler>> buffs = 
-            new Dictionary<BuffType, Dictionary<int, BuffHandler>>(); // Key->buffhash;
+        public Dictionary<BuffType, Dictionary<int, BuffHandler>> buffDic; // Key->buffhash;
+        public List<int> buffHashes;
+
+        public delegate void OnBuffChanged(int buffHash, bool isAdd);
+        public OnBuffChanged OnBuffChangedEvent;
 
         public BuffManager(int entityHash)
         {
             this.entityHash = entityHash;
+            buffDic = new Dictionary<BuffType, Dictionary<int, BuffHandler>>();
+            buffHashes = new List<int>();
         }
 
         public void AddBuff(BuffHandler bh)
         {
             int buffhash = bh.BuffHash;
             BuffType buffType = bh.TemplateBuff.type;
-            if (buffs.ContainsKey(buffType)) {
-                if (buffs[buffType].ContainsKey(buffhash)) {
-                    BuffHandler buffHandler = buffs[buffType][buffhash];
+            if (buffDic.ContainsKey(buffType)) {
+                if (buffDic[buffType].ContainsKey(buffhash)) {
+                    BuffHandler buffHandler = buffDic[buffType][buffhash];
                     if (buffHandler.Stackable) {
                         buffHandler.OnStacked();
                     }
@@ -168,23 +173,27 @@ namespace Wing.RPGSystem
                     }
                 }
                 else {
-                    buffs[buffType].Add(buffhash, bh);
+                    buffDic[buffType].Add(buffhash, bh);
+                    buffHashes.Add(buffhash);
+                    OnBuffChangedEvent?.Invoke(buffHashes.Count-1,true);
                 }
             }
             else {
-                buffs.Add(buffType, new Dictionary<int, BuffHandler>());
-                buffs[buffType].Add(buffhash, bh);
+                buffDic.Add(buffType, new Dictionary<int, BuffHandler>());
+                buffDic[buffType].Add(buffhash, bh);
+                buffHashes.Add(buffhash);
+                OnBuffChangedEvent?.Invoke(buffHashes.Count - 1,true);
             }
         }
 
         public void UpdateBuffs()
         {
             // Do something to host
-
-            foreach (var buffDic in buffs.Values) {
+            foreach (var buffDic in buffDic.Values) {
                 foreach (var buff in buffDic.Values) {
                     if (!buff.UpdateBuff()) {
                         buffDic.Remove(buff.BuffHash);
+                        OnBuffChangedEvent?.Invoke(buffHashes.IndexOf(buff.BuffHash), false);
                     }
                 }
             }
@@ -193,14 +202,14 @@ namespace Wing.RPGSystem
         public EntityAttribute GetAttributeAdjustment()
         {
             EntityAttribute tmp = new EntityAttribute();
-            if (buffs.ContainsKey(BuffType.Attribute))
-                foreach (var buffHandler in buffs[BuffType.Attribute].Values) {
+            if (buffDic.ContainsKey(BuffType.Attribute))
+                foreach (var buffHandler in buffDic[BuffType.Attribute].Values) {
                     tmp += (buffHandler.TemplateBuff as AttributeBuff).adjustValue;
                 }
 
             return tmp;
         }
 
-        public BuffHandler GetBuffHandler(int buffhash) => buffs[buffhash.GetBaseBuff().type][buffhash];
+        public BuffHandler GetBuffHandler(int buffhash) => buffDic[buffhash.GetBaseBuff().type][buffhash];
     }
 }

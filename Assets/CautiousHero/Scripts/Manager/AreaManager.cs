@@ -257,6 +257,7 @@ namespace Wing.RPGSystem
             character.InitCharacter("AreaPlayer",WorldData.ActiveData.attribute, WorldData.ActiveData.HealthPoints);
             character.MoveToLocation(spawnLoc,false, true);
             character.transform.position = spawnLoc.ToAreaView();
+            m_areaUIController.BindBuffManager();
 
             // Init battle system
             BattleManager.Instance.Init();

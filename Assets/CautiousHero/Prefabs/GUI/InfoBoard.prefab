@@ -1907,7 +1907,7 @@ MonoBehaviour:
   title: {fileID: 9138966802873314983}
   description: {fileID: 914193313943698583}
   header: {fileID: 9138966804444458232}
-  apcostToggles:
+  apcostImgs:
   - {fileID: 9138966803339408614}
   - {fileID: 8322161366755724796}
   - {fileID: 5343239404625683052}

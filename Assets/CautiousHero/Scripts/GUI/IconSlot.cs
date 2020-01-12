@@ -18,6 +18,11 @@ namespace Wing.RPGSystem
         private UnityAction<int> DisplayAction;
         private UnityAction hideAction;
 
+        public void UpdateSlotID(int removedID)
+        {
+            if (slotID > removedID) slotID--;
+        }
+
         public void RegisterDisplayAction(UnityAction<int> action)
         {
             this.DisplayAction = action;

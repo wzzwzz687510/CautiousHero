@@ -44,14 +44,18 @@ public class AreaUIController : MonoBehaviour
     public Image image_die;
 
     [Header("Buff Visual")]
-    public IconSlot[] buffSlots;
+    public IconSlot buffSlotPrefab;
+    public Transform buffSlotHolder;
+    public List<IconSlot> buffSlots;
+    //public IconSlot[] buffSlots;
 
     [Header("Skill Board")]
     public float waitDuration;
     public IconSlot[] skillSlots;
     public InfoBoard infoBoard;
     private int selectSlot = -1;
-    private bool isSkillBoardDisplayed;    
+    private bool isInfoBoardDisplayed;
+    private bool isSkillInfo;
 
     [Header("Skill Learning Page")]
     public GameObject skillLearningPage;
@@ -75,12 +79,13 @@ public class AreaUIController : MonoBehaviour
 
     private void FixedUpdate()
     {
-        if (startTimer && !isSkillBoardDisplayed && !isCreatureBoardDisplayed) {
+        if (startTimer && !isInfoBoardDisplayed && !isCreatureBoardDisplayed) {
             timer += Time.deltaTime;
             if (timer > waitDuration) {
                 if (selectSlot != -1) {
-                    ShowSkillBoard();
-                    isSkillBoardDisplayed = true;
+                    if (isSkillInfo) DisplaySkillBoard();
+                    else DisplayBuffBoard();
+                    isInfoBoardDisplayed = true;
                 }
                 else if (selectCreatureID != -1) {
                     ShowCreatureBoard();
@@ -95,7 +100,8 @@ public class AreaUIController : MonoBehaviour
 
     private void Start()
     {
-        BindEvent();
+        buffSlots = new List<IconSlot>();
+        BindEvent();       
     }
 
     public void EnterAreaAnim()
@@ -109,8 +115,13 @@ public class AreaUIController : MonoBehaviour
         CharacterArmourPointsChangeAnimation(false, character.MagicalArmourPoints);
     }
 
-    private void BindEvent()
+    public void BindBuffManager()
     {
+        character.BuffManager.OnBuffChangedEvent += OnCharacterBuffChanged;
+    }
+
+    private void BindEvent()
+    {        
         character.OnMovedEvent += OnPlayerMovedEvent;
         character.HPChangeAnimation += CharacterHPChangeAnimation;
         character.ArmourPointsChangeAnimation += CharacterArmourPointsChangeAnimation;
@@ -118,16 +129,13 @@ public class AreaUIController : MonoBehaviour
 
         character.ssAnimEvent += CharacterSkillShiftAnimation;
         character.OnAPChanged.AddListener(OnCharacterAPChanged);
-        for (int i = 0; i < buffSlots.Length; i++) {
-
-        }
         for (int i = 0; i < skillSlots.Length; i++) {
-            skillSlots[i].RegisterDisplayAction(DisplaySkillInfoBoard);
-            skillSlots[i].RegisterHideAction(HideSkillInfoBoard);
+            skillSlots[i].RegisterDisplayAction(OnShowSkillInfoBoardEvent);
+            skillSlots[i].RegisterHideAction(OnHideInfoBoardEvent);
         }
         for (int i = 0; i < skillLearningSlots.Length; i++) {
-            skillLearningSlots[i].RegisterDisplayAction(DisplaySkillInfoBoardAtLearningPage);
-            skillLearningSlots[i].RegisterHideAction(HideSkillInfoBoard);
+            skillLearningSlots[i].RegisterDisplayAction(OnShowLearnSkillInfoBoardEvent);
+            skillLearningSlots[i].RegisterHideAction(OnHideInfoBoardEvent);
         }
 
         BattleManager.Instance.OnTurnSwitched += OnTurnSwitched;
@@ -135,6 +143,54 @@ public class AreaUIController : MonoBehaviour
         BattleManager.Instance.MovePreviewEvent += MovePreviewEvent;
         BattleManager.Instance.CastPreviewEvent += CastPreviewEvent;
         AnimationManager.Instance.OnGameoverEvent.AddListener(Gameover);
+    }
+
+    private void OnShowSkillInfoBoardEvent(int slotID)
+    {
+        if (character.SkillHashes.Count < character.defaultSkillCount) return;
+        startTimer = true;
+        isSkillInfo = true;
+        selectSlot = slotID;
+        if (timer > waitDuration) DisplaySkillBoard();
+    }
+
+    private void OnShowBuffInfoBoardEvent(int slotID)
+    {
+        startTimer = true;
+        isSkillInfo = false;
+        selectSlot = slotID;
+        if (timer > waitDuration) DisplayBuffBoard();
+    }
+
+    private void OnShowLearnSkillInfoBoardEvent(int slotID)
+    {
+        //float xOffset = Input.mousePosition.x > Screen.width - 370 ? -350 : 350;
+        infoBoard.transform.position = skillLearningSlots[slotID].transform.position + new Vector3(0, -200, 0);
+        infoBoard.UpdateToSkillBoard(AreaManager.Instance.RandomedSkillHashes[slotID]);
+    }
+
+    private void OnHideInfoBoardEvent()
+    {
+        startTimer = false;
+        isInfoBoardDisplayed = false;
+        selectSlot = -1;
+        infoBoard.transform.position = new Vector3(Screen.width + 260, 0, 0);
+    }
+
+    private void DisplayBuffBoard()
+    {
+        if (!skillLearningPage.activeSelf) {
+            infoBoard.transform.position = buffSlots[selectSlot].transform.position + new Vector3(272, 0, 0);
+            infoBoard.UpdateToBuffBoard(character.BuffManager.buffHashes[selectSlot]);
+        }
+    }
+
+    private void DisplaySkillBoard()
+    {
+        if (!skillLearningPage.activeSelf) {
+            infoBoard.transform.position = skillSlots[selectSlot].transform.position + new Vector3(0, 160, 0);
+            infoBoard.UpdateToSkillBoard(character.SkillHashes[selectSlot]);
+        }
     }
 
     private void OnPlayerMovedEvent(int steps)
@@ -180,6 +236,24 @@ public class AreaUIController : MonoBehaviour
         playerHpText.text = hp.ToString() + "/" + maxHP.ToString();
     }
 
+    private void OnCharacterBuffChanged(int buffID,bool isAdding)
+    {
+        if (isAdding) {
+            IconSlot buffSlot = Instantiate(buffSlotPrefab, buffSlotHolder);
+            buffSlot.slotID = buffID;
+            buffSlot.icon.sprite = character.BuffManager.buffHashes[buffID].GetBaseBuff().sprite;
+            buffSlot.RegisterDisplayAction(OnShowBuffInfoBoardEvent);
+            buffSlot.RegisterHideAction(OnHideInfoBoardEvent);
+            buffSlots.Add(buffSlot);
+        }
+        else {
+            for (int i = 0; i < buffSlots.Count; i++) {
+                buffSlots[i].UpdateSlotID(buffID);
+            }
+            Destroy(buffSlotHolder.GetChild(buffID).gameObject);
+        }
+    }
+
     private void OnCharacterAPChanged()
     {
         for (int i = 0; i < aps.Length; i++) {
@@ -207,6 +281,11 @@ public class AreaUIController : MonoBehaviour
         for (int i = 0; i < aps.Length; i++) {
             aps[i].gameObject.SetActive(false);
         }
+
+        for (int i = 0; i < buffSlotHolder.childCount; i++) {
+            Destroy(buffSlotHolder.GetChild(i).gameObject);
+        }
+        buffSlots.Clear();
     }
 
     private void CastPreviewEvent(int skillID)
@@ -239,29 +318,6 @@ public class AreaUIController : MonoBehaviour
         for (int i = steps; i < skills.Length; i++) {
             skills[i].sprite = character.SkillHashes[i- steps].GetBaseSkill().sprite;
         }
-    }
-
-    private void DisplaySkillInfoBoard(int slotID)
-    {
-        if (character.SkillHashes.Count < character.defaultSkillCount) return;
-        startTimer = true;
-        selectSlot = slotID;
-        if (timer > waitDuration) ShowSkillBoard();
-    }
-
-    private void DisplaySkillInfoBoardAtLearningPage(int slotID)
-    {
-        //float xOffset = Input.mousePosition.x > Screen.width - 370 ? -350 : 350;
-        infoBoard.transform.position = skillLearningSlots[slotID].transform.position + new Vector3(0, -200, 0);
-        infoBoard.UpdateToSkillBoard(AreaManager.Instance.RandomedSkillHashes[slotID]);
-    }
-
-    private void HideSkillInfoBoard()
-    {
-        startTimer = false;
-        isSkillBoardDisplayed = false;
-        selectSlot = -1;
-        infoBoard.transform.position = new Vector3(Screen.width + 260, 0, 0);
     }
 
     public void BattleStartAnim()
@@ -347,14 +403,6 @@ public class AreaUIController : MonoBehaviour
         else if (isExit) {            
             isCreatureBoardDisplayed = false;
             creatureBoard.position = new Vector3(-300, 0, 0);
-        }
-    }
-
-    public void ShowSkillBoard()
-    {
-        if (!skillLearningPage.activeSelf) {
-            infoBoard.transform.position = skillSlots[selectSlot].transform.position + new Vector3(0, 160, 0);
-            infoBoard.UpdateToSkillBoard(character.SkillHashes[selectSlot]);
         }
     }
 

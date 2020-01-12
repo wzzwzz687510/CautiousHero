@@ -115,6 +115,11 @@ namespace Wing.RPGSystem
             if (Input.GetKeyDown(KeyCode.K)) {
                 AreaManager.Instance.PrepareChooseSkill();
             }
+
+            if (Input.GetKeyDown(KeyCode.B)) {
+                Entity character = AreaManager.Instance.character;
+                character.BuffManager.AddBuff(new BuffHandler(character.Hash, character.Hash, defaultRace.buffSet[0].Hash));
+            }
         }
 
         private void Start()
