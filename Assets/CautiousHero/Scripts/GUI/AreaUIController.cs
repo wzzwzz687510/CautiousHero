@@ -30,9 +30,10 @@ public class AreaUIController : MonoBehaviour
     public Image[] skills;
     public Image[] skillCovers;
     public Sprite unknownSkill;
+    public GameObject arrowAnim;
 
     [Header("AP Visual")]
-    public GameObject[] aps;
+    public Animation[] aps;
 
     [Header("Turn Switch Visual")]
     public Image turnBG;
@@ -176,13 +177,15 @@ public class AreaUIController : MonoBehaviour
     private void OnCharacterAPChanged()
     {
         for (int i = 0; i < aps.Length; i++) {
-            aps[i].SetActive(i < character.ActionPoints);
+            aps[i].gameObject.SetActive(i < character.ActionPoints);
+            aps[i].Play("apStatic");
         }
     }
 
     public void UpdateSkillSprites()
     {
-        if (character.SkillHashes.Count < character.defaultSkillCount) return;
+        arrowAnim.SetActive(false);
+        if (character.SkillHashes.Count < character.defaultSkillCount) return;        
         for (int i = 0; i < character.defaultSkillCount; i++) {
             skills[i].sprite = character.SkillHashes[i].GetBaseSkill().sprite;
         }
@@ -196,14 +199,17 @@ public class AreaUIController : MonoBehaviour
 
         endTurnButton.gameObject.SetActive(false);
         for (int i = 0; i < aps.Length; i++) {
-            aps[i].SetActive(false);
+            aps[i].gameObject.SetActive(false);
         }
     }
 
     private void CastPreviewEvent(int skillID)
     {
+        arrowAnim.SetActive(true);
+        int cost = character.SkillHashes[skillID].GetBaseSkill().actionPointsCost;
         for (int i = 0; i < character.ActionPoints; i++) {
-            aps[i].SetActive(i < character.ActionPoints - character.SkillHashes[skillID].GetBaseSkill().actionPointsCost);
+            aps[i].Play("apStatic");
+            if (i >= character.ActionPoints - cost) aps[i].Play("apBlink");
         }
         skills[0].sprite = unknownSkill;
         for (int i = 1; i < skills.Length; i++) {
@@ -213,8 +219,10 @@ public class AreaUIController : MonoBehaviour
 
     private void MovePreviewEvent(int steps)
     {
+        arrowAnim.SetActive(steps != 0);
         for (int i = 0; i < character.ActionPoints; i++) {
-            aps[i].SetActive(i < character.ActionPoints - steps);
+            aps[i].Play("apStatic");
+            if (i >= character.ActionPoints - steps) aps[i].Play("apBlink");
         }
 
         for (int i = 0; i < steps; i++) {

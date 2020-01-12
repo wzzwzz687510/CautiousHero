@@ -156,14 +156,15 @@ namespace Wing.RPGSystem
         {
             if (bookPage.activeSelf) {
                 bookPage.SetActive(false);
-                return;
-            }
-
-            if (WorldMapManager.Instance.IsWorldView) {
-                WorldMapManager.Instance.EnterArea(AreaManager.Instance.CurrentAreaLoc);
+                if(!WorldMapManager.Instance.IsWorldView) AreaManager.Instance.CompleteExploration();
             }
             else {
-                AreaManager.Instance.CompleteExploration();
+                if (WorldMapManager.Instance.IsWorldView) {
+                    WorldMapManager.Instance.EnterArea(AreaManager.Instance.CurrentAreaLoc);
+                }
+                else {
+                    AreaManager.Instance.CompleteExploration();
+                }
             }
         }
 
