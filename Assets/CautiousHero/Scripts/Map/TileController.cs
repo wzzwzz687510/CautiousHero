@@ -46,7 +46,7 @@ namespace Wing.RPGSystem
         }
         public TileInfo(TTile template)
         {
-            this.tTileHash = template.Hash;
+            tTileHash = template.Hash;
             mana = template.mana;
             isObstacle = template.type == TileType.Obstacle;
             isExplored = false;
@@ -95,6 +95,7 @@ namespace Wing.RPGSystem
         public Entity StayEntity { get { return StayEntityHash.GetEntity(); } }
         public bool IsEmpty { get { return Info.isEmpty; } }
         public bool IsBind { get; private set; }
+        public bool HasImpacts => Info.tTileHash.GetTTile().HasImpacts;
 
         public int SortOrder { get { return m_bSpriteRenderer.sortingOrder; } }
 
@@ -166,6 +167,7 @@ namespace Wing.RPGSystem
             // Do something to entity;
             AreaManager.Instance.SetEntityHash(Loc, hash);
             GridManager.Instance.Nav.SetTileWeight(Loc, 0);
+            if (HasImpacts) ApplyEffect();
         }
 
         public void OnEntityLeaving()
@@ -179,6 +181,17 @@ namespace Wing.RPGSystem
         {
             CastLoc = from;
             IsBind = true;
+        }
+
+        public void ApplyEffect()
+        {
+            TTile tTile = Info.tTileHash.GetTTile();
+            foreach (var skill in tTile.impactSkills) {
+                skill.ApplyEffect(0, Loc);
+            }
+            foreach (var buff in tTile.impactBuffs) {
+                StayEntity.BuffManager.AddBuff(new BuffHandler(0, StayEntityHash, buff.Hash));
+            }
         }
 
         public void DebindCastLocation()

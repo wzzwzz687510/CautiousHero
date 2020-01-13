@@ -11,10 +11,14 @@ namespace Wing.RPGSystem
         public string templateName;
         public string description;
         public int Hash => templateName.GetStableHashCode();
+        public bool HasImpacts => impactSkills.Length == 0 && impactBuffs.Length == 0;
         public TileType type;
         public Sprite fSprite;
         public Sprite bSprite;
         public ElementMana mana;
+
+        public BaseSkill[] impactSkills;
+        public BaseBuff[] impactBuffs;
 
         static Dictionary<int, TTile> cache;
         public static Dictionary<int, TTile> Dict {
