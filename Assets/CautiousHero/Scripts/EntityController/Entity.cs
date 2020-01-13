@@ -158,6 +158,7 @@ namespace Wing.RPGSystem
         public int PhysicalArmourPoints { get; protected set; }
         public int MagicalArmourPoints { get; protected set; }
         public int ActionPoints { get; protected set; }
+        public bool IsCostAP { get; private set; }
         public bool IsDeath { get; protected set; }
         public List<int> SkillHashes { get; protected set; }
         public BuffManager BuffManager { get; protected set; }
@@ -210,6 +211,7 @@ namespace Wing.RPGSystem
             m_spriteRenderer = GetComponentInChildren<SpriteRenderer>();
             m_glowEffect = GetComponentInChildren<SpriteGlowEffect>();
             m_collider = GetComponentInChildren<BoxCollider2D>();
+            IsCostAP = true;
             IsDeath = false;
             SkillHashes = new List<int>();
             OnSortingOrderChanged += OnSortingOrderChangedEvent;
@@ -339,6 +341,10 @@ namespace Wing.RPGSystem
 
         public virtual void ImpactActionPoints(int value, bool reduce)
         {
+            if(!IsCostAP) {
+                IsCostAP = true;
+                return;
+            }
             ActionPoints += (reduce ? -1 : 1) * value;
             ActionPoints = Mathf.Clamp(ActionPoints, 0, MaxActionPoints);
             OnAPChanged?.Invoke();
