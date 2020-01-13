@@ -89,6 +89,7 @@ public class BattleManager : MonoBehaviour
 
     public void NewBattle(List<int> battleSet)
     {
+        AnimationManager.Instance.OnAnimCompleted.RemoveListener(OnAnimCompleted);
         AnimationManager.Instance.OnAnimCompleted.AddListener(OnAnimCompleted);
         AIManager.Instance.Init(battleSet);
         AudioManager.Instance.PlayMeetClip();
@@ -113,6 +114,7 @@ public class BattleManager : MonoBehaviour
             }
         }            
         else if (State == BattleState.BotTurn) {
+            Debug.Log("end bot turn");
             CompleteBotTurn();
         }
 
@@ -428,9 +430,10 @@ public class BattleManager : MonoBehaviour
 
     private void BattleVictory()
     {
-        m_battleUIController.DisplayInfo("Victory");
-        AudioManager.Instance.PlayVictoryClip();
         AnimationManager.Instance.Clear();
+        m_battleUIController.DisplayInfo("Victory");
+        AudioManager.Instance.PlayVictoryClip();     
+        
         ChangeState(BattleState.FreeMove);
         AreaManager.Instance.CompleteBattle();
         Debug.Log("You win");
