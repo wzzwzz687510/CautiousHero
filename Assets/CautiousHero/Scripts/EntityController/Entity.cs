@@ -249,16 +249,10 @@ namespace Wing.RPGSystem
                     return 0;
                 }
 
-                MovePath = path.Reverse().ToArray();
-
-                // AP cost and invoke event
-                ImpactActionPoints(MovePath.Length * MoveCost, true);
-                // Animation move
+                MovePath = path.ToArray();
             }
             // Pass move condition
             OnStartMovedEvent?.Invoke(Loc.Distance(targetLoc));
-
-
 
             if (isInstance) {
                 Loc.GetTileController().OnEntityLeaving();
@@ -271,14 +265,18 @@ namespace Wing.RPGSystem
                 int stepID = 0, passedCount = 0;
                 for (int i = 0; i < MovePath.Length; i++) {
                     if (MovePath[i].GetTileController().HasImpacts || i == MovePath.Length - 1) {
+                        Debug.Log(stepID);
                         if (stepID * MoveCost > ActionPoints) return i;
                         SubMoveToTile(passedCount, stepID);
+
                         stepID = 0;
                         passedCount = i + 1;
                         continue;
                     }
                     stepID++;
                 }
+                // AP cost
+                ImpactActionPoints(passedCount * MoveCost, true);
             }
           
             return isInstance ? 0 : MovePath.Length;
@@ -286,7 +284,9 @@ namespace Wing.RPGSystem
 
         public virtual void SubMoveToTile(int passedCount,int stepID)
         {
-            Location[] subPath = MovePath.Skip(passedCount).Take(stepID + 1).ToArray();
+            //Debug.Log("pass: " + passedCount + ", step: " + stepID);
+            Location[] subPath = MovePath.Skip(passedCount).Take(stepID+1).ToArray();
+            //Debug.Log("mov: " + MovePath.Length + ", sub: " + subPath.Length);
 
             Loc.GetTileController().OnEntityLeaving();
             Loc = subPath[stepID];

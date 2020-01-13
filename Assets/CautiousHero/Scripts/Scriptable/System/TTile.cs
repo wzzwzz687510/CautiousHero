@@ -11,7 +11,7 @@ namespace Wing.RPGSystem
         public string templateName;
         public string description;
         public int Hash => templateName.GetStableHashCode();
-        public bool HasImpacts => impactSkills.Length == 0 && impactBuffs.Length == 0;
+        public bool HasImpacts => impactSkills.Length != 0 || impactBuffs.Length != 0;
         public TileType type;
         public Sprite fSprite;
         public Sprite bSprite;

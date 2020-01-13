@@ -64,7 +64,7 @@ namespace Wing.RPGSystem
                 if (!nav.HasPath(Loc, targetLoc)) return;
                 Stack<Location> path = nav.GetPath(Loc, targetLoc);
 
-                MovePath = path.Reverse().ToArray();
+                MovePath = path.ToArray();
             }
 
             if(isWorldMap) Loc = targetLoc;
