@@ -40,6 +40,7 @@ namespace Wing.RPGSystem
             if (!Instance)
                 Instance = this;
             AreaDic = new Dictionary<Location, AreaController>();
+            discoveredLocs = new List<Location>();
             character.EntitySprite.DOFade(0, 0);
             IsWorldView = true;
         }
@@ -52,7 +53,7 @@ namespace Wing.RPGSystem
             var hit = Physics2D.Raycast(ray.origin, ray.direction, 20, areaLayer);
             if (hit) {
                 var ac = hit.transform.parent.GetComponent<AreaController>();
-                if (ac.IsExplored) {
+                if (discoveredLocs.Contains(ac.Loc)) {
                     HighlightVisual(ac.Loc);
 
                     if (Input.GetMouseButtonDown(0)) {
@@ -182,11 +183,9 @@ namespace Wing.RPGSystem
 
         private void MoveToArea(Location areaLoc)
         {
-            if (!AreaDic.ContainsKey(areaLoc) || !AreaDic[areaLoc].IsExplored) return;
+            if (!AreaDic.ContainsKey(areaLoc) || !discoveredLocs.Contains(areaLoc)) return;
             character.MoveToLocation(areaLoc, true, false);
-            StartCoroutine(EnterAreaAfterAnim(areaLoc));
-            //ExploreArea(loc);
-            
+            StartCoroutine(EnterAreaAfterAnim(areaLoc));    
         }
 
         private void RelocateAreaPosition()
@@ -204,8 +203,7 @@ namespace Wing.RPGSystem
                 Nav.SetTileWeight(loc, 1);
                 AreaController ac = areaHolder.GetChild(i).GetComponent<AreaController>();
                 ac.transform.position = new Vector3(0.524f * (loc.y-loc.x), 0.262f * (loc.x + loc.y), 0);
-                ac.ChangeAreaState(AreaState.Default);
-                ac.m_spriteRenderer.DOFade(0, 0);
+                ac.ResetArea();
                 AreaDic.Add(loc, ac);
             }
         }

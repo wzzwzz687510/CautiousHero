@@ -93,7 +93,6 @@ namespace Wing.RPGSystem
         public Color moveColor = new Color(0.36f, 1.0f, 0.36f);
 
         public Vector3 Archor { get { return m_archor.position; } }
-        public bool IsExplored { get; private set; }
         public Location Loc { get; private set; }
         public AreaInfo AreaInfo { get { Database.Instance.TryGetAreaInfo(Loc, out AreaInfo info); return info; } }
 
@@ -108,7 +107,6 @@ namespace Wing.RPGSystem
             m_spriteRenderer.sprite = AreaInfo.templateHash.GetAreaConfig().sprite;
 
             m_animation.Play("tile_fall");
-            IsExplored = true;
             m_coll.enabled = true;
             StartCoroutine(DelayChange(AreaState.Selectable, 1));
         }
@@ -134,6 +132,13 @@ namespace Wing.RPGSystem
                 default:
                     break;
             }
+        }
+
+        public void ResetArea()
+        {
+            ChangeAreaState(AreaState.Default);
+            m_spriteRenderer.DOFade(0, 0);
+            m_coll.enabled = false;
         }
 
         private void SetCoverColor(Color c)

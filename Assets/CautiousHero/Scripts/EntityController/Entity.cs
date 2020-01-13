@@ -265,7 +265,6 @@ namespace Wing.RPGSystem
                 int stepID = 0, passedCount = 0;
                 for (int i = 0; i < MovePath.Length; i++) {
                     if (MovePath[i].GetTileController().HasImpacts || i == MovePath.Length - 1) {
-                        Debug.Log(stepID);
                         if (stepID * MoveCost > ActionPoints) return i;
                         SubMoveToTile(passedCount, stepID);
 
