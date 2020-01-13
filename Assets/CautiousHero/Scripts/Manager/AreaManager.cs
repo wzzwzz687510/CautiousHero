@@ -158,7 +158,7 @@ namespace Wing.RPGSystem
                     creature.SetVisual(distance <= playerViewDistance);
                     int delta = enemyViewDistance - distance;
                     // TODO: improve trigger condition
-                    if (delta < 0) continue;
+                    if (delta < 0 || loc == creature.Loc) continue;
                     Location stopLoc = delta > 0 ?
                         character.Loc.GetLocationWithGivenStep(loc, character.Loc.Distance(loc) - delta) : loc;
                     character.MoveToLocation(stopLoc, false, false);
