@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using DG.Tweening;
 using SpriteGlow;
+using System.Linq;
 
 namespace Wing.RPGSystem
 {
@@ -63,26 +64,12 @@ namespace Wing.RPGSystem
                 if (!nav.HasPath(Loc, targetLoc)) return;
                 Stack<Location> path = nav.GetPath(Loc, targetLoc);
 
-                Vector3[] sortedPath = new Vector3[path.Count];
-                if (isWorldMap) {
-                    for (int i = 0; i < sortedPath.Length; i++) {
-                        sortedPath[i] = path.Pop().ToWorldView();
-                    }
-                }
-                else {
-                    for (int i = 0; i < sortedPath.Length; i++) {
-                        sortedPath[i] = path.Pop().ToAreaView();
-                    }
-                }
-
-                MovePath = sortedPath;
+                MovePath = path.Reverse().ToArray();
             }
 
             if(isWorldMap) Loc = targetLoc;
             else {
-                if (Loc.TryGetTileController(out TileController leaveTile)) {
-                    leaveTile.OnEntityLeaving();
-                }
+                Loc.GetTileController().OnEntityLeaving();
                 Loc = targetLoc;
                 Loc.GetTileController().OnEntityEntering(Hash);
             }

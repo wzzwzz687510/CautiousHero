@@ -2,6 +2,7 @@
 using SpriteGlow;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -164,7 +165,7 @@ namespace Wing.RPGSystem
         public BuffManager BuffManager { get; protected set; }
 
         public Location Loc { get; protected set; }
-        public Vector3[] MovePath { get; protected set; }
+        public Location[] MovePath { get; protected set; }
 
         protected EntityAttribute m_attribute;
         protected EntityAttribute tempAttribute;
@@ -188,7 +189,7 @@ namespace Wing.RPGSystem
         protected BoxCollider2D m_collider;
 
         public delegate void IntDelegate(int value);
-        public IntDelegate OnMovedEvent;
+        public IntDelegate OnStartMovedEvent;
         public IntDelegate OnSortingOrderChanged;
         public delegate void PointsChange(int hp,int maxHP, float duraion);
         public PointsChange HPChangeAnimation;
@@ -240,6 +241,7 @@ namespace Wing.RPGSystem
             if (targetLoc == Loc) {
                 return 0;
             }
+            // Calculate movement path
             if (!isInstance) {
                 Stack<Location> path = GridManager.Instance.Nav.GetPath(Loc, targetLoc);
 
@@ -247,36 +249,50 @@ namespace Wing.RPGSystem
                     return 0;
                 }
 
-                Vector3[] sortedPath = new Vector3[path.Count];
-
-                for (int i = 0; i < sortedPath.Length; i++) {
-                    sortedPath[i] = path.Pop().ToAreaView();
-                }
-
-                MovePath = sortedPath;
+                MovePath = path.Reverse().ToArray();
 
                 // AP cost and invoke event
-                ImpactActionPoints(sortedPath.Length * MoveCost, true);
+                ImpactActionPoints(MovePath.Length * MoveCost, true);
                 // Animation move
             }
+            // Pass move condition
+            OnStartMovedEvent?.Invoke(Loc.Distance(targetLoc));
 
-            OnMovedEvent?.Invoke(Loc.Distance(targetLoc));
-            if (Loc.TryGetTileController(out TileController leaveTile)) {
-                leaveTile.OnEntityLeaving();
-            }
-            Loc = targetLoc;
-            Loc.GetTileController().OnEntityEntering(Hash);
+
 
             if (isInstance) {
+                Loc.GetTileController().OnEntityLeaving();
+                Loc = targetLoc;
+                Loc.GetTileController().OnEntityEntering(Hash);
                 AnimationManager.Instance.AddAnimClip(new MoveInstantAnimClip(Hash, targetLoc, 0.2f));
                 AnimationManager.Instance.PlayOnce();
             }
             else {
-                AnimationManager.Instance.AddAnimClip(new MovePathAnimClip(Hash, MovePath, 0.2f));
+                int stepID = 0, passedCount = 0;
+                for (int i = 0; i < MovePath.Length; i++) {
+                    if (MovePath[i].GetTileController().HasImpacts || i == MovePath.Length - 1) {
+                        if (stepID * MoveCost > ActionPoints) return i;
+                        SubMoveToTile(passedCount, stepID);
+                        stepID = 0;
+                        passedCount = i + 1;
+                        continue;
+                    }
+                    stepID++;
+                }
             }
-
-            
+          
             return isInstance ? 0 : MovePath.Length;
+        }
+
+        public virtual void SubMoveToTile(int passedCount,int stepID)
+        {
+            Location[] subPath = MovePath.Skip(passedCount).Take(stepID + 1).ToArray();
+
+            Loc.GetTileController().OnEntityLeaving();
+            Loc = subPath[stepID];
+            Loc.GetTileController().OnEntityEntering(Hash);
+
+            AnimationManager.Instance.AddAnimClip(new MovePathAnimClip(Hash, subPath, 0.2f));
         }
 
         public virtual bool CastSkill(int skillID, Location castLoc)

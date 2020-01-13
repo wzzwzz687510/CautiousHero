@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 using DG.Tweening;
+using System.Linq;
 
 namespace Wing.RPGSystem
 {
@@ -36,9 +37,9 @@ namespace Wing.RPGSystem
     public class MovePathAnimClip : BaseAnimClip
     {
         public int entityHash;
-        public Vector3[] path;
+        public Location[] path;
 
-        public MovePathAnimClip(int entityHash, Vector3[] path, float duration = 0.5f)
+        public MovePathAnimClip(int entityHash, Location[] path, float duration = 0.5f)
             :base(AnimType.MovePath,duration)
         {
             this.entityHash = entityHash;
@@ -234,9 +235,10 @@ namespace Wing.RPGSystem
                     if (!EntityManager.Instance.TryGetEntity(movePathClip.entityHash, out entity))
                         break;
                     float duration = movePathClip.duration * entity.MovePath.Length * animRate;
-                    entity.transform.DOPath(movePathClip.path, duration);
+                    Vector3[] path = (from loc in movePathClip.path let pos = loc.ToPosition() select pos).ToArray();
+                    entity.transform.DOPath(path, duration);
                     for (int i = 0; i < movePathClip.path.Length; i++) {
-                        var pathLoc = isWorldView ? movePathClip.path[i].WorldViewToLocation() : movePathClip.path[i].AreaViewToLocation();
+                        var pathLoc = movePathClip.path[i];
                         yield return new WaitForSeconds(clip.duration * animRate);
                         entity.OnSortingOrderChanged?.Invoke(pathLoc.x + pathLoc.y * 8);
                     }
@@ -246,8 +248,7 @@ namespace Wing.RPGSystem
                     if (!EntityManager.Instance.TryGetEntity(moveInstantClip.entityHash, out entity))
                         break;
 
-                    entity.transform.position = isWorldView ? 
-                        moveInstantClip.destination.ToWorldView(): moveInstantClip.destination.ToAreaView();
+                    entity.transform.position = moveInstantClip.destination.ToPosition();
                     entity.OnSortingOrderChanged?.Invoke(moveInstantClip.destination.x + moveInstantClip.destination.y * 8);
                     break;
                 case AnimType.Cast:
@@ -255,8 +256,7 @@ namespace Wing.RPGSystem
                     if (castClip.skillHash.GetBaseSkill().castEffect.effectName == null) break;
                     CastEffect ce = castClip.skillHash.GetBaseSkill().castEffect;
                     GameObject effect;
-                    Vector3 endPosition = effectOffset + (isWorldView ? 
-                        castClip.end.ToWorldView() : castClip.end.ToAreaView());
+                    Vector3 endPosition = effectOffset + castClip.end.ToPosition();
                     switch (castClip.castType) {
                         case CastType.Instant:                            
                             effect = Instantiate(skillPrefab, endPosition, Quaternion.identity, effectHolder);                           
@@ -266,8 +266,7 @@ namespace Wing.RPGSystem
                             StartCoroutine(DelayDestory(effect, castClip.duration * animRate));
                             break;
                         case CastType.Trajectory:
-                            Vector3 startPosition = effectOffset + (isWorldView ? 
-                                castClip.start.ToWorldView() : castClip.start.ToAreaView());
+                            Vector3 startPosition = effectOffset + castClip.start.ToPosition();
                             effect = Instantiate(skillPrefab, startPosition, Quaternion.identity, effectHolder);
                             effect.GetComponent<Animator>().Play(ce.effectName, 0);
                             effect.GetComponent<AudioSource>().PlayOneShot(ce.sound);

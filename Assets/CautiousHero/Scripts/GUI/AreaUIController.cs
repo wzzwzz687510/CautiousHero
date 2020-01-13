@@ -122,7 +122,7 @@ public class AreaUIController : MonoBehaviour
 
     private void BindEvent()
     {        
-        character.OnMovedEvent += OnPlayerMovedEvent;
+        character.OnStartMovedEvent += OnCharacterStartMovedEvent;
         character.HPChangeAnimation += CharacterHPChangeAnimation;
         character.ArmourPointsChangeAnimation += CharacterArmourPointsChangeAnimation;
         character.OnCancelArmourEvent.AddListener(OnCharacterCancelArmourEvent);
@@ -193,7 +193,7 @@ public class AreaUIController : MonoBehaviour
         }
     }
 
-    private void OnPlayerMovedEvent(int steps)
+    private void OnCharacterStartMovedEvent(int steps)
     {
     }
 

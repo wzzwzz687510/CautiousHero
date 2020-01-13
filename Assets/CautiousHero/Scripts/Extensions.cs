@@ -29,18 +29,34 @@ namespace Wing.RPGSystem
             location.x = loc.x; location.y = loc.y;
             return location;
         }
-        public static Vector3 ToWorldView(this Location location)
-            => new Vector3((location.x - location.y) * -0.524f, (location.x + location.y) * 0.262f, 0);
-        public static Vector3 ToAreaView(this Location location)
-            => new Vector3(location.x + 100, location.y + 100, 0);
-        public static Location WorldViewToLocation(this Vector3 position)
+
+        public delegate Vector3 ToPositionMethods(Location loc);
+        public static ToPositionMethods[] LocationToPositionMethods = {
+            PositionToWorldView,
+            PositionToAreaView
+        };
+        public static Vector3 PositionToWorldView(Location loc) 
+            => new Vector3((loc.x - loc.y) * -0.524f, (loc.x + loc.y) * 0.262f, 0);
+        public static Vector3 PositionToAreaView(Location loc)
+            => new Vector3(loc.x + 100, loc.y + 100, 0);
+        public static Vector3 ToPosition(this Location location)
+            => LocationToPositionMethods[WorldMapManager.Instance.IsWorldView ? 0 : 1](location);
+
+        public delegate Location ToLocationMethods(Vector3 pos);
+        public static ToLocationMethods[] ViewToLocationMethods = {
+            WorldViewToPosition,
+            AreaViewToPosition
+        };
+        public static Location WorldViewToPosition(Vector3 pos)
         {
-            float a = position.x / -0.524f;
-            float b = position.y / 0.262f;
+            float a = pos.x / -0.524f;
+            float b = pos.y / 0.262f;
             return new Location((int)(a + b) / 2, (int)(b - a) / 2);
         }
-        public static Location AreaViewToLocation(this Vector3 position)
-            => new Location((int)position.x - 100, (int)position.y - 100);
+        public static Location AreaViewToPosition(Vector3 pos)
+        => new Location((int)pos.x - 100, (int)pos.y - 100);
+        public static Location WorldViewToLocation(this Vector3 position)
+        => ViewToLocationMethods[WorldMapManager.Instance.IsWorldView ? 0 : 1](position);
 
 
         public static bool IsValid(this Location location) => GridManager.Instance.TileDic.ContainsKey(location);
