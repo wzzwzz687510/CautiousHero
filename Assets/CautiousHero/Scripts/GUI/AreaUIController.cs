@@ -147,7 +147,7 @@ public class AreaUIController : MonoBehaviour
 
     private void OnShowSkillInfoBoardEvent(int slotID)
     {
-        if (character.SkillHashes.Count < character.defaultSkillCount) return;
+        if (character.SkillHashes.Count < character.defaultSkillCount || !endTurnButton.gameObject.activeSelf) return;
         startTimer = true;
         isSkillInfo = true;
         selectSlot = slotID;

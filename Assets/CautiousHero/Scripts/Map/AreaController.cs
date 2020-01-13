@@ -85,7 +85,7 @@ namespace Wing.RPGSystem
         [Header("Components")]
         public SpriteRenderer m_spriteRenderer;
         public SpriteRenderer m_cover;
-        public Animator m_animator;
+        public Animation m_animation;
         public Transform m_archor;
         public PolygonCollider2D m_coll;
         
@@ -107,7 +107,7 @@ namespace Wing.RPGSystem
 
             m_spriteRenderer.sprite = AreaInfo.templateHash.GetAreaConfig().sprite;
 
-            m_animator.Play("tile_fall");
+            m_animation.Play("tile_fall");
             IsExplored = true;
             m_coll.enabled = true;
             StartCoroutine(DelayChange(AreaState.Selectable, 1));

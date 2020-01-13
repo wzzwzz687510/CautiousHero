@@ -32,6 +32,7 @@ namespace Wing.RPGSystem
 
         private Dictionary<Location, PreAreaInfo> preDic;
         private List<Location> stageAreaLocs;
+        private List<Location> discoveredLocs;
 
 
         private void Awake()
@@ -83,6 +84,8 @@ namespace Wing.RPGSystem
 
         public void DiscoverArea(Location loc)
         {
+            if (discoveredLocs.Contains(loc)) return;
+            discoveredLocs.Add(loc);
             AreaDic[loc].Init(loc);
             Database.Instance.SetAreaDiscovered(loc);
             //Debug.Log(string.Format("Area {0} discover: {1}",loc.ToString(),AreaDic[loc].AreaInfo.discovered));
@@ -104,7 +107,6 @@ namespace Wing.RPGSystem
         public void ContinueGame()
         {
             AudioManager.Instance.PlayPeacefulClip();
-            m_worldUIController.gameObject.SetActive(true);
             m_worldUIController.UpdateUI();
 
             // Init map visual
@@ -113,6 +115,7 @@ namespace Wing.RPGSystem
             InitAreas();
 
             // Init player
+            character.EntitySprite.DOFade(0, 0);
             character.InitCharacter("WorldCharacter", WorldData.ActiveData.attribute);
             character.MoveToLocation(currentLoc, true, true);
             StartCoroutine(DelayShowCharacter(1));
@@ -142,8 +145,8 @@ namespace Wing.RPGSystem
             RelocateAreaPosition();
             currentLoc = WorldData.ActiveData.characterLocation;
 
-            List<Location> locs = Database.Instance.GetDiscoveredAreaLocs();
-            if (locs.Count == 0) {
+            discoveredLocs = Database.Instance.GetDiscoveredAreaLocs();
+            if (discoveredLocs.Count == 0) {
                 DiscoverArea(currentLoc);
                 foreach (var dp in AreaDic[currentLoc].AreaInfo.entranceDic.Keys) {
                     DiscoverArea(dp + currentLoc);
@@ -151,7 +154,7 @@ namespace Wing.RPGSystem
                 Database.Instance.SaveAreaChunks();
             }
 
-            foreach (var loc in locs) {
+            foreach (var loc in discoveredLocs) {
                 AreaDic[loc].Init(loc);
             }
             if(!WorldData.ActiveData.stageLocations.Contains(currentLoc)) {
@@ -201,7 +204,8 @@ namespace Wing.RPGSystem
                 Nav.SetTileWeight(loc, 1);
                 AreaController ac = areaHolder.GetChild(i).GetComponent<AreaController>();
                 ac.transform.position = new Vector3(0.524f * (loc.y-loc.x), 0.262f * (loc.x + loc.y), 0);
-                ac.m_animator.Play("default");
+                ac.ChangeAreaState(AreaState.Default);
+                ac.m_spriteRenderer.DOFade(0, 0);
                 AreaDic.Add(loc, ac);
             }
         }
@@ -216,6 +220,9 @@ namespace Wing.RPGSystem
         #region Generate New World
         public void StartNewGame()
         {
+            foreach (var loc in discoveredLocs) {
+                AreaDic[loc].ChangeAreaState(AreaState.Default);
+            }
             character.EntitySprite.DOFade(0, 0);
             StartCoroutine(GenerateNewWorld());
         }

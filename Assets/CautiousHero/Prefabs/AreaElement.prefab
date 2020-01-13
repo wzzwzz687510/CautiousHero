@@ -158,6 +158,7 @@ MonoBehaviour:
   m_spriteRenderer: {fileID: 139088509316534877}
   m_cover: {fileID: 1449387168386603742}
   m_animator: {fileID: 7606906693993894146}
+  m_animation: {fileID: 582347342929434501}
   m_archor: {fileID: 4500170288438816224}
   m_coll: {fileID: 8875429303846710342}
   moveColor: {r: 0.36, g: 1, b: 0.36, a: 1}
@@ -171,6 +172,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4963916126757478437}
   - component: {fileID: 139088509316534877}
+  - component: {fileID: 582347342929434501}
   - component: {fileID: 7606906693993894146}
   - component: {fileID: 8875429303846710342}
   m_Layer: 11
@@ -244,6 +246,22 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!111 &582347342929434501
+Animation:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5550606920453441068}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Animation: {fileID: 7400000, guid: dbd1f7bd8083ada408e4a18a4e5445e6, type: 2}
+  m_Animations:
+  - {fileID: 7400000, guid: dbd1f7bd8083ada408e4a18a4e5445e6, type: 2}
+  m_WrapMode: 0
+  m_PlayAutomatically: 0
+  m_AnimatePhysics: 0
+  m_CullingType: 0
 --- !u!95 &7606906693993894146
 Animator:
   serializedVersion: 3
@@ -252,7 +270,7 @@ Animator:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5550606920453441068}
-  m_Enabled: 1
+  m_Enabled: 0
   m_Avatar: {fileID: 0}
   m_Controller: {fileID: 9100000, guid: da2a1396359ef6b409f625c87c326822, type: 2}
   m_CullingMode: 0

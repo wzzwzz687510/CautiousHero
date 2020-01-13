@@ -93,6 +93,7 @@ namespace Wing.RPGSystem
 
         public void Gameover()
         {
+            musicSource.loop = false;
             StartCoroutine(FadeToClip(loseClip));
         }
 
