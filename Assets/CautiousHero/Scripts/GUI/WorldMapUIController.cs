@@ -70,8 +70,7 @@ namespace Wing.RPGSystem
 
             skillDeck = (from skillHash in WorldData.ActiveData.learnedSkills select skillHash.GetBaseSkill()).ToList();
             skillDeck.Sort(BaseSkill.CompareByName);
-            for (int i = 0; i < skillElements.Length; i++) {
-                
+            for (int i = 0; i < skillElements.Length; i++) {               
                 if(i < skillDeck.Count) {
                     skillElements[i].gameObject.SetActive(true);
                     skillElements[i].icon.sprite = skillDeck[i].sprite;

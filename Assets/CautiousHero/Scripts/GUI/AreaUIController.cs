@@ -43,6 +43,11 @@ public class AreaUIController : MonoBehaviour
     public Image image_blackBG;
     public Image image_die;
 
+    [Header("Deck Visual")]
+    public GameObject deckPage;
+    public IconSlot[] deckSkillSlots;
+    private bool isDeckInfo;
+
     [Header("Buff Visual")]
     public IconSlot buffSlotPrefab;
     public Transform buffSlotHolder;
@@ -129,6 +134,12 @@ public class AreaUIController : MonoBehaviour
 
         character.ssAnimEvent += CharacterSkillShiftAnimation;
         character.OnAPChanged.AddListener(OnCharacterAPChanged);
+        for (int i = 0; i < deckSkillSlots.Length; i++) {
+            deckSkillSlots[i].slotID = i;
+            deckSkillSlots[i].RegisterDisplayAction(OnShowDeckSkillInfoEvent);
+            deckSkillSlots[i].RegisterHideAction(OnHideInfoBoardEvent);
+            deckSkillSlots[i].gameObject.SetActive(false);
+        }
         for (int i = 0; i < skillSlots.Length; i++) {
             skillSlots[i].RegisterDisplayAction(OnShowSkillInfoBoardEvent);
             skillSlots[i].RegisterHideAction(OnHideInfoBoardEvent);
@@ -143,6 +154,13 @@ public class AreaUIController : MonoBehaviour
         BattleManager.Instance.MovePreviewEvent += MovePreviewEvent;
         BattleManager.Instance.CastPreviewEvent += CastPreviewEvent;
         AnimationManager.Instance.OnGameoverEvent.AddListener(Gameover);
+    }
+
+    private void OnShowDeckSkillInfoEvent(int slotID)
+    {
+        float xOffset = Input.mousePosition.x > Screen.width - 330 ? -320 : 320;
+        infoBoard.transform.position = deckSkillSlots[slotID].transform.position + new Vector3(xOffset, 0, 0);
+        infoBoard.UpdateToSkillBoard(isDeckInfo?character.SkillDeck[slotID]: character.SkillDiscardPile[slotID]);
     }
 
     private void OnShowSkillInfoBoardEvent(int slotID)
@@ -367,6 +385,38 @@ public class AreaUIController : MonoBehaviour
     public void DisplayInfo(string text)
     {
         StartCoroutine(DisplayInfoAnim(text));
+    }
+
+    public void Button_Deck()
+    {
+        if (!BattleManager.Instance.IsInBattle) return;
+        deckPage.SetActive(true);
+        isDeckInfo = true;
+        for (int i = 0; i < deckSkillSlots.Length; i++) {
+            if (i < character.SkillDeck.Count) {
+                deckSkillSlots[i].gameObject.SetActive(true);
+                deckSkillSlots[i].icon.sprite = character.SkillDeck[i].GetBaseSkill().sprite;
+            }
+            else {
+                deckSkillSlots[i].gameObject.SetActive(false);
+            }
+        }
+    }
+
+    public void Button_DiscardPile()
+    {
+        if (!BattleManager.Instance.IsInBattle) return;
+        deckPage.SetActive(true);
+        isDeckInfo = false;
+        for (int i = 0; i < deckSkillSlots.Length; i++) {
+            if (i < character.SkillDiscardPile.Count) {
+                deckSkillSlots[i].gameObject.SetActive(true);
+                deckSkillSlots[i].icon.sprite = character.SkillDiscardPile[i].GetBaseSkill().sprite;
+            }
+            else {
+                deckSkillSlots[i].gameObject.SetActive(false);
+            }
+        }
     }
 
     public void Button_EndTurn()
