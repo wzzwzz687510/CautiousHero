@@ -9,8 +9,12 @@ namespace Wing.RPGSystem
     {
         [Header("Setting")]
         public Color[] colors;
+        public Vector2 baseRect;
+        public int charLengthPerRow;
+        public float hightPerRow;
 
         [Header("UI Elements")]
+        public RectTransform m_rectT;
         public Text title;
         public Text description;
         public Image header;
@@ -29,6 +33,8 @@ namespace Wing.RPGSystem
             for (int i = 0; i < apcostImgs.Length; i++) {
                 apcostImgs[i].gameObject.SetActive(i < skill.actionPointsCost);
             }
+
+            m_rectT.sizeDelta = baseRect + new Vector2(0, (description.text.Length / charLengthPerRow + 1) * hightPerRow);
         }
 
         public void UpdateToBuffBoard(int buffHash)
@@ -41,6 +47,22 @@ namespace Wing.RPGSystem
             title.text = buff.buffName;
             description.text = buff.description;
             header.color = Color.grey;
+
+            m_rectT.sizeDelta = baseRect + new Vector2(0, (description.text.Length / charLengthPerRow + 1) * hightPerRow);
+        }
+
+        public void UpdateToRelicBoard(int relicHash)
+        {
+            for (int i = 0; i < apcostImgs.Length; i++) {
+                apcostImgs[i].gameObject.SetActive(false);
+            }
+
+            BaseRelic relic = relicHash.GetRelic();
+            title.text = relic.relicName;
+            description.text = relic.description;
+            header.color = Color.yellow;
+
+            m_rectT.sizeDelta = baseRect + new Vector2(0, (description.text.Length / charLengthPerRow + 1) * hightPerRow);
         }
     }
 }
