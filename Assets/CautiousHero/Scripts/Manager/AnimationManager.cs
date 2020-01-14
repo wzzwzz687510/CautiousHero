@@ -198,7 +198,7 @@ namespace Wing.RPGSystem
         }
 
         private IEnumerator WaitForPlayOnce()
-        {         
+        {
             isPlayAll = true;
             yield return currentCoroutine;
             while (clips.Count != 0) {
@@ -316,7 +316,6 @@ namespace Wing.RPGSystem
                 default:
                     break;
             }
-
             if (!isPlayAll) {
                 IsPlaying = false;
                 OnAnimCompleted?.Invoke();

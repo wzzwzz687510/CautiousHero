@@ -17,6 +17,5 @@ MonoBehaviour:
     and terrorize, then to settle. Yet there was an energy,  a love of adventure,
     that sang from every page. Long into the  night Liriel read, lighting candle after
     precious candle.
-  buffSet:
-  - {fileID: 11400000, guid: d1dff7f9203fb5f40bd9975dc5fb6245, type: 2}
-  - {fileID: 11400000, guid: 37af54a3b2bea6c4487ebd7eee7ae3f5, type: 2}
+  relic: {fileID: 11400000, guid: d7d79f33724698e4f9c7b819269366de, type: 2}
+  skill: {fileID: 11400000, guid: 50128fe247e5bd24abb6ceeb6045caee, type: 2}

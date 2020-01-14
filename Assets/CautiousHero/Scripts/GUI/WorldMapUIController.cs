@@ -53,7 +53,7 @@ namespace Wing.RPGSystem
                 Instance = this;
 
             Database.Instance.WorldDataChangedEvent.AddListener(UpdateUI);
-            AreaManager.Instance.character.OnHPChanged.AddListener(UpdateHP);
+            AreaManager.Instance.character.HPChangeAnimation+=UpdateHP;
             for (int i = 0; i < skillElements.Length; i++) {
                 skillElements[i].slotID = i;
                 skillElements[i].RegisterDisplayAction(DisplaySkillInfoBoard);
@@ -81,9 +81,9 @@ namespace Wing.RPGSystem
             }
         }
 
-        public void UpdateHP()
+        public void UpdateHP(int hp, int maxHP, float duration)
         {
-            hpText.text = AreaManager.Instance.character.HealthPoints + "/" + AreaManager.Instance.character.MaxHealthPoints;
+            hpText.DOText(hp + "/" + maxHP, duration);
         }
 
         public void SetLoadingPage(bool isShow)

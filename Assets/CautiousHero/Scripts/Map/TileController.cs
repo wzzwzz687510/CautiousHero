@@ -187,7 +187,7 @@ namespace Wing.RPGSystem
         {
             TTile tTile = Info.tTileHash.GetTTile();
             foreach (var skill in tTile.impactSkills) {
-                skill.ApplyEffect(0, Loc);
+                skill.ApplyEffect(0, Loc,true);
             }
             foreach (var buff in tTile.impactBuffs) {
                 StayEntity.BuffManager.AddBuff(new BuffHandler(0, StayEntityHash, buff.Hash));

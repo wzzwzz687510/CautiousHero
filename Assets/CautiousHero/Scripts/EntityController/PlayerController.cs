@@ -39,6 +39,7 @@ namespace Wing.RPGSystem
         public void InitSkillDeck()
         {
             SkillDeck = new List<int>(WorldData.ActiveData.learnedSkills);
+            SkillHashes = new List<int>();
             SkillDiscardPile = new List<int>();
             for (int i = 0; i < defaultSkillCount; i++) {
                 ShiftASkill();
@@ -116,6 +117,7 @@ namespace Wing.RPGSystem
             SkillDiscardPile.Add(SkillHashes[skillID+1]);
             SkillHashes.RemoveAt(skillID+1);
             ssAnimEvent?.Invoke(ssAnimDuration);
+            //Debug.Log("skill: " + SkillDiscardPile[SkillDiscardPile.Count - 1] + " was removed");
         }
 
         public void ShiftASkill()
@@ -132,7 +134,8 @@ namespace Wing.RPGSystem
             if (SkillHashes.Count <= defaultSkillCount) return;
 
             SkillDiscardPile.Add(SkillHashes[defaultSkillCount]);
-            SkillHashes.RemoveAt(defaultSkillCount);            
+            SkillHashes.RemoveAt(defaultSkillCount);
+            //Debug.Log("skill: " + SkillDiscardPile[SkillDiscardPile.Count - 1] + " was shifted");
         }
 
         public void AddASkillToDeck(int skillHash)

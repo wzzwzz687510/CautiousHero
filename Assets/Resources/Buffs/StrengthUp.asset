@@ -1,0 +1,31 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5b63973488458fe498f32ebef2ab6883, type: 3}
+  m_Name: StrengthUp
+  m_EditorClassIdentifier: 
+  buffName: StrengthUp
+  description: Add 1 strength
+  sprite: {fileID: 0}
+  type: 1
+  trigger: 0
+  triggerTimes: 0
+  lastTurn: 1
+  infinity: 0
+  stackable: 0
+  adjustValue:
+    maxHealth: 0
+    maxAction: 0
+    actionPerTurn: 0
+    strength: 1
+    intelligence: 0
+    agility: 0
+    moveCost: 0

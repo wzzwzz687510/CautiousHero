@@ -16,6 +16,7 @@ MonoBehaviour:
   description: 
   sprite: {fileID: -8924638685331413173, guid: 95182df2e629f5c4c90c733881fc6d9c, type: 3}
   actionPointsCost: 2
+  rarity: 0
   damageType: 1
   skillElement: 1
   castType: 0
@@ -27,8 +28,10 @@ MonoBehaviour:
   tCastPatterns:
     type: 0
     size: 4
-    emptySize: 1
+    emptySize: 2
   tEffectPatterns: {fileID: 11400000, guid: 6ea384fd33e47c44baaf0ab2bc8eb637, type: 2}
+  additionSkills: []
+  additionBuffs: []
   baseValue: 20
   attributeCof: 0
   attribute: 1

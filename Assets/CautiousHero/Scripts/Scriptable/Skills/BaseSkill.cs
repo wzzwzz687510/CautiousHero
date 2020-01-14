@@ -75,8 +75,8 @@ namespace Wing.RPGSystem
         public AudioClip sound;
     }
 
-    //[CreateAssetMenu(fileName = "Skill", menuName = "ScriptableSkills/BaseSkill", order = 1)]
-    public abstract class BaseSkill : ScriptableObject
+    [CreateAssetMenu(fileName = "Skill", menuName = "Wing/Scriptable Skills/BaseSkill", order = 0)]
+    public class BaseSkill : ScriptableObject
     {
         [Header("Basic Parameters")]
         public string skillName;
@@ -99,7 +99,30 @@ namespace Wing.RPGSystem
         public Location[] CastPattern => ScriptablePattern.Dict[Hash];
         public EffectPattern[] EffectPattern => tEffectPatterns.effectPatterns;
 
-        public abstract void ApplyEffect(int casterHash, Location castLoc);
+        [Header("Addon")]
+        public BaseSkill[] additionSkills;
+        public BaseBuff[] additionBuffs;
+
+        public virtual void ApplyEffect(int casterHash, Location castLoc, bool anim)
+        {
+            foreach (var skill in additionSkills) {
+                skill.ApplyEffect(casterHash, castLoc,anim);
+            }
+
+            TileController tc = castLoc.GetTileController();
+            if (!tc.IsEmpty) {
+                foreach (var buff in additionBuffs) {
+                    tc.StayEntity.BuffManager.AddBuff(new BuffHandler(casterHash, tc.StayEntity.Hash, buff.Hash));
+                }
+            }
+
+            if (anim) {
+                AnimationManager.Instance.AddAnimClip(new CastAnimClip(castType,
+                    Hash, casterHash.GetEntity().Loc, castLoc, castEffect.animDuration));
+                if (BattleManager.Instance.IsPlayerTurn)
+                    AnimationManager.Instance.PlayOnce();
+            }
+        }
 
         public virtual Location GetFixedEffectPattern(Location cp, Location ep)
         {

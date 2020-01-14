@@ -25,6 +25,7 @@ public class BattleManager : MonoBehaviour
     //public BaseSkill[] skills;
     //public BattleConfig config;
     public GameObject win;
+    public float clickCDDuration = 0.1f;
 
     [Header("Component References")]
     public LayerMask tileLayer;
@@ -48,6 +49,7 @@ public class BattleManager : MonoBehaviour
 
     private HashSet<Location> tileZone = new HashSet<Location>();
     private bool endTurn;
+    private bool clickCD;
 
     public delegate void TurnSwitchCallback(bool isPlayerTurn);
     public event TurnSwitchCallback OnTurnSwitched;
@@ -95,7 +97,6 @@ public class BattleManager : MonoBehaviour
         AudioManager.Instance.PlayMeetClip();
         AudioManager.Instance.PlayBattleClip();
         character.InitSkillDeck();
-        //m_battleUIController.UpdateSkillSprites();
         m_battleUIController.BattleStartAnim();
         StartNewTurn(true);
     }
@@ -104,7 +105,6 @@ public class BattleManager : MonoBehaviour
     {
         if (!IsInBattle || GameConditionCheck())
             return;
-
         if (State == BattleState.PlayerAnim) {
             State = BattleState.PlayerMove;
             if (endTurn) {
@@ -114,7 +114,6 @@ public class BattleManager : MonoBehaviour
             }
         }            
         else if (State == BattleState.BotTurn) {
-            Debug.Log("end bot turn");
             CompleteBotTurn();
         }
 
@@ -144,11 +143,20 @@ public class BattleManager : MonoBehaviour
         ChangeState(BattleState.PlayerMove);
     }
 
+    IEnumerator StartClickCD()
+    {
+        clickCD = true;
+        yield return new WaitForSeconds(clickCDDuration);
+        clickCD = false;
+    }
+
     private void ApplyCast()
     {
-        character.CastSkill(selectedSkillID, currentSelected[0]);
+        Location loc = currentSelected[0];
+        int skillID = selectedSkillID;
         ChangeState(BattleState.PlayerAnim);
-        //ChangeState(BattleState.Move);
+        character.CastSkill(skillID, loc);
+        StartCoroutine(StartClickCD());
     }
 
     private void CompletePlayerTurn()
@@ -237,7 +245,7 @@ public class BattleManager : MonoBehaviour
                     case BattleState.PlayerMove:
                         character.ChangeOutlineColor(Color.red);
 
-                        if (Input.GetMouseButtonDown(0)) {
+                        if (!clickCD && Input.GetMouseButtonDown(0)) {
                             PrepareMove();
                         }
                         break;

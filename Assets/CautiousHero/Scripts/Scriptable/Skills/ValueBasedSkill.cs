@@ -11,7 +11,7 @@ namespace Wing.RPGSystem
         public int baseValue;
         public float attributeCof;
 
-        public override void ApplyEffect(int casterHash, Location castLoc)
+        public override void ApplyEffect(int casterHash, Location castLoc, bool anim)
         {
             Entity caster = casterHash.GetEntity();
             Location effectLocation;
@@ -57,6 +57,7 @@ namespace Wing.RPGSystem
                 default:
                     break;
             }
+            base.ApplyEffect(casterHash, castLoc,false);
         }
 
         public abstract int CalculateValue(int casterHash, float cof);

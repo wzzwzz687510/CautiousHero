@@ -32,7 +32,7 @@ namespace Wing.RPGSystem
             unlockedClasses = new List<int>() { defaultClass.Hash };
             unlockedSkills = new List<int>() { defaultClass.skillSet[0].Hash,
                     defaultClass.skillSet[1].Hash , defaultClass.skillSet[2].Hash };
-            unlockedBuffs = new List<int>() { defaultRace.buffSet[0].Hash, defaultRace.buffSet[1].Hash };
+            unlockedBuffs = new List<int>() { defaultRace.relic.Hash, defaultRace.relic.Hash };
             unlockedCreatures = new List<int>();
             unlockedEquipments = new List<int>();
         }
@@ -116,10 +116,10 @@ namespace Wing.RPGSystem
                 AreaManager.Instance.PrepareChooseSkill();
             }
 
-            if (Input.GetKeyDown(KeyCode.B)) {
-                Entity character = AreaManager.Instance.character;
-                character.BuffManager.AddBuff(new BuffHandler(character.Hash, character.Hash, defaultRace.buffSet[0].Hash));
-            }
+            //if (Input.GetKeyDown(KeyCode.B)) {
+            //    Entity character = AreaManager.Instance.character;
+            //    character.BuffManager.AddBuff(new BuffHandler(character.Hash, character.Hash, defaultRace.relic.Hash));
+            //}
         }
 
         private void Start()
@@ -258,7 +258,7 @@ namespace Wing.RPGSystem
             for (int i = 0; i < 4; i++) {
                 skillDeck.Add(tClass.skillSet[1].Hash);
             }
-            skillDeck.Add(tClass.skillSet[2].Hash);
+            skillDeck.Add(tRace.skill.Hash);
             m_activeWorldData = new WorldData() {
                 seed = System.DateTime.Now.ToString(),
                 attribute = attribute,

@@ -206,7 +206,7 @@ public class AreaUIController : MonoBehaviour
     private void DisplaySkillBoard()
     {
         if (!skillLearningPage.activeSelf) {
-            infoBoard.transform.position = skillSlots[selectSlot].transform.position + new Vector3(0, 160, 0);
+            infoBoard.transform.position = skillSlots[selectSlot].transform.position + new Vector3(0, 150, 0);
             infoBoard.UpdateToSkillBoard(character.SkillHashes[selectSlot]);
         }
     }

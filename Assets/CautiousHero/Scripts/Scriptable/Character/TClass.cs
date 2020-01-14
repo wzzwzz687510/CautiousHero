@@ -9,6 +9,7 @@ namespace Wing.RPGSystem
     public class TClass : ScriptableObject
     {
         public string className;
+        public BaseRelic relic;
         public BaseSkill[] skillSet;
         public int Hash => className.GetStableHashCode();
 

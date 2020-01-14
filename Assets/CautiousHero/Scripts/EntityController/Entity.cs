@@ -301,7 +301,7 @@ namespace Wing.RPGSystem
                 return false;
             ImpactActionPoints(tSkill.actionPointsCost,true);
 
-            tSkill.ApplyEffect(Hash, castLoc);
+            tSkill.ApplyEffect(Hash, castLoc, true);
             tempAttribute = new EntityAttribute();
             return true;
         }

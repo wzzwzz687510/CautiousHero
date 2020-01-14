@@ -10,7 +10,8 @@ namespace Wing.RPGSystem
     {
         public string raceName;
         public string description;
-        public BaseBuff[] buffSet;
+        public BaseRelic relic;
+        public BaseSkill skill;
         public int Hash => raceName.GetStableHashCode();
 
         static Dictionary<int, TRace> cache;

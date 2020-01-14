@@ -12,7 +12,7 @@ namespace Wing.RPGSystem
         public int magicalArmourPoints;
         public int actionPoints;
 
-        public override void ApplyEffect(int casterHash, Location castLoc)
+        public override void ApplyEffect(int casterHash, Location castLoc,bool anim)
         {           
             TileController tc = castLoc.GetTileController();
             if (!tc.IsEmpty) {
@@ -25,6 +25,7 @@ namespace Wing.RPGSystem
                 tc.StayEntity.ImpactArmour(Mathf.Abs(magicalArmourPoints), false, magicalArmourPoints < 0);
                 tc.StayEntity.ImpactActionPoints(Mathf.Abs(actionPoints), actionPoints < 0);
             }
+            base.ApplyEffect(casterHash,castLoc,false);
         }
     }
 }
