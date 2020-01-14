@@ -27,7 +27,7 @@ namespace Wing.RPGSystem
                     for (int x = -size + 1; x < size; x++) {
                         for (int y = -size + 1; y < size; y++) {
                             int distance = Mathf.Abs(x) + Mathf.Abs(y);
-                            if (distance < size && distance > emptySize)
+                            if (distance < size && distance >= emptySize)
                                 locs.Add(new Location(x, y));
                         }
                     }
@@ -35,7 +35,7 @@ namespace Wing.RPGSystem
                 case PatternType.Cross:
                     for (int x = -size + 1; x < size; x++) {
                         for (int y = -size + 1; y < size; y++) {
-                            if ((x == 0 || y == 0) && (Mathf.Abs(x) + Mathf.Abs(y)) > emptySize)
+                            if ((x == 0 || y == 0) && (Mathf.Abs(x) + Mathf.Abs(y)) >= emptySize)
                                 locs.Add(new Location(x, y));
                         }
                     }
@@ -44,7 +44,7 @@ namespace Wing.RPGSystem
                     for (int x = -size + 1; x < size; x++) {
                         for (int y = -size + 1; y < size; y++) {
                             int distance = Mathf.Abs(x) + Mathf.Abs(y);
-                            if (x == y && distance < size && distance > emptySize)
+                            if (x == y && distance < size && distance >= emptySize)
                                 locs.Add(new Location(x, y));
                         }
                     }
