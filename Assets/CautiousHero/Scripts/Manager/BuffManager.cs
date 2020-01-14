@@ -189,13 +189,18 @@ namespace Wing.RPGSystem
         public void UpdateBuffs()
         {
             // Do something to host
+            List<int> removeHashes = new List<int>();
             foreach (var buffDic in buffDic.Values) {
                 foreach (var buff in buffDic.Values) {
                     if (!buff.UpdateBuff()) {
-                        buffDic.Remove(buff.BuffHash);
-                        OnBuffChangedEvent?.Invoke(buffHashes.IndexOf(buff.BuffHash), false);
+                        removeHashes.Add(buff.BuffHash);
                     }
                 }
+                foreach (var hash in removeHashes) {
+                    buffDic.Remove(hash);
+                    OnBuffChangedEvent?.Invoke(buffHashes.IndexOf(hash), false);
+                }
+                removeHashes.Clear();
             }
         }
 
