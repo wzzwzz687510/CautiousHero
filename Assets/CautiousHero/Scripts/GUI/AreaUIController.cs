@@ -434,10 +434,19 @@ public class AreaUIController : MonoBehaviour
         BattleManager.Instance.CastSkill(skillID);
     }
 
+    public void Button_CompleteAWorld()
+    {
+        image_blackBG.gameObject.SetActive(false);
+        image_blackBG.DOFade(0, 0);
+        image_die.DOFade(0, 0);
+        image_blackBG.raycastTarget = false;
+    }
+
     public void Gameover()
     {
-        DOTween.ToAlpha(() => image_blackBG.color, color => image_blackBG.color = color, 0.7f, 0.5f);
-        DOTween.ToAlpha(() => image_die.color, color => image_die.color = color, 1, 2);
+        image_blackBG.gameObject.SetActive(true);
+        image_blackBG.DOFade(0.7f, 0.5f);
+        image_die.DOFade(1, 2);
         image_blackBG.raycastTarget = true;
     }
 

@@ -109,6 +109,7 @@ namespace Wing.RPGSystem
         {
             AudioManager.Instance.PlayPeacefulClip();
             m_worldUIController.UpdateUI();
+            m_worldUIController.SwitchToWorldView();
 
             // Init map visual
             Location bound = WorldData.ActiveData.worldBound;
