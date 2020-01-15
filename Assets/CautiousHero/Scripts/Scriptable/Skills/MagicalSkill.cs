@@ -12,9 +12,9 @@ namespace Wing.RPGSystem
     public class MagicalSkill : BaseSkill, IMagicalCost
     {
 
-        public override void ApplyEffect(int casterHash, Location castLoc, bool anim)
+        public override void ApplyEffect(int casterHash, Location casterLoc, Location selecLoc, bool anim)
         {
-            base.ApplyEffect(casterHash, castLoc,false);
+            base.ApplyEffect(casterHash,casterLoc, selecLoc,false);
         }
 
         public virtual void ApplyMagicCost(int casterHash)

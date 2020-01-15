@@ -10,15 +10,19 @@ namespace Wing.RPGSystem
         public bool isInstanceMovement;
         public bool isMovementFirst;
 
-        public override void ApplyEffect(int casterHash, Location castLoc, bool anim)
+        public override void ApplyEffect(int casterHash, Location casterLoc, Location selecLoc, bool anim)
         {
-            if(!isMovementFirst) base.ApplyEffect(casterHash, castLoc, true);
+            if(!isMovementFirst) base.ApplyEffect(casterHash,casterLoc, selecLoc, true);
             Entity caster = casterHash.GetEntity();
-            caster.MoveToTile(castLoc, 0, isInstanceMovement);
-            if (BattleManager.Instance.IsPlayerTurn)
-                AnimationManager.Instance.PlayOnce();
+            if (selecLoc.IsEmpty()) {
+                caster.MoveToTile(selecLoc, 0, isInstanceMovement);
+                if (BattleManager.Instance.IsPlayerTurn)
+                    AnimationManager.Instance.PlayOnce();
+            }
 
-            if (isMovementFirst) base.ApplyEffect(casterHash, castLoc, true);
+            if (isMovementFirst) {
+                base.ApplyEffect(casterHash, casterLoc, selecLoc, true);
+            }
         }
     }
 }

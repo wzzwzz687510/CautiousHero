@@ -103,13 +103,13 @@ namespace Wing.RPGSystem
         public BaseSkill[] additionSkills;
         public BaseBuff[] additionBuffs;
 
-        public virtual void ApplyEffect(int casterHash, Location castLoc, bool anim)
+        public virtual void ApplyEffect(int casterHash,Location casterLoc, Location selecLoc, bool anim)
         {
             foreach (var skill in additionSkills) {
-                skill.ApplyEffect(casterHash, castLoc,anim);
+                skill.ApplyEffect(casterHash,casterLoc, selecLoc,anim);
             }
 
-            TileController tc = castLoc.GetTileController();
+            TileController tc = selecLoc.GetTileController();
             if (!tc.IsEmpty) {
                 foreach (var buff in additionBuffs) {
                     tc.StayEntity.BuffManager.AddBuff(new BuffHandler(casterHash, tc.StayEntity.Hash, buff.Hash));
@@ -118,7 +118,7 @@ namespace Wing.RPGSystem
 
             if (anim) {
                 AnimationManager.Instance.AddAnimClip(new CastAnimClip(castType,
-                    Hash, casterHash.GetEntity().Loc, castLoc, castEffect.animDuration));
+                    Hash, casterHash.GetEntity().Loc, selecLoc, castEffect.animDuration));
                 if (BattleManager.Instance.IsPlayerTurn)
                     AnimationManager.Instance.PlayOnce();
             }

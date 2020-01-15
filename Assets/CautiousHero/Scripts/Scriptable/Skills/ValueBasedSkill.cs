@@ -11,21 +11,22 @@ namespace Wing.RPGSystem
         public int baseValue;
         public float attributeCof;
 
-        public override void ApplyEffect(int casterHash, Location castLoc, bool anim)
+        public override void ApplyEffect(int casterHash, Location casterLoc, Location selecLoc, bool anim)
         {
             Entity caster = casterHash.GetEntity();
             Location effectLocation;
             switch (castType) {
                 case CastType.Instant:
-                    if (anim) {
-                        AnimationManager.Instance.AddAnimClip(new CastAnimClip(castType, Hash, caster.Loc, castLoc, castEffect.animDuration));
-                        if (BattleManager.Instance.IsPlayerTurn)
-                            AnimationManager.Instance.PlayOnce();
-                    }
-
-                    foreach (var ep in EffectPattern) {
-                        effectLocation = castLoc + GetFixedEffectPattern(castLoc - caster.Loc, ep.loc);
+                    foreach (var ep in EffectPattern) {                       
+                        effectLocation = selecLoc + GetFixedEffectPattern(selecLoc - casterLoc, ep.loc);
+                        //Debug.Log(string.Format("el: {0}, cl: {1}, cp: {2}, ep: {3}", effectLocation, casterLoc, castLoc - casterLoc, ep.loc));
                         if (effectLocation.TryGetStayEntity(out Entity target) && target != null) {
+                            if (anim) {
+                                AnimationManager.Instance.AddAnimClip(new CastAnimClip(
+                                    castType, Hash, casterLoc, effectLocation, castEffect.animDuration));
+                                if (BattleManager.Instance.IsPlayerTurn)
+                                    AnimationManager.Instance.PlayOnce();
+                            }
                             target.DealDamage(CalculateValue(casterHash, ep.coefficient), damageType);
                             for (int i = 0; i < ep.additionBuffs.Length; i++) {
                                 target.BuffManager.AddBuff(new BuffHandler(
@@ -36,13 +37,13 @@ namespace Wing.RPGSystem
                     break;
                 case CastType.Trajectory:
                     foreach (var ep in EffectPattern) {
-                        var dir = GetFixedEffectPattern(castLoc - caster.Loc, ep.loc);
-                        effectLocation = castLoc + dir;
-                        foreach (var tc in GridManager.Instance.GetTrajectoryHitTile(castLoc, dir)) {
+                        var dir = GetFixedEffectPattern(selecLoc - casterLoc, ep.loc);
+                        effectLocation = selecLoc + dir;
+                        foreach (var tc in GridManager.Instance.GetTrajectoryHitTile(selecLoc, dir)) {
                             if (!tc.IsEmpty) {
                                 if (anim) {
                                     AnimationManager.Instance.AddAnimClip(new CastAnimClip(castType,
-                                        Hash, caster.Loc, tc.Loc, castEffect.animDuration));
+                                        Hash, casterLoc, tc.Loc, castEffect.animDuration));
                                     if (BattleManager.Instance.IsPlayerTurn)
                                         AnimationManager.Instance.PlayOnce();
                                 }
@@ -61,7 +62,7 @@ namespace Wing.RPGSystem
                 default:
                     break;
             }
-            base.ApplyEffect(casterHash, castLoc,false);
+            base.ApplyEffect(casterHash,casterLoc, selecLoc,false);
         }
 
         public abstract int CalculateValue(int casterHash, float cof);

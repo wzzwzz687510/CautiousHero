@@ -153,6 +153,14 @@ public class BattleManager : MonoBehaviour
 
     private void ApplyCast()
     {
+        bool effectiveCast = false;
+        foreach (var tile in currentSelected) {
+            if (tile.TryGetStayEntity(out Entity entity) && entity != null) {
+                effectiveCast = true;
+                break;
+            }              
+        }
+        if (!effectiveCast) return;
         Location loc = currentSelected[0];
         int skillID = selectedSkillID;
         ChangeState(BattleState.PlayerAnim);

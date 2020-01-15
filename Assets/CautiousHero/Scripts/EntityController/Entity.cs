@@ -299,9 +299,9 @@ namespace Wing.RPGSystem
             BaseSkill tSkill = SkillHashes[skillID].GetBaseSkill();
             if (ActionPoints < tSkill.actionPointsCost)
                 return false;
-            ImpactActionPoints(tSkill.actionPointsCost,true);
+            ImpactActionPoints(tSkill.actionPointsCost, true);
 
-            tSkill.ApplyEffect(Hash, castLoc, true);
+            tSkill.ApplyEffect(Hash, Loc, castLoc, true);
             tempAttribute = new EntityAttribute();
             return true;
         }
