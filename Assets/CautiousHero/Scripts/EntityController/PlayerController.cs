@@ -46,9 +46,9 @@ namespace Wing.RPGSystem
             }
         }
 
-        public override int MoveToTile(Location targetLoc, bool isInstance = false)
+        public override int MoveToTile(Location targetLoc,int moveCost, bool isInstance = false)
         {
-            int movesteps = base.MoveToTile(targetLoc, isInstance);
+            int movesteps = base.MoveToTile(targetLoc, moveCost, isInstance);
             for (int i = 0; i < movesteps; i++) {
                 ShiftASkill();
             }

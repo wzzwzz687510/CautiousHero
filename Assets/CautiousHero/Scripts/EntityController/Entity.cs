@@ -236,7 +236,7 @@ namespace Wing.RPGSystem
         /// </summary>
         /// <param name="targetLoc"></param>
         /// <param name="isInstance"></param>
-        public virtual int MoveToTile(Location targetLoc, bool isInstance = false)
+        public virtual int MoveToTile(Location targetLoc,int moveCost, bool isInstance = false)
         {
             if (targetLoc == Loc) {
                 return 0;
@@ -245,7 +245,7 @@ namespace Wing.RPGSystem
             if (!isInstance) {
                 Stack<Location> path = GridManager.Instance.Nav.GetPath(Loc, targetLoc);
 
-                if (path.Count * MoveCost > ActionPoints) {
+                if (path.Count * moveCost > ActionPoints) {
                     return 0;
                 }
 
@@ -265,7 +265,7 @@ namespace Wing.RPGSystem
                 int stepID = 0, passedCount = 0;
                 for (int i = 0; i < MovePath.Length; i++) {
                     if (MovePath[i].GetTileController().HasImpacts || i == MovePath.Length - 1) {
-                        if (stepID * MoveCost > ActionPoints) return i;
+                        if (stepID * moveCost > ActionPoints) return i;
                         SubMoveToTile(passedCount, stepID);
 
                         stepID = 0;
@@ -275,7 +275,7 @@ namespace Wing.RPGSystem
                     stepID++;
                 }
                 // AP cost
-                ImpactActionPoints(passedCount * MoveCost, true);
+                ImpactActionPoints(passedCount * moveCost, true);
             }
           
             return isInstance ? 0 : MovePath.Length;

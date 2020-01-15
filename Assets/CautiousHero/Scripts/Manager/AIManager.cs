@@ -40,7 +40,6 @@ namespace Wing.RPGSystem
         public bool isCalculating { get; private set; }
 
         private SimplePriorityQueue<int> possibleAttackedCreature;
-        private CastSkillAction currentCSA;
         private List<CastableSkill> castableSkills;
 
 
@@ -54,18 +53,6 @@ namespace Wing.RPGSystem
         {
             Creatures = new List<CreatureController>();
 
-            // Obsolute
-            {
-                //for (int i = 0; i < config.creatureSets.Length; i++) {
-                //    if (!config.creatureSets[i].location.IsValid()) {
-                //        Debug.LogError("Creature " + i + " location over edge, please check battle config!");
-                //        Creatures.Add(null);
-                //        continue;
-                //    }
-                //    Creatures.Add(Instantiate(creaturePrefab, creatureHolder.transform).GetComponent<CreatureController>());
-                //    StartCoroutine(Creatures[i].InitCreature(config.creatureSets[i].tCreature,config.creatureSets[i].location));
-                //}
-            }
             for (int i = 0; i < battleSet.Count; i++) {
                 Creatures.Add(battleSet[i].GetEntity() as CreatureController);
             }
@@ -99,7 +86,6 @@ namespace Wing.RPGSystem
 
         private void PrepareDecisionMaking()
         {
-            currentCSA = new CastSkillAction();
             possibleAttackedCreature = new SimplePriorityQueue<int>();
 
             foreach (var creature in Creatures) {
@@ -129,7 +115,7 @@ namespace Wing.RPGSystem
                 if (player.IsDeath) break;
                 AnimationManager.Instance.AddAnimClip(new OutlineEntityAnimClip(bot.Hash, Color.red));
                 AnimationManager.Instance.AddAnimClip(new BaseAnimClip(AnimType.Delay, 0.5f));
-                bot.MoveToTile(skill.action.destination);
+                bot.MoveToTile(skill.action.destination,bot.MoveCost);
                 bot.CastSkill(bot.NextCastSkillID, skill.action.castLocation);
                 if (player.IsDeath) break;
                 AnimationManager.Instance.AddAnimClip(new OutlineEntityAnimClip(bot.Hash, Color.black));
@@ -156,7 +142,7 @@ namespace Wing.RPGSystem
                                     destination = bot.Loc.GetLocationWithGivenStep(destination, sparePoints);
                                     //Debug.Log("creature id: " + Creatures.IndexOf(bot) + "destination loc: " + destination.ToString() + ", spare points: " + sparePoints);
                                     AnimationManager.Instance.AddAnimClip(new OutlineEntityAnimClip(bot.Hash, Color.red));
-                                    bot.MoveToTile(destination);
+                                    bot.MoveToTile(destination,bot.MoveCost);
                                     AnimationManager.Instance.AddAnimClip(new OutlineEntityAnimClip(bot.Hash, Color.black));
                                     finished = true;
                                     break;
@@ -177,7 +163,7 @@ namespace Wing.RPGSystem
                     if (player.IsDeath) break;
                     AnimationManager.Instance.AddAnimClip(new OutlineEntityAnimClip(bot.Hash, Color.red));
                     AnimationManager.Instance.AddAnimClip(new BaseAnimClip(AnimType.Delay, 0.5f));
-                    bot.MoveToTile(skill.action.destination);
+                    bot.MoveToTile(skill.action.destination,bot.MoveCost);
                     bot.CastSkill(bot.NextCastSkillID, skill.action.castLocation);
                     SetNextSkillTarget(skill.creatureID);
                     if (player.IsDeath) break;
@@ -255,12 +241,6 @@ namespace Wing.RPGSystem
             foreach (var loc in destinations) {
                 GridManager.Instance.Nav.SetTileWeight(loc, 1);
             }
-        }
-
-        private void CastSkillActionAnimation(int index,int skillID)
-        {
-            Creatures[index].MoveToTile(currentCSA.destination);
-            Creatures[index].CastSkill(skillID, currentCSA.castLocation);
         }
 
     }

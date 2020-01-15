@@ -49,7 +49,7 @@ namespace Wing.RPGSystem {
             hpBar.enabled = false;
             mask_hpEffect.alphaCutoff = 1;
             mask_hp.alphaCutoff = 1;
-            MoveToTile(loc, true);
+            MoveToTile(loc, 0, true);
 
             hpBar.enabled = true;
             CreatureHpChangeAnimation(MaxHealthPoints, MaxHealthPoints, 1);
