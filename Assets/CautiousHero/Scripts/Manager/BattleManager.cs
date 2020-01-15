@@ -9,6 +9,7 @@ using UnityEngine.EventSystems;
 public enum BattleState
 {
     FreeMove,
+    ExtraMove,
     PlayerMove,
     PlayerCast,    
     PlayerAnim,
@@ -207,16 +208,21 @@ public class BattleManager : MonoBehaviour
         if (hit) {
             var tile = hit.transform.parent.GetComponent<TileController>();
             switch (State) {
+                case BattleState.ExtraMove:
+                    SelectVisual(tile.Loc, TileState.MoveZone);
+                    if (Input.GetMouseButtonDown(0) && tile.Loc != character.Loc && tileZone.Contains(currentSelected[0])) {
+                        character.MoveToTile(tile.Loc, 0);
+                        ChangeState(BattleState.PlayerAnim);
+                        AnimationManager.Instance.PlayOnce();
+                    }
+                    break;
                 case BattleState.PlayerMove:
                     SelectVisual(tile.Loc, TileState.MoveZone);
 
-                    if (Input.GetMouseButtonDown(0) && tileZone.Contains(currentSelected[0])) {
-                        var tc = character.Loc.GetTileController();
-                        character.MoveToTile(tile.Loc);
-                        if (tile != tc) {
-                            ChangeState(BattleState.PlayerAnim);
-                            AnimationManager.Instance.PlayOnce();
-                        }
+                    if (Input.GetMouseButtonDown(0) && tile.Loc != character.Loc && tileZone.Contains(currentSelected[0])) {
+                        character.MoveToTile(tile.Loc,character.MoveCost);
+                        ChangeState(BattleState.PlayerAnim);
+                        AnimationManager.Instance.PlayOnce();
                     }
                     break;
                 case BattleState.PlayerCast:
@@ -246,7 +252,7 @@ public class BattleManager : MonoBehaviour
                         character.ChangeOutlineColor(Color.red);
 
                         if (!clickCD && Input.GetMouseButtonDown(0)) {
-                            PrepareMove();
+                            PrepareMovement();
                         }
                         break;
                     case BattleState.PlayerCast:
@@ -301,15 +307,25 @@ public class BattleManager : MonoBehaviour
 
     }
 
-    private void PrepareMove()
+    private void PrepareMovement()
     {
         if (character.ActionPoints == 0)
             return;
         character.SetActiveCollider(false);
         SetVisualPlayer(character.transform.position, character.Loc.GetTileController().SortOrder + 64);
-
         character.EntitySprite.color = new Color(1, 1, 1, 0.5f);
         foreach (var loc in GridManager.Instance.Nav.GetGivenDistancePoints(character.Loc, character.ActionPoints / character.MoveCost)) {
+            GridManager.Instance.ChangeTileState(loc, TileState.MoveZone);
+            tileZone.Add(loc);
+        }
+    }
+
+    private void PrepareExtraMovement(int steps)
+    {
+        character.SetActiveCollider(false);
+        SetVisualPlayer(character.transform.position, character.Loc.GetTileController().SortOrder + 64);
+        character.EntitySprite.color = new Color(1, 1, 1, 0.5f);
+        foreach (var loc in GridManager.Instance.Nav.GetGivenDistancePoints(character.Loc, steps)) {
             GridManager.Instance.ChangeTileState(loc, TileState.MoveZone);
             tileZone.Add(loc);
         }
