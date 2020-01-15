@@ -12,6 +12,7 @@ namespace Wing.RPGSystem
         public string description;
         public BaseRelic relic;
         public BaseSkill skill;
+        public EntityAttribute attribute;
         public int Hash => raceName.GetStableHashCode();
 
         static Dictionary<int, TRace> cache;

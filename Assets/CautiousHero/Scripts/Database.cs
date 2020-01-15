@@ -261,7 +261,7 @@ namespace Wing.RPGSystem
             skillDeck.Add(tRace.skill.Hash);
             m_activeWorldData = new WorldData() {
                 seed = System.DateTime.Now.ToString(),
-                attribute = attribute,
+                attribute = (tRace.attribute + tClass.attribute) / 2,
                 HealthPoints = attribute.maxHealth,
                 learnedSkills = skillDeck,
                 worldMap = new List<Location>(),

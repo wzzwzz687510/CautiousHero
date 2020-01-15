@@ -20,7 +20,7 @@ namespace Wing.RPGSystem
             else if (attribute == AdditiveAttribute.Strength)
                 aa = caster.Strength;
 
-            return Mathf.RoundToInt(cof * baseValue * (1 + attributeCof * aa));
+            return Mathf.RoundToInt(cof * (baseValue + attributeCof * aa));
         }
     }
 }

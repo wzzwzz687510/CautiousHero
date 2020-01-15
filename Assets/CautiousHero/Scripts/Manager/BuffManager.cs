@@ -55,7 +55,7 @@ namespace Wing.RPGSystem
         public void OnStacked()
         {
             StackCount++;
-            (TemplateBuff as StackableBuff).OnStacked(this);
+            TemplateBuff.OnStacked(this);
         }
 
         private void ConnectEvent(bool isBind)
@@ -209,7 +209,7 @@ namespace Wing.RPGSystem
             EntityAttribute tmp = new EntityAttribute();
             if (buffDic.ContainsKey(BuffType.Attribute))
                 foreach (var buffHandler in buffDic[BuffType.Attribute].Values) {
-                    tmp += (buffHandler.TemplateBuff as AttributeBuff).adjustValue;
+                    tmp += buffHandler.TemplateBuff.adjustValue * buffHandler.StackCount;
                 }
 
             return tmp;

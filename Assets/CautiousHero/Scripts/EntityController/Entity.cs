@@ -36,6 +36,10 @@ namespace Wing.RPGSystem
             new EntityAttribute(a.maxHealth + b.maxHealth, a.maxAction + b.maxAction, a.actionPerTurn + b.actionPerTurn,
                 a.strength + b.strength, a.intelligence + b.intelligence, a.agility + b.agility, a.moveCost + b.moveCost);
         public static EntityAttribute operator -(EntityAttribute a, EntityAttribute b) => a + -(b);
+        public static EntityAttribute operator *(EntityAttribute a, float b) =>
+            new EntityAttribute(a.maxHealth * 2, a.maxAction * 2, a.actionPerTurn * 2, a.strength * 2, a.intelligence * 2, a.agility * 2, a.moveCost * 2);
+        public static EntityAttribute operator /(EntityAttribute a, float b) =>
+            new EntityAttribute(a.maxHealth / 2, a.maxAction / 2, a.actionPerTurn / 2, a.strength / 2, a.intelligence / 2, a.agility / 2, a.moveCost / 2);
     }
 
     [System.Serializable]

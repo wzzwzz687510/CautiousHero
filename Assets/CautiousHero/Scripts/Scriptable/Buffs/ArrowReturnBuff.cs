@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Wing.RPGSystem
 {
-    public abstract class ArrowReturnBuff : StackableBuff
+    public abstract class ArrowReturnBuff : BaseBuff
     {
         public new bool stackable = true;
 

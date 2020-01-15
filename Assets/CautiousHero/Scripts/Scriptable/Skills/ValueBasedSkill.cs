@@ -9,7 +9,7 @@ namespace Wing.RPGSystem
         [Header("Value Parameters")]
         // Final number = baseValue * (1 + levelCof * level + attributeCof * attribute)
         public int baseValue;
-        public float attributeCof;
+        public float attributeCof = 1;
 
         public override void ApplyEffect(int casterHash, Location casterLoc, Location selecLoc, bool anim)
         {
