@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   buffName: StrengthUp
   description: Add 1 strength
-  sprite: {fileID: 0}
+  sprite: {fileID: -5721522318260220260, guid: 95182df2e629f5c4c90c733881fc6d9c, type: 3}
   type: 1
   trigger: 0
   triggerTimes: 0

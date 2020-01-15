@@ -23,7 +23,7 @@ MonoBehaviour:
   labels: 04000000
   castEffect:
     effectName: powerUp
-    animDuration: 0.3
+    animDuration: 1
     sound: {fileID: 8300000, guid: 4344690b37619b24696179cce40be53a, type: 3}
   tCastPatterns:
     type: 0
