@@ -26,9 +26,10 @@ namespace Wing.RPGSystem
             title.text = skill.skillName;
             Color c = colors[(int)skill.skillElement];
             string element = skill.damageType == DamageType.Physical ? "Physical" : skill.skillElement.ToString();
-            description.text = !skill.labels.Contains(Label.Damage) ? skill.description :
+            description.text = skill.description;
+            description.text += skill.labels.Contains(Label.Damage) ? 
                 string.Format("Deal <color=#{0:X2}{1:X2}{2:X2}>{3} {4}</color> damage to target",
-                 (int)(c.r * 255), (int)(c.g * 255), (int)(c.b * 255), (skill as ValueBasedSkill).baseValue, element);
+                (int)(c.r * 255), (int)(c.g * 255), (int)(c.b * 255), (skill as ValueBasedSkill).baseValue, element) : "";
             header.color = colors[(int)skill.skillElement];
             for (int i = 0; i < apcostImgs.Length; i++) {
                 apcostImgs[i].gameObject.SetActive(i < skill.actionPointsCost);

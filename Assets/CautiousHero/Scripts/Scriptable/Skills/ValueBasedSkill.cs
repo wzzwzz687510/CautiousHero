@@ -17,11 +17,12 @@ namespace Wing.RPGSystem
             Location effectLocation;
             switch (castType) {
                 case CastType.Instant:
-                    // Sequnence is important, 
-                    AnimationManager.Instance.AddAnimClip(new CastAnimClip(castType,
-                        Hash, caster.Loc, castLoc, castEffect.animDuration));
-                    if (BattleManager.Instance.IsPlayerTurn)
-                        AnimationManager.Instance.PlayOnce();
+                    if (anim) {
+                        AnimationManager.Instance.AddAnimClip(new CastAnimClip(castType, Hash, caster.Loc, castLoc, castEffect.animDuration));
+                        if (BattleManager.Instance.IsPlayerTurn)
+                            AnimationManager.Instance.PlayOnce();
+                    }
+
                     foreach (var ep in EffectPattern) {
                         effectLocation = castLoc + GetFixedEffectPattern(castLoc - caster.Loc, ep.loc);
                         if (effectLocation.TryGetStayEntity(out Entity target) && target != null) {
@@ -39,10 +40,13 @@ namespace Wing.RPGSystem
                         effectLocation = castLoc + dir;
                         foreach (var tc in GridManager.Instance.GetTrajectoryHitTile(castLoc, dir)) {
                             if (!tc.IsEmpty) {
-                                AnimationManager.Instance.AddAnimClip(new CastAnimClip(castType,
-                                    Hash, caster.Loc, tc.Loc, castEffect.animDuration));
-                                if (BattleManager.Instance.IsPlayerTurn)
-                                    AnimationManager.Instance.PlayOnce();
+                                if (anim) {
+                                    AnimationManager.Instance.AddAnimClip(new CastAnimClip(castType,
+                                        Hash, caster.Loc, tc.Loc, castEffect.animDuration));
+                                    if (BattleManager.Instance.IsPlayerTurn)
+                                        AnimationManager.Instance.PlayOnce();
+                                }
+
                                 Entity target = tc.StayEntity;
                                 target.DealDamage(CalculateValue(casterHash, ep.coefficient), damageType);
                                 for (int i = 0; i < ep.additionBuffs.Length; i++) {
