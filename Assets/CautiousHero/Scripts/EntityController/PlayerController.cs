@@ -26,7 +26,7 @@ namespace Wing.RPGSystem
             m_attribute = attributes;
             EntityName = name;
             Hash = EntityManager.Instance.AddEntity(this);
-            EntityBuffManager = new BuffManager(Hash);
+            if (EntityBuffManager == null) EntityBuffManager = new BuffManager(Hash);
             HealthPoints = hp;
             PhysicalArmourPoints = 0;
             MagicalArmourPoints = 0;

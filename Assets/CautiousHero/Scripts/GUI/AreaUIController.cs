@@ -122,6 +122,7 @@ public class AreaUIController : MonoBehaviour
 
     public void BindBuffManager()
     {
+        character.EntityBuffManager.OnBuffChangedEvent -= OnCharacterBuffChanged;
         character.EntityBuffManager.OnBuffChangedEvent += OnCharacterBuffChanged;
     }
 
@@ -199,7 +200,7 @@ public class AreaUIController : MonoBehaviour
     {
         if (!skillLearningPage.activeSelf) {
             infoBoard.transform.position = buffSlots[selectSlot].transform.position + new Vector3(272, 0, 0);
-            infoBoard.UpdateToBuffBoard(character.EntityBuffManager.buffHashes[selectSlot]);
+            infoBoard.UpdateToBuffBoard(character.EntityBuffManager.BuffHashes[selectSlot]);
         }
     }
 
@@ -259,7 +260,7 @@ public class AreaUIController : MonoBehaviour
         if (isAdding) {
             IconSlot buffSlot = Instantiate(buffSlotPrefab, buffSlotHolder);
             buffSlot.slotID = buffID;
-            buffSlot.icon.sprite = character.EntityBuffManager.buffHashes[buffID].GetBaseBuff().sprite;
+            buffSlot.icon.sprite = character.EntityBuffManager.BuffHashes[buffID].GetBaseBuff().sprite;
             buffSlot.RegisterDisplayAction(OnShowBuffInfoBoardEvent);
             buffSlot.RegisterHideAction(OnHideInfoBoardEvent);
             buffSlots.Add(buffSlot);

@@ -72,13 +72,13 @@ namespace Wing.RPGSystem
         {
             StackCount -= number;
             if (StackCount < 1) {
-                ConnectEvent(false);
                 TargetHash.GetEntity().EntityBuffManager.RemoveBuffHashes.Add(BuffHash);
             }              
         }
 
-        private void ConnectEvent(bool isBind)
+        public void ConnectEvent(bool isBind)
         {
+            //Debug.Log("Name: " + Template.buffName + ", trigger: " + Template.trigger);
             Entity target = TargetHash.GetEntity();
             if (isBind)
                 switch (Template.trigger) {
@@ -147,8 +147,14 @@ namespace Wing.RPGSystem
                     case BuffTrigger.CasterDeath:
                         CasterHash.GetEntity().OnDead.RemoveListener(OnTriggered);
                         break;
+                    case BuffTrigger.CasterMovement:
+                        CasterHash.GetEntity().OnMovedEvent -= OnTriggeredMultipleTimes;
+                        break;
                     case BuffTrigger.TargetDeath:
                         target.OnDead.RemoveListener(OnTriggered);
+                        break;
+                    case BuffTrigger.TargetMovement:
+                        target.OnMovedEvent -= OnTriggeredMultipleTimes;
                         break;
                     case BuffTrigger.BattleEnd:
                         BattleManager.Instance.BattleEndEvent.RemoveListener(OnTriggered);
@@ -181,26 +187,33 @@ namespace Wing.RPGSystem
     {
         public int entityHash;
         public Dictionary<BuffType, Dictionary<int, BuffHandler>> buffTypeDic; // Key->buffhash;
-        public List<int> buffHashes;
+        public List<int> BuffHashes { get; private set; }
 
         public List<int> RemoveBuffHashes { get; private set; }
 
-        public delegate void OnBuffChanged(int buffHash, bool isAdd);
+        public delegate void OnBuffChanged(int buffID, bool isAdd);
         public OnBuffChanged OnBuffChangedEvent;
 
         public BuffManager(int entityHash)
         {
             this.entityHash = entityHash;
             buffTypeDic = new Dictionary<BuffType, Dictionary<int, BuffHandler>>();
-            buffHashes = new List<int>();
+            BuffHashes = new List<int>();
             RemoveBuffHashes = new List<int>();
         }
 
         public void ResetManager()
         {
-            buffTypeDic = new Dictionary<BuffType, Dictionary<int, BuffHandler>>();
-            buffHashes = new List<int>();
-            RemoveBuffHashes = new List<int>();
+            // Unbind all event
+            foreach (var buffDic in buffTypeDic.Values) {
+                foreach (var bh in buffDic.Values) {
+                    //OnBuffChangedEvent.Invoke(BuffHashes.IndexOf(bh.BuffHash), false);
+                    bh.ConnectEvent(false);
+                }
+            }
+            buffTypeDic.Clear();
+            BuffHashes.Clear();
+            RemoveBuffHashes.Clear();            
         }
 
         public void AddBuff(BuffHandler bh)
@@ -219,15 +232,15 @@ namespace Wing.RPGSystem
                 }
                 else {
                     buffTypeDic[buffType].Add(buffhash, bh);
-                    buffHashes.Add(buffhash);
-                    OnBuffChangedEvent?.Invoke(buffHashes.Count-1,true);
+                    BuffHashes.Add(buffhash);
+                    OnBuffChangedEvent?.Invoke(BuffHashes.Count-1,true);
                 }
             }
             else {
                 buffTypeDic.Add(buffType, new Dictionary<int, BuffHandler>());
                 buffTypeDic[buffType].Add(buffhash, bh);
-                buffHashes.Add(buffhash);
-                OnBuffChangedEvent?.Invoke(buffHashes.Count - 1,true);
+                BuffHashes.Add(buffhash);
+                OnBuffChangedEvent?.Invoke(BuffHashes.Count - 1,true);
             }
         }
 
@@ -242,9 +255,8 @@ namespace Wing.RPGSystem
                     }
                 }
                 foreach (var hash in removeHashes) {
-                    buffDic.Remove(hash);
-                    OnBuffChangedEvent?.Invoke(buffHashes.IndexOf(hash), false);
-                    buffHashes.Remove(hash);
+                    Debug.Log(1);
+                    RemoveBuff(hash);
                 }
                 removeHashes.Clear();
             }
@@ -252,10 +264,11 @@ namespace Wing.RPGSystem
 
         public void RemoveBuff(int buffHash)
         {
-            if (!buffHashes.Contains(buffHash)) return;
-            buffTypeDic[buffHash.GetBaseBuff().type].Remove(buffHash);            
-            OnBuffChangedEvent?.Invoke(buffHashes.IndexOf(buffHash), false);
-            buffHashes.Remove(buffHash);
+            if (!BuffHashes.Contains(buffHash)) return;
+            buffTypeDic[buffHash.GetBaseBuff().type][buffHash].ConnectEvent(false);
+            buffTypeDic[buffHash.GetBaseBuff().type].Remove(buffHash);
+            OnBuffChangedEvent?.Invoke(BuffHashes.IndexOf(buffHash), false);
+            BuffHashes.Remove(buffHash);
         }
 
         public EntityAttribute GetAttributeAdjustment()

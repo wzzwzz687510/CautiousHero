@@ -313,7 +313,6 @@ namespace Wing.RPGSystem
                     VisualEffect buffEffect = buffClip.buffHash.GetBaseBuff().buffEffect;
                     GameObject buffGO = Instantiate(effectPrefab, buffClip.loc.ToPosition(), Quaternion.identity, effectHolder);
                     buffGO.GetComponent<Animator>().Play(buffEffect.effectName, 0);
-                    Debug.Log(buffClip.buffHash.GetBaseBuff().buffName);
                     buffGO.GetComponent<AudioSource>().PlayOneShot(buffEffect.sound);
                     StartCoroutine(DelayDestory(buffGO, buffClip.duration * animRate));
                     break;
