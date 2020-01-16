@@ -23,7 +23,7 @@ MonoBehaviour:
   labels: 06000000
   castEffect:
     effectName: slash
-    animDuration: 0.3
+    animDuration: 1
     sound: {fileID: 8300000, guid: c50eb61221d9d1d44a6b79e2d56c0131, type: 3}
   tCastPatterns:
     type: 0
@@ -33,5 +33,5 @@ MonoBehaviour:
   additionSkills: []
   additionBuffs: []
   baseValue: 12
-  attributeCof: 0
+  attributeCof: 1
   attribute: 0

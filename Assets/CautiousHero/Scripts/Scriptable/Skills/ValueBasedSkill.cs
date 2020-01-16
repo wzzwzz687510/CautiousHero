@@ -29,7 +29,7 @@ namespace Wing.RPGSystem
                             }
                             target.DealDamage(CalculateValue(casterHash, ep.coefficient), damageType);
                             for (int i = 0; i < ep.additionBuffs.Length; i++) {
-                                target.BuffManager.AddBuff(new BuffHandler(
+                                target.EntityBuffManager.AddBuff(new BuffHandler(
                                     casterHash, target.Hash, ep.additionBuffs[i].Hash));
                             }
                         }
@@ -51,7 +51,7 @@ namespace Wing.RPGSystem
                                 Entity target = tc.StayEntity;
                                 target.DealDamage(CalculateValue(casterHash, ep.coefficient), damageType);
                                 for (int i = 0; i < ep.additionBuffs.Length; i++) {
-                                    target.BuffManager.AddBuff(new BuffHandler(
+                                    target.EntityBuffManager.AddBuff(new BuffHandler(
                                         casterHash, target.Hash, ep.additionBuffs[i].Hash));
                                 }
                                 break;

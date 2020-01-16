@@ -31,14 +31,16 @@ namespace Wing.RPGSystem
             if (skill.labels.Contains(Label.Damage)) {
                 var vSkill = skill as BasicAttackSkill;
                 int adjustmentDamage = vSkill.baseValue;
-                if (vSkill.attribute == AdditiveAttribute.Strength) {
-                    adjustmentDamage += AreaManager.Instance.character.Strength;
-                }
-                else if(vSkill.attribute == AdditiveAttribute.Intelligence) {
-                    adjustmentDamage += AreaManager.Instance.character.Intelligence;
-                }
-                else {
-                    adjustmentDamage += AreaManager.Instance.character.Agility;
+                if (BattleManager.Instance.IsInBattle) {
+                    if (vSkill.attribute == AdditiveAttribute.Strength) {
+                        adjustmentDamage += AreaManager.Instance.character.Strength;
+                    }
+                    else if (vSkill.attribute == AdditiveAttribute.Intelligence) {
+                        adjustmentDamage += AreaManager.Instance.character.Intelligence;
+                    }
+                    else {
+                        adjustmentDamage += AreaManager.Instance.character.Agility;
+                    }
                 }
                 description.text += string.Format("Deal <color=#{0:X2}{1:X2}{2:X2}>{3} {4}</color> damage to target",
                 (int)(c.r * 255), (int)(c.g * 255), (int)(c.b * 255), adjustmentDamage, element);

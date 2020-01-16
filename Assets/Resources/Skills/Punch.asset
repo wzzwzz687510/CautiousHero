@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Punch
   m_EditorClassIdentifier: 
   skillName: Punch
-  description: Using hand gives heavy hit
+  description: 
   sprite: {fileID: 4460921126383611002, guid: 95182df2e629f5c4c90c733881fc6d9c, type: 3}
   actionPointsCost: 1
   rarity: 0
@@ -33,5 +33,5 @@ MonoBehaviour:
   additionSkills: []
   additionBuffs: []
   baseValue: 8
-  attributeCof: 0
+  attributeCof: 1
   attribute: 0

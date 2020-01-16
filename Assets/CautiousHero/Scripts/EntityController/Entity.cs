@@ -166,7 +166,7 @@ namespace Wing.RPGSystem
         public bool IsCostAP { get; private set; }
         public bool IsDeath { get; protected set; }
         public List<int> SkillHashes { get; protected set; }
-        public BuffManager BuffManager { get; protected set; }
+        public BuffManager EntityBuffManager { get; protected set; }
 
         public Location Loc { get; protected set; }
         public Location[] MovePath { get; protected set; }
@@ -175,7 +175,7 @@ namespace Wing.RPGSystem
         protected EntityAttribute tempAttribute;
         public EntityAttribute Attribute {
             get {
-                return m_attribute + BuffManager.GetAttributeAdjustment() + tempAttribute;
+                return m_attribute + EntityBuffManager.GetAttributeAdjustment() + tempAttribute;
             }
         }
         public int MaxHealthPoints       => Attribute.maxHealth;
@@ -193,7 +193,7 @@ namespace Wing.RPGSystem
         protected BoxCollider2D m_collider;
 
         public delegate void IntDelegate(int value);
-        public IntDelegate OnStartMovedEvent;
+        public IntDelegate OnMovedEvent;
         public IntDelegate OnSortingOrderChanged;
         public delegate void PointsChange(int hp,int maxHP, float duraion);
         public PointsChange HPChangeAnimation;
@@ -225,7 +225,7 @@ namespace Wing.RPGSystem
         public virtual void OnTurnStarted()
         {
             OnTurnStartedEvent?.Invoke();
-            BuffManager.UpdateBuffs();
+            EntityBuffManager.UpdateBuffs();
             CancelArmour();
             ImpactActionPoints(ActionPointsPerTurn,false);
         }
@@ -255,8 +255,6 @@ namespace Wing.RPGSystem
 
                 MovePath = path.ToArray();
             }
-            // Pass move condition
-            OnStartMovedEvent?.Invoke(Loc.Distance(targetLoc));
 
             if (isInstance) {
                 Loc.GetTileController().OnEntityLeaving();
@@ -269,7 +267,10 @@ namespace Wing.RPGSystem
                 int stepID = 0, passedCount = 0;
                 for (int i = 0; i < MovePath.Length; i++) {
                     if (MovePath[i].GetTileController().HasImpacts || i == MovePath.Length - 1) {
-                        if (stepID * moveCost > ActionPoints) return i;
+                        if (stepID * moveCost > ActionPoints) {
+                            OnMovedEvent?.Invoke(i);
+                            return i;
+                        }
                         SubMoveToTile(passedCount, stepID);
 
                         stepID = 0;
@@ -281,8 +282,10 @@ namespace Wing.RPGSystem
                 // AP cost
                 ImpactActionPoints(passedCount * moveCost, true);
             }
-          
-            return isInstance ? 0 : MovePath.Length;
+            int movementSteps = isInstance ? 0 : MovePath.Length;
+            // Pass move condition
+            OnMovedEvent?.Invoke(movementSteps);
+            return movementSteps;
         }
 
         public virtual void SubMoveToTile(int passedCount,int stepID)
@@ -345,6 +348,7 @@ namespace Wing.RPGSystem
 
         public virtual bool DealDamage(int value, DamageType damageType)
         {
+            if (EntityBuffManager.CheckIsInvincible()) return true;
             int damage = value;
 
             if(damageType == DamageType.Physical && PhysicalArmourPoints!=0) {

@@ -190,7 +190,7 @@ namespace Wing.RPGSystem
                 skill.ApplyEffect(0, Loc, Loc, true);
             }
             foreach (var buff in tTile.impactBuffs) {
-                StayEntity.BuffManager.AddBuff(new BuffHandler(0, StayEntityHash, buff.Hash));
+                StayEntity.EntityBuffManager.AddBuff(new BuffHandler(0, StayEntityHash, buff.Hash));
             }
         }
 

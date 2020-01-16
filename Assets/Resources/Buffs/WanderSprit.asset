@@ -9,25 +9,32 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 303b8ed2dee848447b0af971cc64f319, type: 3}
-  m_Name: StrengthUp
+  m_Script: {fileID: 11500000, guid: b1fbc9ff1ccca434fac2cc4022e7cf42, type: 3}
+  m_Name: WanderSprit
   m_EditorClassIdentifier: 
-  buffName: StrengthUp
-  description: Increase strength
-  sprite: {fileID: -5721522318260220260, guid: 95182df2e629f5c4c90c733881fc6d9c, type: 3}
-  type: 1
+  buffName: Wander Sprit
+  description: 
+  sprite: {fileID: 8671817140711672497, guid: 95182df2e629f5c4c90c733881fc6d9c, type: 3}
+  type: 0
+  buffEffect:
+    effectName: 
+    animDuration: 0
+    sound: {fileID: 0}
   trigger: 0
   triggerTimes: 0
+  triggerInfinityTimes: 0
   lastTurn: 0
-  infinity: 0
+  infinity: 1
   stackable: 1
-  stackTriggerNumber: 0
+  stackTriggerNumber: 5
   isTriggeredOnStacked: 0
   adjustValue:
     maxHealth: 0
     maxAction: 0
     actionPerTurn: 0
-    strength: 1
+    strength: 0
     intelligence: 0
     agility: 0
     moveCost: 0
+  additionBuffs:
+  - {fileID: 11400000, guid: af9714b8a5b6abd49ab03636f5f73a88, type: 2}

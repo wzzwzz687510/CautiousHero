@@ -97,7 +97,7 @@ public class BattleManager : MonoBehaviour
         AIManager.Instance.Init(battleSet);
         AudioManager.Instance.PlayMeetClip();
         AudioManager.Instance.PlayBattleClip();
-        character.InitSkillDeck();
+        character.StartNewBattle();
         m_battleUIController.BattleStartAnim();
         StartNewTurn(true);
     }

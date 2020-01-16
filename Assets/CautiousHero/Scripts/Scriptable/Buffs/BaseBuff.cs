@@ -11,6 +11,7 @@ namespace Wing.RPGSystem
         Attribute,
         Defense,
         ArrowReturn,
+        Invincible,
         Combined
     }
 
@@ -26,7 +27,9 @@ namespace Wing.RPGSystem
         ArmourPChange,
         SkillChange,
         CasterDeath,
+        CasterMovement,
         TargetDeath,
+        TargetMovement,
         BattleEnd
     }
 
@@ -43,21 +46,31 @@ namespace Wing.RPGSystem
         public string description;
         public Sprite sprite;
         public BuffType type;
+        public VisualEffect buffEffect;
 
         [Header("Trigger Parameters")]
         public BuffTrigger trigger;
         public int triggerTimes;
+        public bool triggerInfinityTimes;
         public int lastTurn;
         public bool infinity;
 
-        [Header("Stack Parameters")]
+        [Header("Stack Parameters")]        
         public bool stackable;
         public int stackTriggerNumber;
         public bool isTriggeredOnStacked;
 
-
         public EntityAttribute adjustValue;
         public int Hash => buffName.GetStableHashCode();
+
+        public BaseBuff(){ }
+
+        public BaseBuff(BuffType type,bool infinity, bool stackable)
+        {
+            this.type = type;
+            this.infinity = infinity;
+            this.stackable = stackable;
+        }
 
         public virtual void ApplyEffect(BuffHandler bh)
         {

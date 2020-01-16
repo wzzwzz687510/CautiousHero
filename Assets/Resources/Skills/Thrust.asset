@@ -10,29 +10,30 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: ec70590e5fc5eea4f9776aa96baa83a4, type: 3}
-  m_Name: Trust
+  m_Name: Thrust
   m_EditorClassIdentifier: 
-  skillName: 
-  description: 
-  sprite: {fileID: 0}
-  actionPointsCost: 0
+  skillName: Thrust
+  description: 'Step forward. '
+  sprite: {fileID: 2028768670444973792, guid: 95182df2e629f5c4c90c733881fc6d9c, type: 3}
+  actionPointsCost: 2
   rarity: 0
   damageType: 0
   skillElement: 0
   castType: 0
-  labels: 
+  labels: 06000000
   castEffect:
-    effectName: 
-    animDuration: 0
-    sound: {fileID: 0}
+    effectName: slash
+    animDuration: 1
+    sound: {fileID: 8300000, guid: 4904581351450ab4385bb730fd68e077, type: 3}
   tCastPatterns:
     type: 0
-    size: 0
-    emptySize: 0
-  tEffectPatterns: {fileID: 0}
+    size: 2
+    emptySize: 1
+  tEffectPatterns: {fileID: 11400000, guid: 35c43e361d112b04b869656d407daef2, type: 2}
   additionSkills: []
   additionBuffs: []
-  baseValue: 0
-  attributeCof: 0
+  baseValue: 12
+  attributeCof: 1
   attribute: 0
-  isInstance: 0
+  isInstanceMovement: 0
+  isMovementFirst: 1

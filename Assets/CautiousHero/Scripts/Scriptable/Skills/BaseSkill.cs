@@ -68,7 +68,7 @@ namespace Wing.RPGSystem
         public BaseBuff[] additionBuffs;
     }
     [System.Serializable]
-    public struct CastEffect
+    public struct VisualEffect
     {
         public string effectName;
         public float animDuration;
@@ -93,7 +93,7 @@ namespace Wing.RPGSystem
         public List<Label> labels;
 
         [Header("Point Pattern")]
-        public CastEffect castEffect;
+        public VisualEffect castEffect;
         public ScriptablePattern tCastPatterns;
         public ScriptableEffectPattern tEffectPatterns;
         public Location[] CastPattern => ScriptablePattern.Dict[Hash];
@@ -112,7 +112,7 @@ namespace Wing.RPGSystem
             TileController tc = selecLoc.GetTileController();
             if (!tc.IsEmpty) {
                 foreach (var buff in additionBuffs) {
-                    tc.StayEntity.BuffManager.AddBuff(new BuffHandler(casterHash, tc.StayEntity.Hash, buff.Hash));
+                    tc.StayEntity.EntityBuffManager.AddBuff(new BuffHandler(casterHash, tc.StayEntity.Hash, buff.Hash));
                 }
             }
 

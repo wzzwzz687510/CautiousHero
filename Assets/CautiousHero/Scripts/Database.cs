@@ -47,13 +47,15 @@ namespace Wing.RPGSystem
         public int worldConfigHash;
         public string worldName;
         public float playTime;
+        public int selectClassID;
+        public int selectRaceID;
 
-        public int spriteID;
         public EntityAttribute attribute;
         public int HealthPoints;
         public long coins;
         public long exp;
-        public List<int> learnedSkills;
+        public List<int> gainedRelicHashes;
+        public List<int> learnedSkillHashes;
         public List<Location> worldMap;
         public List<Location> stageLocations;
         public int currentStage;
@@ -261,9 +263,13 @@ namespace Wing.RPGSystem
             skillDeck.Add(tRace.skill.Hash);
             m_activeWorldData = new WorldData() {
                 seed = System.DateTime.Now.ToString(),
+                selectClassID = classID,
+                selectRaceID = raceID,
                 attribute = (tRace.attribute + tClass.attribute) / 2,
                 HealthPoints = attribute.maxHealth,
-                learnedSkills = skillDeck,
+                gainedRelicHashes = new List<int>() { classID.GetTClassFromID().relic.Hash,
+                    raceID.GetTRaceFromID().relic.Hash },
+                learnedSkillHashes = skillDeck,
                 worldMap = new List<Location>(),
                 stageLocations = new List<Location>(),
                 currentStage = 0,
@@ -385,7 +391,7 @@ namespace Wing.RPGSystem
 
         public void LearnASkill(int skillHash)
         {
-            m_activeWorldData.learnedSkills.Add(skillHash);
+            m_activeWorldData.learnedSkillHashes.Add(skillHash);
             WorldDataChangedEvent?.Invoke();
         }
     }

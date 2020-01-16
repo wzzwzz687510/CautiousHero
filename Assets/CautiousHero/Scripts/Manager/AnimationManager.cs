@@ -12,6 +12,8 @@ namespace Wing.RPGSystem
         MovePath,
         MoveInstant,
         Cast,
+        Buff,
+        BuffRemovement,
         HPChange,
         ArmourPChange,
         SkillShift,
@@ -78,6 +80,32 @@ namespace Wing.RPGSystem
         }
     }
 
+    public class BuffAnimClip : BaseAnimClip
+    {
+        public int buffHash;
+        public Location loc;
+
+        public BuffAnimClip(int buffHash,Location loc, float duration = 0.5f)
+            : base(AnimType.Buff, duration)
+        {
+            this.buffHash = buffHash;
+            this.loc = loc;
+        }
+    }
+
+    public class BuffRemovementAnimClip : BaseAnimClip
+    {
+        public int entityHash;
+        public int buffHash;
+
+        public BuffRemovementAnimClip(int entityHash,int buffHash, float duration = 0.5f)
+            :base(AnimType.BuffRemovement, duration)
+        {
+            this.entityHash = entityHash;
+            this.buffHash = buffHash;
+        }
+    }
+
     public class HPChangeAnimClip : BaseAnimClip
     {
         public int entityHash;
@@ -136,7 +164,7 @@ namespace Wing.RPGSystem
         [Header("Setting")]
         public float animRate = 1.0f;
         public Vector3 effectOffset;
-        public GameObject skillPrefab;
+        public GameObject effectPrefab;
 
         public bool IsPlaying { get; private set; }
         public int Count { get { return clips.Count; } }
@@ -254,31 +282,44 @@ namespace Wing.RPGSystem
                 case AnimType.Cast:
                     var castClip = clip as CastAnimClip;
                     if (castClip.skillHash.GetBaseSkill().castEffect.effectName == null) break;
-                    CastEffect ce = castClip.skillHash.GetBaseSkill().castEffect;
-                    GameObject effect;
+                    VisualEffect castEffect = castClip.skillHash.GetBaseSkill().castEffect;
+                    GameObject castGO;
                     Vector3 endPosition = effectOffset + castClip.end.ToPosition();
                     switch (castClip.castType) {
                         case CastType.Instant:                            
-                            effect = Instantiate(skillPrefab, endPosition, Quaternion.identity, effectHolder);                           
-                            effect.GetComponent<Animator>().Play(ce.effectName, 0);
-                            effect.GetComponent<AudioSource>().PlayOneShot(ce.sound);
+                            castGO = Instantiate(effectPrefab, endPosition, Quaternion.identity, effectHolder);                           
+                            castGO.GetComponent<Animator>().Play(castEffect.effectName, 0);
+                            castGO.GetComponent<AudioSource>().PlayOneShot(castEffect.sound);
                             //yield return StartCoroutine(PlayAnimation(clips.Dequeue()));
-                            StartCoroutine(DelayDestory(effect, castClip.duration * animRate));
+                            StartCoroutine(DelayDestory(castGO, castClip.duration * animRate));
                             break;
                         case CastType.Trajectory:
                             Vector3 startPosition = effectOffset + castClip.start.ToPosition();
-                            effect = Instantiate(skillPrefab, startPosition, Quaternion.identity, effectHolder);
-                            effect.GetComponent<Animator>().Play(ce.effectName, 0);
-                            effect.GetComponent<AudioSource>().PlayOneShot(ce.sound);
+                            castGO = Instantiate(effectPrefab, startPosition, Quaternion.identity, effectHolder);
+                            castGO.GetComponent<Animator>().Play(castEffect.effectName, 0);
+                            castGO.GetComponent<AudioSource>().PlayOneShot(castEffect.sound);
                             int distance = AStarSearch.Heuristic(castClip.start, castClip.end);
-                            effect.transform.DOMove(endPosition, castClip.duration * distance * animRate)
-                                  .OnComplete(() => Destroy(effect));
+                            castGO.transform.DOMove(endPosition, castClip.duration * distance * animRate)
+                                  .OnComplete(() => Destroy(castGO));
                             yield return new WaitForSeconds(castClip.duration * distance * animRate);
                             break;
                         default:
                             break;
                     }
-
+                    break;
+                case AnimType.Buff:
+                    var buffClip = clip as BuffAnimClip;
+                    if (buffClip.buffHash.GetBaseBuff().buffEffect.effectName == null) break;
+                    VisualEffect buffEffect = buffClip.buffHash.GetBaseBuff().buffEffect;
+                    GameObject buffGO = Instantiate(effectPrefab, buffClip.loc.ToPosition(), Quaternion.identity, effectHolder);
+                    buffGO.GetComponent<Animator>().Play(buffEffect.effectName, 0);
+                    Debug.Log(buffClip.buffHash.GetBaseBuff().buffName);
+                    buffGO.GetComponent<AudioSource>().PlayOneShot(buffEffect.sound);
+                    StartCoroutine(DelayDestory(buffGO, buffClip.duration * animRate));
+                    break;
+                case AnimType.BuffRemovement:
+                    var buffRemovementClip = clip as BuffRemovementAnimClip;
+                    buffRemovementClip.entityHash.GetEntity().EntityBuffManager.RemoveBuff(buffRemovementClip.buffHash);                    
                     break;
                 case AnimType.HPChange:
                     var hpChangeClip = clip as HPChangeAnimClip;

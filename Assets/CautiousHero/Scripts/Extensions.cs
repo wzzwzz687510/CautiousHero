@@ -98,7 +98,11 @@ namespace Wing.RPGSystem
 
         public static TRace GetTRace(this int hash) => TRace.Dict[hash];
 
+        public static TRace GetTRaceFromID(this int selectID) => TRace.Dict[Database.Instance.ActivePlayerData.unlockedRaces[selectID]];
+
         public static TClass GetTClass(this int hash) => TClass.Dict[hash];
+
+        public static TClass GetTClassFromID(this int selectID) => TClass.Dict[Database.Instance.ActivePlayerData.unlockedClasses[selectID]];
 
         public static TTile GetTTile(this int hash) => TTile.Dict[hash];
 

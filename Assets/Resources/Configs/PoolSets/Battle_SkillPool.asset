@@ -14,10 +14,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   commonSet:
     defaultSet:
-    - {fileID: 11400000, guid: 0e65bc4a892fa1341b496a64ab32841c, type: 2}
+    - {fileID: 11400000, guid: f5d41ed3cb673694487d5170a5089039, type: 2}
     - {fileID: 11400000, guid: 7438a386ca6b5f447b020f5829f5cdbc, type: 2}
     - {fileID: 11400000, guid: 64bde5e8209701a409f8b332188ead94, type: 2}
-    - {fileID: 11400000, guid: 18d6163ba0d59a243bcf2713246b3068, type: 2}
+    - {fileID: 11400000, guid: e2ab5d1574e1bdd419e317c43dc6a30f, type: 2}
     - {fileID: 11400000, guid: fa65afbb161c7c644b5a119dec9dcf43, type: 2}
     - {fileID: 11400000, guid: 394c9b0c5a3201944a815a400f7e5e93, type: 2}
     lockedSet: []
@@ -40,5 +40,8 @@ MonoBehaviour:
     defaultSet: []
     lockedSet: []
   lancerSet:
+    defaultSet: []
+    lockedSet: []
+  berserker:
     defaultSet: []
     lockedSet: []

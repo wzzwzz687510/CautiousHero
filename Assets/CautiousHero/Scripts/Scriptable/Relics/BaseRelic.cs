@@ -19,6 +19,13 @@ namespace Wing.RPGSystem
         [Header("Labels")]
         public Rarity rarity;
 
+        public void ApplyEffect(int entityHash)
+        {
+            foreach (var buff in buffs) {
+                entityHash.GetEntity().EntityBuffManager.AddBuff(new BuffHandler(entityHash,entityHash,buff.Hash));
+            }            
+        }
+
         static Dictionary<int, BaseRelic> cache;
         public static Dictionary<int, BaseRelic> Dict {
             get {

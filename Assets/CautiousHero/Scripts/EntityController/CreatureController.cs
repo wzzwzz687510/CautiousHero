@@ -30,9 +30,9 @@ namespace Wing.RPGSystem {
             Template = creature;
             EntityName = Template.creatureName;
             Hash = EntityManager.Instance.AddEntity(this);
-            BuffManager = new BuffManager(Hash);
+            EntityBuffManager = new BuffManager(Hash);
             foreach (var buff in Template.buffs) {
-                BuffManager.AddBuff(new BuffHandler(Hash, Hash, buff.Hash));
+                EntityBuffManager.AddBuff(new BuffHandler(Hash, Hash, buff.Hash));
             }
             m_spriteRenderer.sprite = Template.sprite;
             m_attribute = Template.attribute;

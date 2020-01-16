@@ -33,5 +33,5 @@ MonoBehaviour:
   additionSkills: []
   additionBuffs: []
   baseValue: 20
-  attributeCof: 0
+  attributeCof: 1
   attribute: 1

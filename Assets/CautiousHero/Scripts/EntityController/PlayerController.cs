@@ -26,7 +26,7 @@ namespace Wing.RPGSystem
             m_attribute = attributes;
             EntityName = name;
             Hash = EntityManager.Instance.AddEntity(this);
-            BuffManager = new BuffManager(Hash);
+            EntityBuffManager = new BuffManager(Hash);
             HealthPoints = hp;
             PhysicalArmourPoints = 0;
             MagicalArmourPoints = 0;
@@ -36,9 +36,22 @@ namespace Wing.RPGSystem
             m_collider.enabled = true;
         }
 
-        public void InitSkillDeck()
+        public void StartNewBattle()
         {
-            SkillDeck = new List<int>(WorldData.ActiveData.learnedSkills);
+            EntityBuffManager.ResetManager();
+            PhysicalArmourPoints = 0;
+            MagicalArmourPoints = 0;
+            ActionPoints = 0;
+            foreach (var relicHash in WorldData.ActiveData.gainedRelicHashes) {
+                relicHash.GetRelic().ApplyEffect(Hash);
+            }
+
+            ResetSkillDeck();
+        }
+
+        public void ResetSkillDeck()
+        {
+            SkillDeck = new List<int>(WorldData.ActiveData.learnedSkillHashes);
             SkillHashes = new List<int>();
             SkillDiscardPile = new List<int>();
             for (int i = 0; i < defaultSkillCount; i++) {

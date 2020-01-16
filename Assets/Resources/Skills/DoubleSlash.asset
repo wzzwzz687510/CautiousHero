@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: DoubleSlash
   m_EditorClassIdentifier: 
   skillName: Double Slash
-  description: Slash twice
+  description: 
   sprite: {fileID: -779878946710169077, guid: 95182df2e629f5c4c90c733881fc6d9c, type: 3}
   actionPointsCost: 4
   rarity: 0
@@ -23,7 +23,7 @@ MonoBehaviour:
   labels: 06000000
   castEffect:
     effectName: slash
-    animDuration: 0.3
+    animDuration: 1
     sound: {fileID: 8300000, guid: c50eb61221d9d1d44a6b79e2d56c0131, type: 3}
   tCastPatterns:
     type: 0
@@ -33,5 +33,5 @@ MonoBehaviour:
   additionSkills: []
   additionBuffs: []
   baseValue: 24
-  attributeCof: 0
+  attributeCof: 1
   attribute: 0

@@ -19,3 +19,11 @@ MonoBehaviour:
     precious candle.
   relic: {fileID: 11400000, guid: d7d79f33724698e4f9c7b819269366de, type: 2}
   skill: {fileID: 11400000, guid: 50128fe247e5bd24abb6ceeb6045caee, type: 2}
+  attribute:
+    maxHealth: 90
+    maxAction: 6
+    actionPerTurn: 4
+    strength: 0
+    intelligence: 0
+    agility: 0
+    moveCost: 1

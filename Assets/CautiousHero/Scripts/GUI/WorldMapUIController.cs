@@ -68,7 +68,7 @@ namespace Wing.RPGSystem
             coinText.text = ActiveWorldData.coins.ToString();
             expText.text = ActiveWorldData.exp.ToString();
 
-            skillDeck = (from skillHash in WorldData.ActiveData.learnedSkills select skillHash.GetBaseSkill()).ToList();
+            skillDeck = (from skillHash in WorldData.ActiveData.learnedSkillHashes select skillHash.GetBaseSkill()).ToList();
             skillDeck.Sort(BaseSkill.CompareByName);
             for (int i = 0; i < skillElements.Length; i++) {               
                 if(i < skillDeck.Count) {
