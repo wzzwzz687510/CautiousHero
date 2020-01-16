@@ -12,4 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b310617e927b1e04cac5e0c7a23f340b, type: 3}
   m_Name: DownTwoPoint
   m_EditorClassIdentifier: 
-  effectPatterns: []
+  effectPatterns:
+  - loc:
+      x: 0
+      y: -2
+    coefficient: 1
+    additionBuffs: []

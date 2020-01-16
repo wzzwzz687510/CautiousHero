@@ -13,11 +13,13 @@ MonoBehaviour:
   m_Name: PolarCrossPoints
   m_EditorClassIdentifier: 
   effectPatterns:
-  - pattern:
+  - loc:
       x: 1
       y: 1
     coefficient: 1
-  - pattern:
+    additionBuffs: []
+  - loc:
       x: -1
       y: 1
     coefficient: 1
+    additionBuffs: []

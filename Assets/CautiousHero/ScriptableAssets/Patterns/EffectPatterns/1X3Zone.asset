@@ -13,15 +13,18 @@ MonoBehaviour:
   m_Name: 1X3Zone
   m_EditorClassIdentifier: 
   effectPatterns:
-  - pattern:
+  - loc:
+      x: 1
+      y: 0
+    coefficient: 1
+    additionBuffs: []
+  - loc:
       x: 0
       y: 0
     coefficient: 1
-  - pattern:
+    additionBuffs: []
+  - loc:
       x: -1
       y: 0
     coefficient: 1
-  - pattern:
-      x: 1
-      y: 0
-    coefficient: 0.8
+    additionBuffs: []

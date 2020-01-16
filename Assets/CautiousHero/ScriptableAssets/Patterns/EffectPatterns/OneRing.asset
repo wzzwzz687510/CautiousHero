@@ -13,19 +13,23 @@ MonoBehaviour:
   m_Name: OneRing
   m_EditorClassIdentifier: 
   effectPatterns:
-  - pattern:
-      x: 0
-      y: 1
-    coefficient: 1
-  - pattern:
-      x: 1
-      y: 0
-    coefficient: 1
-  - pattern:
-      x: 0
-      y: -1
-    coefficient: 1
-  - pattern:
+  - loc:
       x: -1
       y: 0
     coefficient: 1
+    additionBuffs: []
+  - loc:
+      x: 1
+      y: 0
+    coefficient: 1
+    additionBuffs: []
+  - loc:
+      x: 0
+      y: -1
+    coefficient: 1
+    additionBuffs: []
+  - loc:
+      x: 0
+      y: 1
+    coefficient: 1
+    additionBuffs: []

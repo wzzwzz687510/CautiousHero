@@ -10,26 +10,31 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: b310617e927b1e04cac5e0c7a23f340b, type: 3}
-  m_Name: OneZone
+  m_Name: Cross
   m_EditorClassIdentifier: 
   effectPatterns:
-  - pattern:
-      x: 0
-      y: 1
-    coefficient: 0.6
-  - pattern:
-      x: 1
-      y: 0
-    coefficient: 0.6
-  - pattern:
-      x: 0
-      y: -1
-    coefficient: 0.6
-  - pattern:
+  - loc:
       x: -1
       y: 0
     coefficient: 0.6
-  - pattern:
+    additionBuffs: []
+  - loc:
+      x: 1
+      y: 0
+    coefficient: 0.6
+    additionBuffs: []
+  - loc:
+      x: 0
+      y: -1
+    coefficient: 0.6
+    additionBuffs: []
+  - loc:
+      x: 0
+      y: 1
+    coefficient: 0.6
+    additionBuffs: []
+  - loc:
       x: 0
       y: 0
     coefficient: 1
+    additionBuffs: []
