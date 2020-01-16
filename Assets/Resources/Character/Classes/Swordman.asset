@@ -13,8 +13,10 @@ MonoBehaviour:
   m_Name: Swordman
   m_EditorClassIdentifier: 
   className: Swardman
-  relic: {fileID: 0}
-  skillSet: []
+  relic: {fileID: 11400000, guid: 2fad66a5417576b46a6afbf687e143e0, type: 2}
+  skillSet:
+  - {fileID: 11400000, guid: 394c9b0c5a3201944a815a400f7e5e93, type: 2}
+  - {fileID: 11400000, guid: 0e65bc4a892fa1341b496a64ab32841c, type: 2}
   attribute:
     maxHealth: 70
     maxAction: 6

@@ -12,8 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 47a8051cd7d92b941bb1c646c112d213, type: 3}
   m_Name: DoubleSlash
   m_EditorClassIdentifier: 
-  skillName: Double Slash
-  description: 
+  skillName: Star Explosion Give Up Healing Slash
+  description: 'Double slash can lock enemy''s leeway. '
   sprite: {fileID: -779878946710169077, guid: 95182df2e629f5c4c90c733881fc6d9c, type: 3}
   actionPointsCost: 4
   rarity: 0
@@ -32,6 +32,6 @@ MonoBehaviour:
   tEffectPatterns: {fileID: 11400000, guid: 6ea384fd33e47c44baaf0ab2bc8eb637, type: 2}
   additionSkills: []
   additionBuffs: []
-  baseValue: 24
-  attributeCof: 1
+  baseValue: 44
+  attributeCof: 3
   attribute: 0

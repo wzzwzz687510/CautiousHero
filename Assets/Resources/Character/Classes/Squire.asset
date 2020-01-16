@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Squire
   m_EditorClassIdentifier: 
   className: Squire
-  relic: {fileID: 11400000, guid: c92aae04a82e1bd479aff9584baf7962, type: 2}
+  relic: {fileID: 11400000, guid: 2fad66a5417576b46a6afbf687e143e0, type: 2}
   skillSet:
   - {fileID: 11400000, guid: fa65afbb161c7c644b5a119dec9dcf43, type: 2}
   - {fileID: 11400000, guid: 0e65bc4a892fa1341b496a64ab32841c, type: 2}

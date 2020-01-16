@@ -19,9 +19,9 @@ MonoBehaviour:
   buffEffect:
     effectName: 
     animDuration: 0
-    sound: {fileID: 0}
+    sound: {fileID: 8300000, guid: 066d44e6386e9fe4492b89203ac3e0e9, type: 3}
   trigger: 0
-  triggerTimes: 0
+  triggerTimes: 1
   triggerInfinityTimes: 0
   lastTurn: 0
   infinity: 1
