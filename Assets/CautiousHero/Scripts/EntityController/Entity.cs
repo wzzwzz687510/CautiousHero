@@ -366,17 +366,22 @@ namespace Wing.RPGSystem
         public virtual bool DealDamage(int value, DamageType damageType)
         {
             if (EntityBuffManager.CheckIsInvincible()) return true;
-            int damage = value;
+            if (value > 0) {
+                int damage = value;
 
-            if(damageType == DamageType.Physical && PhysicalArmourPoints!=0) {
-                damage -= ImpactArmour(damage, true, true);
-            }
-            else if(damageType == DamageType.Magical && MagicalArmourPoints != 0) {
-                damage -= ImpactArmour(damage, false, true);
-            }
-            if (damage == 0) return true;
+                if (damageType == DamageType.Physical && PhysicalArmourPoints != 0) {
+                    damage -= ImpactArmour(damage, true, true);
+                }
+                else if (damageType == DamageType.Magical && MagicalArmourPoints != 0) {
+                    damage -= ImpactArmour(damage, false, true);
+                }
+                if (damage == 0) return true;
 
-            return ImpactHP(damage,true);
+                return ImpactHP(damage, true);
+            }
+            else {
+                return ImpactHP(value, false);
+            }          
         }
 
         public virtual void ImpactActionPoints(int value, bool reduce)

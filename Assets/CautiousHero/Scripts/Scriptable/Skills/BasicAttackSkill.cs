@@ -27,7 +27,7 @@ namespace Wing.RPGSystem
             else if (attribute == AdditiveAttribute.Strength)
                 extraValue = caster.Strength;
 
-            return  baseValue + attributeMag * extraValue;
+            return (baseValue + attributeMag * extraValue) * caster.EntityBuffManager.GetDamageAdjustment();
         }
 
         public virtual float ApplyResistanceAdjustment(int casterHash,float baseValue)

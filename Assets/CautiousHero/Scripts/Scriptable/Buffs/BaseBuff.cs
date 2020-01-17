@@ -9,6 +9,7 @@ namespace Wing.RPGSystem
     {
         Default,
         Attribute,
+        DamageAdjustment,
         Defense,
         ArrowReturn,
         Invincible,

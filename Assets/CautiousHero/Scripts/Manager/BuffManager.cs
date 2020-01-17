@@ -282,6 +282,16 @@ namespace Wing.RPGSystem
             return tmp;
         }
 
+        public float GetDamageAdjustment()
+        {
+            float cof = 1.0f;
+            if (buffTypeDic.ContainsKey(BuffType.DamageAdjustment))
+                foreach (var bh in buffTypeDic[BuffType.DamageAdjustment].Values) {
+                    cof += (bh.Template as ValueBasedBuff).cof;
+                }
+            return cof;
+        }
+
         public bool CheckIsInvincible()
         {
             if (buffTypeDic.ContainsKey(BuffType.Invincible) && buffTypeDic[BuffType.Invincible].Count != 0) {
