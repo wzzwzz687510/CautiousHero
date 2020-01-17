@@ -18,8 +18,9 @@ namespace Wing.RPGSystem
         public int intelligence;
         public int agility;
         public int moveCost;
+        public ElementResistance eleResist;
 
-        public EntityAttribute(int maxHp, int maxAct, int act, int str, int inte, int agi, int mvCost)
+        public EntityAttribute(int maxHp, int maxAct, int act, int str, int inte, int agi, int mvCost, ElementResistance resist)
         {
             maxHealth = maxHp;
             maxAction = maxAct;
@@ -28,18 +29,19 @@ namespace Wing.RPGSystem
             intelligence = inte;
             agility = agi;
             moveCost = mvCost;
+            eleResist = resist;
         }
 
         public static EntityAttribute operator -(EntityAttribute a) =>
-            new EntityAttribute(-a.maxHealth, -a.maxAction, -a.actionPerTurn, -a.strength, -a.intelligence, -a.agility, -a.moveCost);
+            new EntityAttribute(-a.maxHealth, -a.maxAction, -a.actionPerTurn, -a.strength, -a.intelligence, -a.agility, -a.moveCost,-a.eleResist);
         public static EntityAttribute operator +(EntityAttribute a, EntityAttribute b) =>
             new EntityAttribute(a.maxHealth + b.maxHealth, a.maxAction + b.maxAction, a.actionPerTurn + b.actionPerTurn,
-                a.strength + b.strength, a.intelligence + b.intelligence, a.agility + b.agility, a.moveCost + b.moveCost);
+                a.strength + b.strength, a.intelligence + b.intelligence, a.agility + b.agility, a.moveCost + b.moveCost, a.eleResist + b.eleResist);
         public static EntityAttribute operator -(EntityAttribute a, EntityAttribute b) => a + -(b);
-        public static EntityAttribute operator *(EntityAttribute a, float b) =>
-            new EntityAttribute(a.maxHealth * 2, a.maxAction * 2, a.actionPerTurn * 2, a.strength * 2, a.intelligence * 2, a.agility * 2, a.moveCost * 2);
-        public static EntityAttribute operator /(EntityAttribute a, float b) =>
-            new EntityAttribute(a.maxHealth / 2, a.maxAction / 2, a.actionPerTurn / 2, a.strength / 2, a.intelligence / 2, a.agility / 2, a.moveCost / 2);
+        public static EntityAttribute operator *(EntityAttribute a, float scale) =>
+            new EntityAttribute((int)(a.maxHealth * scale), (int)(a.maxAction * scale), (int)(a.actionPerTurn * scale), (int)(a.strength * scale), 
+                (int)(a.intelligence * scale), (int)(a.agility * scale), (int)(a.moveCost * scale), (a.eleResist * scale));
+        public static EntityAttribute operator /(EntityAttribute a, float scale) => a * (1 / scale);
     }
 
     [System.Serializable]
@@ -68,12 +70,11 @@ namespace Wing.RPGSystem
             resist.dark = dark;
         }
 
-        public static ElementResistance operator -(ElementResistance a) =>
-            new ElementResistance(-a.Fire, -a.Water, -a.Earth, -a.Air, -a.Light, -a.Dark);
-        public static ElementResistance operator +(ElementResistance a, ElementResistance b) =>
-            new ElementResistance(a.Fire + b.Fire, a.Water + b.Water, a.Earth + b.Earth, 
-                a.Air + b.Air, a.Light + b.Light, a.Dark + b.Dark);
+        public static ElementResistance operator -(ElementResistance a) => new ElementResistance(-a.resist);
+        public static ElementResistance operator +(ElementResistance a, ElementResistance b) => new ElementResistance(a.resist + b.resist);
         public static ElementResistance operator -(ElementResistance a, ElementResistance b) => a + (-b);
+        public static ElementResistance operator *(ElementResistance a, float scale) => new ElementResistance(a.resist * scale);
+        public static ElementResistance operator /(ElementResistance a, float scale) => a * (1 / scale);
     }
 
     [System.Serializable]
@@ -102,12 +103,11 @@ namespace Wing.RPGSystem
             mana.dark = dark;
         }
 
-        public static ElementMana operator -(ElementMana a) =>
-            new ElementMana(-a.Fire, -a.Water, -a.Earth, -a.Air, -a.Light, -a.Dark);
-        public static ElementMana operator +(ElementMana a, ElementMana b) =>
-            new ElementMana(a.Fire + b.Fire, a.Water + b.Water, a.Earth + b.Earth,
-                a.Air + b.Air, a.Light + b.Light, a.Dark + b.Dark);
+        public static ElementMana operator -(ElementMana a) => new ElementMana(-a.mana);
+        public static ElementMana operator +(ElementMana a, ElementMana b) => new ElementMana(a.mana + b.mana);
         public static ElementMana operator -(ElementMana a, ElementMana b) => a + (-b);
+        public static ElementMana operator *(ElementMana a, float scale) => new ElementMana(a.mana * 2);
+        public static ElementMana operator /(ElementMana a, float scale) => a * (1 / scale);
     }
 
     [System.Serializable]
@@ -129,6 +129,16 @@ namespace Wing.RPGSystem
             this.light = light;
             this.dark = dark;
         }
+
+        public static MagicalElement operator -(MagicalElement a) =>
+            new MagicalElement(-a.fire, -a.water, -a.earth, -a.air, -a.light, -a.dark);
+        public static MagicalElement operator +(MagicalElement a, MagicalElement b) =>
+            new MagicalElement(a.fire + b.fire, a.water + b.water, a.earth + b.earth,
+                a.air + b.air, a.light + b.light, a.dark + b.dark);
+        public static MagicalElement operator *(MagicalElement a, float scale) 
+            => new MagicalElement((int)(a.fire*scale), (int)(a.water * scale), (int)(a.earth * scale), 
+                (int)(a.air * scale), (int)(a.light * scale), (int)(a.dark * scale));
+        public static MagicalElement operator /(MagicalElement a, float scale) => a * (1 / scale);
     }
 
     // Obsolete
