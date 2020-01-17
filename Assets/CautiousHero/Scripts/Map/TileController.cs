@@ -183,6 +183,11 @@ namespace Wing.RPGSystem
             IsBind = true;
         }
 
+        public void ImpactManaCost(ElementMana cost,bool reduce)
+        {
+            AreaManager.Instance.SetMana(Loc, Info.mana + cost * (reduce ? -1 : 1));
+        }
+
         public void ApplyEffect()
         {
             TTile tTile = Info.tTileHash.GetTTile();

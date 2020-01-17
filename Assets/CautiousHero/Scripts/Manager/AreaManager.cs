@@ -289,6 +289,11 @@ namespace Wing.RPGSystem
             WorldMapManager.Instance.CompleteAnArea();
         }
 
+        public void SetMana(Location loc, ElementMana mana)
+        {
+            TempData.map[loc.x, loc.y].mana = mana;
+        }
+
         public void SetExploration(Location loc)
         {
             TempData.map[loc.x, loc.y].isExplored = true;

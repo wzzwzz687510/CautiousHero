@@ -78,6 +78,7 @@ namespace Wing.RPGSystem
             => new Resistance(a.physcialResistance + b.physcialResistance, a.elementResistance + b.elementResistance);
         public static Resistance operator -(Resistance a, Resistance b) => a + (-b);
         public static Resistance operator *(Resistance a, float scale) => new Resistance(-a.physcialResistance, a.elementResistance * scale);
+        public static Resistance operator *(float scale, Resistance a) => a * scale;
         public static Resistance operator /(Resistance a, float scale) => a * (1 / scale);
     }
 
@@ -110,7 +111,8 @@ namespace Wing.RPGSystem
         public static ElementMana operator -(ElementMana a) => new ElementMana(-a.mana);
         public static ElementMana operator +(ElementMana a, ElementMana b) => new ElementMana(a.mana + b.mana);
         public static ElementMana operator -(ElementMana a, ElementMana b) => a + (-b);
-        public static ElementMana operator *(ElementMana a, float scale) => new ElementMana(a.mana * 2);
+        public static ElementMana operator *(ElementMana a, float scale) => new ElementMana(a.mana * scale);
+        public static ElementMana operator *(float scale, ElementMana a) => a * scale;
         public static ElementMana operator /(ElementMana a, float scale) => a * (1 / scale);
     }
 

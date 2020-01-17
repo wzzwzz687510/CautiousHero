@@ -4,13 +4,8 @@ using UnityEngine;
 
 namespace Wing.RPGSystem
 {
-    public interface IMagicalCost
-    {
-        void ApplyMagicCost(int casterHash);
-    }
-
     [CreateAssetMenu(fileName = "Skill", menuName = "Wing/Scriptable Skills/BasicAttackSkill", order = 10)]
-    public class BasicAttackSkill : ValueBasedSkill, IMagicalCost
+    public class BasicAttackSkill : ValueBasedSkill
     {
         public AdditiveAttribute attribute;
         public ElementMana cost;
@@ -19,11 +14,6 @@ namespace Wing.RPGSystem
         {
             float attributeAdjusment = ApplyAttributeAdjustment(casterHash, baseValue);
             return Mathf.RoundToInt(cof * ApplyResistanceAdjustment(casterHash, attributeAdjusment));
-        }
-
-        public virtual void ApplyMagicCost(int casterHash)
-        {
-            throw new System.NotImplementedException();
         }
 
         public virtual float ApplyAttributeAdjustment(int casterHash, float baseValue)
@@ -43,24 +33,33 @@ namespace Wing.RPGSystem
         public virtual float ApplyResistanceAdjustment(int casterHash,float baseValue)
         {
             Entity caster = casterHash.GetEntity();
+            int resistanceValue = 0;
             switch (skillElement) {
                 case ElementType.None:
-                    return caster.Resistance.physcialResistance
+                    resistanceValue = caster.Resistance.physcialResistance;
+                    break;
                 case ElementType.Fire:
+                    resistanceValue = caster.Resistance.Fire;
                     break;
                 case ElementType.Water:
+                    resistanceValue = caster.Resistance.Water;
                     break;
                 case ElementType.Earth:
+                    resistanceValue = caster.Resistance.Earth;
                     break;
                 case ElementType.Air:
+                    resistanceValue = caster.Resistance.Air;
                     break;
                 case ElementType.Light:
+                    resistanceValue = caster.Resistance.Light;
                     break;
                 case ElementType.Dark:
+                    resistanceValue = caster.Resistance.Dark;
                     break;
                 default:
                     break;
             }
+            return (1 - resistanceValue / 200.0f) * baseValue;
         }
     }
 }
