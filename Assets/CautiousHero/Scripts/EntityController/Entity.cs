@@ -18,9 +18,9 @@ namespace Wing.RPGSystem
         public int intelligence;
         public int agility;
         public int moveCost;
-        public ElementResistance eleResist;
+        public Resistance resistance;
 
-        public EntityAttribute(int maxHp, int maxAct, int act, int str, int inte, int agi, int mvCost, ElementResistance resist)
+        public EntityAttribute(int maxHp, int maxAct, int act, int str, int inte, int agi, int mvCost, Resistance rst)
         {
             maxHealth = maxHp;
             maxAction = maxAct;
@@ -29,52 +29,56 @@ namespace Wing.RPGSystem
             intelligence = inte;
             agility = agi;
             moveCost = mvCost;
-            eleResist = resist;
+            resistance = rst;
         }
 
         public static EntityAttribute operator -(EntityAttribute a) =>
-            new EntityAttribute(-a.maxHealth, -a.maxAction, -a.actionPerTurn, -a.strength, -a.intelligence, -a.agility, -a.moveCost,-a.eleResist);
+            new EntityAttribute(-a.maxHealth, -a.maxAction, -a.actionPerTurn, -a.strength, -a.intelligence, -a.agility, -a.moveCost,-a.resistance);
         public static EntityAttribute operator +(EntityAttribute a, EntityAttribute b) =>
             new EntityAttribute(a.maxHealth + b.maxHealth, a.maxAction + b.maxAction, a.actionPerTurn + b.actionPerTurn,
-                a.strength + b.strength, a.intelligence + b.intelligence, a.agility + b.agility, a.moveCost + b.moveCost, a.eleResist + b.eleResist);
+                a.strength + b.strength, a.intelligence + b.intelligence, a.agility + b.agility, a.moveCost + b.moveCost, a.resistance + b.resistance);
         public static EntityAttribute operator -(EntityAttribute a, EntityAttribute b) => a + -(b);
         public static EntityAttribute operator *(EntityAttribute a, float scale) =>
             new EntityAttribute((int)(a.maxHealth * scale), (int)(a.maxAction * scale), (int)(a.actionPerTurn * scale), (int)(a.strength * scale), 
-                (int)(a.intelligence * scale), (int)(a.agility * scale), (int)(a.moveCost * scale), (a.eleResist * scale));
+                (int)(a.intelligence * scale), (int)(a.agility * scale), (int)(a.moveCost * scale), (a.resistance * scale));
         public static EntityAttribute operator /(EntityAttribute a, float scale) => a * (1 / scale);
     }
 
     [System.Serializable]
-    public struct ElementResistance
+    public struct Resistance
     {
-        public MagicalElement resist;
-        public int Fire { get { return resist.fire; } }
-        public int Water { get { return resist.water; } }
-        public int Earth { get { return resist.earth; } }
-        public int Air { get { return resist.air; } }
-        public int Light { get { return resist.light; } }
-        public int Dark { get { return resist.dark; } }
+        public int physcialResistance;
+        public MagicalElement elementResistance;
+        public int Fire { get { return elementResistance.fire; } }
+        public int Water { get { return elementResistance.water; } }
+        public int Earth { get { return elementResistance.earth; } }
+        public int Air { get { return elementResistance.air; } }
+        public int Light { get { return elementResistance.light; } }
+        public int Dark { get { return elementResistance.dark; } }
 
-        public ElementResistance(MagicalElement me)
+        public Resistance(int pResist,MagicalElement me)
         {
-            resist = me;
+            physcialResistance = pResist;
+            elementResistance = me;
         }
 
-        public ElementResistance(int fire = 0, int water = 0, int earth = 0, int air = 0, int light = 0, int dark = 0)
+        public Resistance(int pResist, int fire = 0, int water = 0, int earth = 0, int air = 0, int light = 0, int dark = 0)
         {
-            resist.fire = fire;
-            resist.water = water;
-            resist.earth = earth;
-            resist.air = air;
-            resist.light = light;
-            resist.dark = dark;
+            physcialResistance = pResist;
+            elementResistance.fire = fire;
+            elementResistance.water = water;
+            elementResistance.earth = earth;
+            elementResistance.air = air;
+            elementResistance.light = light;
+            elementResistance.dark = dark;
         }
 
-        public static ElementResistance operator -(ElementResistance a) => new ElementResistance(-a.resist);
-        public static ElementResistance operator +(ElementResistance a, ElementResistance b) => new ElementResistance(a.resist + b.resist);
-        public static ElementResistance operator -(ElementResistance a, ElementResistance b) => a + (-b);
-        public static ElementResistance operator *(ElementResistance a, float scale) => new ElementResistance(a.resist * scale);
-        public static ElementResistance operator /(ElementResistance a, float scale) => a * (1 / scale);
+        public static Resistance operator -(Resistance a) => new Resistance(-a.physcialResistance, -a.elementResistance);
+        public static Resistance operator +(Resistance a, Resistance b)
+            => new Resistance(a.physcialResistance + b.physcialResistance, a.elementResistance + b.elementResistance);
+        public static Resistance operator -(Resistance a, Resistance b) => a + (-b);
+        public static Resistance operator *(Resistance a, float scale) => new Resistance(-a.physcialResistance, a.elementResistance * scale);
+        public static Resistance operator /(Resistance a, float scale) => a * (1 / scale);
     }
 
     [System.Serializable]
@@ -194,7 +198,8 @@ namespace Wing.RPGSystem
         public int Strength              => Attribute.strength;
         public int Intelligence          => Attribute.intelligence; 
         public int Agility               => Attribute.agility; 
-        public int MoveCost              => Attribute.moveCost; 
+        public int MoveCost              => Attribute.moveCost;
+        public Resistance Resistance     => Attribute.resistance;
 
         public SpriteRenderer EntitySprite => m_spriteRenderer; 
 
