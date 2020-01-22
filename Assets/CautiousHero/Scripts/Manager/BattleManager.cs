@@ -110,7 +110,7 @@ public class BattleManager : MonoBehaviour
             State = BattleState.PlayerMove;
             if (endTurn) {
                 endTurn = false;
-                CompletePlayerTurn();
+                CompleteCharacterTurn();
                 return;
             }
         }            
@@ -168,8 +168,9 @@ public class BattleManager : MonoBehaviour
         StartCoroutine(StartClickCD());
     }
 
-    private void CompletePlayerTurn()
+    private void CompleteCharacterTurn()
     {
+        character.OnTurnEnded();
         ChangeState(BattleState.BotTurn);
         OnTurnSwitched?.Invoke(false);
     }
@@ -521,7 +522,7 @@ public class BattleManager : MonoBehaviour
             endTurn = true;
             return;
         }
-        CompletePlayerTurn();
+        CompleteCharacterTurn();
     }
 
     /// <summary>
