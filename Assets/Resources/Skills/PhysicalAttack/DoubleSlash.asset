@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 47a8051cd7d92b941bb1c646c112d213, type: 3}
   m_Name: DoubleSlash
   m_EditorClassIdentifier: 
-  skillName: Starplosion Healdrop Slash
+  skillName: "\u661F\u7206\u5F03\u7597\u65A9"
   description: 'Double slash can lock enemy''s leeway. '
   sprite: {fileID: -779878946710169077, guid: 95182df2e629f5c4c90c733881fc6d9c, type: 3}
   actionPointsCost: 3
@@ -32,7 +32,7 @@ MonoBehaviour:
   tEffectPatterns: {fileID: 11400000, guid: 6ea384fd33e47c44baaf0ab2bc8eb637, type: 2}
   additionSkills: []
   additionBuffs: []
-  baseValue: 44
+  baseValue: 30
   attributeMag: 1
   attribute: 0
   cost:
