@@ -483,6 +483,15 @@ MonoBehaviour:
     intelligence: 10
     agility: 10
     moveCost: 1
+    resistance:
+      physcialResistance: 0
+      elementResistance:
+        fire: 0
+        water: 0
+        earth: 0
+        air: 0
+        light: 0
+        dark: 0
   WorldDataChangedEvent:
     m_PersistentCalls:
       m_Calls: []
