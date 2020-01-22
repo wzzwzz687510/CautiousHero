@@ -9,21 +9,21 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 969280248f3578240b70f1887e77ab8e, type: 3}
-  m_Name: BasicInvinsible
+  m_Script: {fileID: 11500000, guid: cecc6838dfcec8245835ce7e9cd1403a, type: 3}
+  m_Name: Frozen
   m_EditorClassIdentifier: 
-  buffName: Invincible
-  description: Prevent any damage
-  sprite: {fileID: -5518778271455951048, guid: 95182df2e629f5c4c90c733881fc6d9c, type: 3}
-  type: 4
+  buffName: Frozen
+  description: Character is frozen like an icicle
+  sprite: {fileID: -3556355415693619510, guid: 95182df2e629f5c4c90c733881fc6d9c, type: 3}
+  type: 1
   lastingTurn: 1
-  infinity: 1
+  infinity: 0
   buffEffect:
     effectName: 
     animDuration: 0
-    sound: {fileID: 8300000, guid: 066d44e6386e9fe4492b89203ac3e0e9, type: 3}
+    sound: {fileID: 0}
   trigger: 0
-  triggerTimes: 1
+  triggerTimes: 0
   triggerInfinityTimes: 0
   stackable: 1
   stackTriggerNumber: 0
@@ -39,11 +39,11 @@ MonoBehaviour:
     agility: 0
     moveCost: 0
     resistance:
-      physcialResistance: 0
+      physcialResistance: -100
       elementResistance:
-        fire: 0
-        water: 0
-        earth: 0
+        fire: 100
+        water: -100
+        earth: 100
         air: 0
         light: 0
         dark: 0

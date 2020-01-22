@@ -16,6 +16,8 @@ MonoBehaviour:
   description: 
   sprite: {fileID: 8671817140711672497, guid: 95182df2e629f5c4c90c733881fc6d9c, type: 3}
   type: 0
+  lastingTurn: 1
+  infinity: 1
   buffEffect:
     effectName: 
     animDuration: 0
@@ -23,11 +25,11 @@ MonoBehaviour:
   trigger: 0
   triggerTimes: 0
   triggerInfinityTimes: 0
-  lastTurn: 0
-  infinity: 1
   stackable: 1
   stackTriggerNumber: 4
   isTriggeredOnStacked: 0
+  isAddLastingTurn: 0
+  isAttributeCof: 0
   adjustValue:
     maxHealth: 0
     maxAction: 0
@@ -36,5 +38,15 @@ MonoBehaviour:
     intelligence: 0
     agility: 0
     moveCost: 0
+    resistance:
+      physcialResistance: 0
+      elementResistance:
+        fire: 0
+        water: 0
+        earth: 0
+        air: 0
+        light: 0
+        dark: 0
   additionBuffs:
   - {fileID: 11400000, guid: af9714b8a5b6abd49ab03636f5f73a88, type: 2}
+  impactSkills: []

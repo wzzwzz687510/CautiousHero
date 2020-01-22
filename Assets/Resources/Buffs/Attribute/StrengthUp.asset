@@ -10,24 +10,40 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 303b8ed2dee848447b0af971cc64f319, type: 3}
-  m_Name: Viigorous
+  m_Name: StrengthUp
   m_EditorClassIdentifier: 
-  buffName: Vigorous
-  description: Increase Max AP
-  sprite: {fileID: 3511992679797895301, guid: 95182df2e629f5c4c90c733881fc6d9c, type: 3}
+  buffName: StrengthUp
+  description: Increase strength
+  sprite: {fileID: -5721522318260220260, guid: 95182df2e629f5c4c90c733881fc6d9c, type: 3}
   type: 1
+  lastingTurn: 1
+  infinity: 0
+  buffEffect:
+    effectName: 
+    animDuration: 0
+    sound: {fileID: 0}
   trigger: 0
   triggerTimes: 0
-  lastTurn: 1
-  infinity: 0
-  stackable: 0
+  triggerInfinityTimes: 0
+  stackable: 1
   stackTriggerNumber: 0
   isTriggeredOnStacked: 0
+  isAddLastingTurn: 0
+  isAttributeCof: 0
   adjustValue:
     maxHealth: 0
-    maxAction: 1
+    maxAction: 0
     actionPerTurn: 0
-    strength: 0
+    strength: 1
     intelligence: 0
     agility: 0
     moveCost: 0
+    resistance:
+      physcialResistance: 0
+      elementResistance:
+        fire: 0
+        water: 0
+        earth: 0
+        air: 0
+        light: 0
+        dark: 0

@@ -10,11 +10,11 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 1ac45dc2f52125949bd791a87c1635f2, type: 3}
-  m_Name: GoblinRaider
+  m_Name: GoblinGrunt
   m_EditorClassIdentifier: 
-  creatureName: Goblin Raider
+  creatureName: Goblin Grunt
   description: 
-  sprite: {fileID: 21300000, guid: b58570dbad5e5034fb1190e274fdcf82, type: 3}
+  sprite: {fileID: 21300000, guid: fc6f2d8828a7e2a43ad29a108ebdf741, type: 3}
   attribute:
     maxHealth: 30
     maxAction: 6
@@ -35,5 +35,5 @@ MonoBehaviour:
   skills:
   - {fileID: 11400000, guid: 671f8855a6c5f55439aef7afc9e05bfb, type: 2}
   - {fileID: 11400000, guid: 671f8855a6c5f55439aef7afc9e05bfb, type: 2}
-  - {fileID: 11400000, guid: b4513c3068bcb594195f9a9c1b917da0, type: 2}
+  - {fileID: 11400000, guid: 88c93079b50b2874c8b2a16f2911a193, type: 2}
   buffs: []

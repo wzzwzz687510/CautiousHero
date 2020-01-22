@@ -9,13 +9,15 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 303b8ed2dee848447b0af971cc64f319, type: 3}
-  m_Name: cuiruo
+  m_Script: {fileID: 11500000, guid: 218017a9e61471a4eaf0a86816795051, type: 3}
+  m_Name: Stun
   m_EditorClassIdentifier: 
-  buffName: 
-  description: 
-  sprite: {fileID: 0}
-  type: 0
+  buffName: Stun
+  description: Cannot do anything
+  sprite: {fileID: -9205221584584489300, guid: 95182df2e629f5c4c90c733881fc6d9c, type: 3}
+  type: 2
+  lastingTurn: 1
+  infinity: 0
   buffEffect:
     effectName: 
     animDuration: 0
@@ -23,11 +25,11 @@ MonoBehaviour:
   trigger: 0
   triggerTimes: 0
   triggerInfinityTimes: 0
-  lastTurn: 0
-  infinity: 0
-  stackable: 0
+  stackable: 1
   stackTriggerNumber: 0
-  isTriggeredOnStacked: 0
+  isTriggeredOnStacked: 1
+  isAddLastingTurn: 1
+  isAttributeCof: 0
   adjustValue:
     maxHealth: 0
     maxAction: 0
@@ -45,3 +47,6 @@ MonoBehaviour:
         air: 0
         light: 0
         dark: 0
+  movement: 1
+  castment: 1
+  recoverAP: 1

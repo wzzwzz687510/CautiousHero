@@ -10,28 +10,36 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 47a8051cd7d92b941bb1c646c112d213, type: 3}
-  m_Name: FireExplosion
+  m_Name: Burn
   m_EditorClassIdentifier: 
-  skillName: Fire Explosion
+  skillName: Burn
   description: 
-  sprite: {fileID: -8924638685331413173, guid: 95182df2e629f5c4c90c733881fc6d9c, type: 3}
-  actionPointsCost: 2
+  sprite: {fileID: -542545160671792255, guid: 95182df2e629f5c4c90c733881fc6d9c, type: 3}
+  actionPointsCost: 0
   rarity: 0
   damageType: 1
   skillElement: 1
   castType: 0
   labels: 06000000
   castEffect:
-    effectName: fire
-    animDuration: 1
-    sound: {fileID: 8300000, guid: 47796a84d51db3a49a4d3dab901636a0, type: 3}
+    effectName: 
+    animDuration: 0
+    sound: {fileID: 0}
   tCastPatterns:
     type: 0
-    size: 4
-    emptySize: 2
+    size: 1
+    emptySize: 0
   tEffectPatterns: {fileID: 11400000, guid: 6ea384fd33e47c44baaf0ab2bc8eb637, type: 2}
   additionSkills: []
   additionBuffs: []
-  baseValue: 20
-  attributeCof: 1
+  baseValue: 10
+  attributeMag: 1
   attribute: 1
+  cost:
+    mana:
+      fire: 0
+      water: 0
+      earth: 0
+      air: 0
+      light: 0
+      dark: 0

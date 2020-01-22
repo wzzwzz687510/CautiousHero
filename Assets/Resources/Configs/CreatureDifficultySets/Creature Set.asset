@@ -10,11 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 0}
-  m_Name: BossBattle
+  m_Name: Creature Set
   m_EditorClassIdentifier: Assembly-CSharp:Wing.RPGSystem:CreatureDifficultySet
-  standardSets:
-  - {fileID: 11400000, guid: 59314958f6fc4dd45923fb0306c04e80, type: 2}
-  - {fileID: 11400000, guid: 4e16270d77a4bc24d967941f6df604b0, type: 2}
-  - {fileID: 11400000, guid: 5c81c04cbf66a91408da351d78cb0e7b, type: 2}
-  - {fileID: 11400000, guid: 12c825271080fc644a9a453c0ef03882, type: 2}
+  standardSets: []
   hardSets: []

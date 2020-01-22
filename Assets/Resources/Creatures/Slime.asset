@@ -19,10 +19,21 @@ MonoBehaviour:
     maxHealth: 20
     maxAction: 6
     actionPerTurn: 3
-    strength: 10
-    intelligence: 10
-    agility: 10
+    strength: 0
+    intelligence: 0
+    agility: 0
     moveCost: 1
+    resistance:
+      physcialResistance: 0
+      elementResistance:
+        fire: 0
+        water: 0
+        earth: 0
+        air: 0
+        light: 0
+        dark: 0
   skills:
   - {fileID: 11400000, guid: fa65afbb161c7c644b5a119dec9dcf43, type: 2}
+  - {fileID: 11400000, guid: fa65afbb161c7c644b5a119dec9dcf43, type: 2}
+  - {fileID: 11400000, guid: 95285e0efa3758e4b8b74d706c9bc18f, type: 2}
   buffs: []

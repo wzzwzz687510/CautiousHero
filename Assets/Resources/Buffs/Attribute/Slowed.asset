@@ -9,21 +9,21 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 969280248f3578240b70f1887e77ab8e, type: 3}
-  m_Name: BasicInvinsible
+  m_Script: {fileID: 11500000, guid: 303b8ed2dee848447b0af971cc64f319, type: 3}
+  m_Name: Slowed
   m_EditorClassIdentifier: 
-  buffName: Invincible
-  description: Prevent any damage
-  sprite: {fileID: -5518778271455951048, guid: 95182df2e629f5c4c90c733881fc6d9c, type: 3}
-  type: 4
+  buffName: Slowed
+  description: Reduce movement speed
+  sprite: {fileID: -98085937798270465, guid: 95182df2e629f5c4c90c733881fc6d9c, type: 3}
+  type: 1
   lastingTurn: 1
-  infinity: 1
+  infinity: 0
   buffEffect:
     effectName: 
     animDuration: 0
-    sound: {fileID: 8300000, guid: 066d44e6386e9fe4492b89203ac3e0e9, type: 3}
+    sound: {fileID: 0}
   trigger: 0
-  triggerTimes: 1
+  triggerTimes: 0
   triggerInfinityTimes: 0
   stackable: 1
   stackTriggerNumber: 0
@@ -37,7 +37,7 @@ MonoBehaviour:
     strength: 0
     intelligence: 0
     agility: 0
-    moveCost: 0
+    moveCost: 1
     resistance:
       physcialResistance: 0
       elementResistance:

@@ -9,25 +9,25 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 969280248f3578240b70f1887e77ab8e, type: 3}
-  m_Name: BasicInvinsible
+  m_Script: {fileID: 11500000, guid: b1fbc9ff1ccca434fac2cc4022e7cf42, type: 3}
+  m_Name: Lacerated
   m_EditorClassIdentifier: 
-  buffName: Invincible
-  description: Prevent any damage
-  sprite: {fileID: -5518778271455951048, guid: 95182df2e629f5c4c90c733881fc6d9c, type: 3}
-  type: 4
+  buffName: Lacerated
+  description: 
+  sprite: {fileID: -8611359072864696906, guid: 95182df2e629f5c4c90c733881fc6d9c, type: 3}
+  type: 1
   lastingTurn: 1
-  infinity: 1
+  infinity: 0
   buffEffect:
     effectName: 
     animDuration: 0
-    sound: {fileID: 8300000, guid: 066d44e6386e9fe4492b89203ac3e0e9, type: 3}
-  trigger: 0
-  triggerTimes: 1
-  triggerInfinityTimes: 0
+    sound: {fileID: 0}
+  trigger: 12
+  triggerTimes: 0
+  triggerInfinityTimes: 1
   stackable: 1
   stackTriggerNumber: 0
-  isTriggeredOnStacked: 1
+  isTriggeredOnStacked: 0
   isAddLastingTurn: 1
   isAttributeCof: 0
   adjustValue:
@@ -39,7 +39,7 @@ MonoBehaviour:
     agility: 0
     moveCost: 0
     resistance:
-      physcialResistance: 0
+      physcialResistance: -50
       elementResistance:
         fire: 0
         water: 0
@@ -47,3 +47,6 @@ MonoBehaviour:
         air: 0
         light: 0
         dark: 0
+  additionBuffs: []
+  impactSkills:
+  - {fileID: 11400000, guid: 6b6f8f21f7d77a641bfe9d9b8d8cfaeb, type: 2}

@@ -10,28 +10,38 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 47a8051cd7d92b941bb1c646c112d213, type: 3}
-  m_Name: DoubleSlash
+  m_Name: GoblinSmash
   m_EditorClassIdentifier: 
-  skillName: Star Explosion Give Up Healing Slash
-  description: 'Double slash can lock enemy''s leeway. '
-  sprite: {fileID: -779878946710169077, guid: 95182df2e629f5c4c90c733881fc6d9c, type: 3}
-  actionPointsCost: 4
+  skillName: Goblin Smash
+  description: 
+  sprite: {fileID: 526149882050484390, guid: 95182df2e629f5c4c90c733881fc6d9c, type: 3}
+  actionPointsCost: 2
   rarity: 0
   damageType: 0
   skillElement: 0
   castType: 0
-  labels: 06000000
+  labels: 0600000008000000
   castEffect:
-    effectName: slash
+    effectName: hit
     animDuration: 1
-    sound: {fileID: 8300000, guid: c50eb61221d9d1d44a6b79e2d56c0131, type: 3}
+    sound: {fileID: 8300000, guid: aa411ad8872ea5b49a1a10ebde496b52, type: 3}
   tCastPatterns:
     type: 0
     size: 2
     emptySize: 1
   tEffectPatterns: {fileID: 11400000, guid: 6ea384fd33e47c44baaf0ab2bc8eb637, type: 2}
   additionSkills: []
-  additionBuffs: []
-  baseValue: 44
-  attributeCof: 3
+  additionBuffs:
+  - {fileID: 11400000, guid: 4328078e8ab43574ab4127b90dad5788, type: 2}
+  - {fileID: 11400000, guid: 4328078e8ab43574ab4127b90dad5788, type: 2}
+  baseValue: 20
+  attributeMag: 1
   attribute: 0
+  cost:
+    mana:
+      fire: 0
+      water: 0
+      earth: 0
+      air: 0
+      light: 0
+      dark: 0

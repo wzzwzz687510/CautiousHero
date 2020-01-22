@@ -32,8 +32,16 @@ MonoBehaviour:
   tEffectPatterns: {fileID: 11400000, guid: 35c43e361d112b04b869656d407daef2, type: 2}
   additionSkills: []
   additionBuffs: []
-  baseValue: 12
-  attributeCof: 1
+  baseValue: 16
+  attributeMag: 1
   attribute: 0
+  cost:
+    mana:
+      fire: 0
+      water: 0
+      earth: 0
+      air: 0
+      light: 0
+      dark: 0
   isInstanceMovement: 0
   isMovementFirst: 1

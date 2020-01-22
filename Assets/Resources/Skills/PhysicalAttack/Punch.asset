@@ -10,12 +10,12 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 47a8051cd7d92b941bb1c646c112d213, type: 3}
-  m_Name: DoublePunches
+  m_Name: Punch
   m_EditorClassIdentifier: 
-  skillName: Double Punch
+  skillName: Punch
   description: 
-  sprite: {fileID: -36115053092343016, guid: 95182df2e629f5c4c90c733881fc6d9c, type: 3}
-  actionPointsCost: 2
+  sprite: {fileID: 4460921126383611002, guid: 95182df2e629f5c4c90c733881fc6d9c, type: 3}
+  actionPointsCost: 1
   rarity: 0
   damageType: 0
   skillElement: 0
@@ -32,6 +32,14 @@ MonoBehaviour:
   tEffectPatterns: {fileID: 11400000, guid: 6ea384fd33e47c44baaf0ab2bc8eb637, type: 2}
   additionSkills: []
   additionBuffs: []
-  baseValue: 16
-  attributeCof: 1
+  baseValue: 8
+  attributeMag: 1
   attribute: 0
+  cost:
+    mana:
+      fire: 0
+      water: 0
+      earth: 0
+      air: 0
+      light: 0
+      dark: 0

@@ -10,19 +10,19 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 1ac45dc2f52125949bd791a87c1635f2, type: 3}
-  m_Name: GoblinRaider
+  m_Name: GoblinElite
   m_EditorClassIdentifier: 
-  creatureName: Goblin Raider
+  creatureName: Goblin Elite
   description: 
-  sprite: {fileID: 21300000, guid: b58570dbad5e5034fb1190e274fdcf82, type: 3}
+  sprite: {fileID: 21300000, guid: bc675756204774340a5096b29c9e34a8, type: 3}
   attribute:
-    maxHealth: 30
+    maxHealth: 40
     maxAction: 6
-    actionPerTurn: 4
-    strength: 4
+    actionPerTurn: 3
+    strength: 10
     intelligence: 0
     agility: 0
-    moveCost: 1
+    moveCost: 2
     resistance:
       physcialResistance: 0
       elementResistance:
@@ -33,7 +33,7 @@ MonoBehaviour:
         light: 0
         dark: 0
   skills:
-  - {fileID: 11400000, guid: 671f8855a6c5f55439aef7afc9e05bfb, type: 2}
-  - {fileID: 11400000, guid: 671f8855a6c5f55439aef7afc9e05bfb, type: 2}
-  - {fileID: 11400000, guid: b4513c3068bcb594195f9a9c1b917da0, type: 2}
+  - {fileID: 11400000, guid: d4b1c804aae54dd468237dbb3d585adf, type: 2}
+  - {fileID: 11400000, guid: d4b1c804aae54dd468237dbb3d585adf, type: 2}
+  - {fileID: 11400000, guid: de5d106e649a915438bf0daf07f0732a, type: 2}
   buffs: []

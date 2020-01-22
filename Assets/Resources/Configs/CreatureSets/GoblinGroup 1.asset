@@ -10,9 +10,9 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 81b9d9d5d60b12540b7af384826a4977, type: 3}
-  m_Name: GoblinGroup
+  m_Name: GoblinGroup 1
   m_EditorClassIdentifier: 
-  setName: Goblin Group
+  setName: Goblin Group 1
   description: 
   creatures:
   - tCreature: {fileID: 11400000, guid: dd9383114f035794683d28d14ed88a37, type: 2}
@@ -27,7 +27,7 @@ MonoBehaviour:
     pattern:
       x: 0
       y: -1
-  difficulty: 1
+  difficulty: 3
   coin: 10
   exp: 20
-  loot: {fileID: 0}
+  chest: {fileID: 0}

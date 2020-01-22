@@ -20,6 +20,8 @@ MonoBehaviour:
     - {fileID: 11400000, guid: e2ab5d1574e1bdd419e317c43dc6a30f, type: 2}
     - {fileID: 11400000, guid: fa65afbb161c7c644b5a119dec9dcf43, type: 2}
     - {fileID: 11400000, guid: 394c9b0c5a3201944a815a400f7e5e93, type: 2}
+    - {fileID: 11400000, guid: 1f624a8b8fbc9c14d8d7da57dfd401f0, type: 2}
+    - {fileID: 11400000, guid: 913da03a4a5af8e4a9b2a94697108c23, type: 2}
     lockedSet: []
   squireSet:
     defaultSet: []

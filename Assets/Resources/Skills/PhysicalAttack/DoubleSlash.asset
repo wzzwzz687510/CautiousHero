@@ -9,13 +9,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ec70590e5fc5eea4f9776aa96baa83a4, type: 3}
-  m_Name: FadeSlash
+  m_Script: {fileID: 11500000, guid: 47a8051cd7d92b941bb1c646c112d213, type: 3}
+  m_Name: DoubleSlash
   m_EditorClassIdentifier: 
-  skillName: Fade Slash
-  description: 'Step backward. '
-  sprite: {fileID: -932929182698393805, guid: 95182df2e629f5c4c90c733881fc6d9c, type: 3}
-  actionPointsCost: 2
+  skillName: Starplosion Healdrop Slash
+  description: 'Double slash can lock enemy''s leeway. '
+  sprite: {fileID: -779878946710169077, guid: 95182df2e629f5c4c90c733881fc6d9c, type: 3}
+  actionPointsCost: 3
   rarity: 0
   damageType: 0
   skillElement: 0
@@ -29,11 +29,17 @@ MonoBehaviour:
     type: 0
     size: 2
     emptySize: 1
-  tEffectPatterns: {fileID: 11400000, guid: fb8a15e96e3b9964793967d6999e77cc, type: 2}
+  tEffectPatterns: {fileID: 11400000, guid: 6ea384fd33e47c44baaf0ab2bc8eb637, type: 2}
   additionSkills: []
   additionBuffs: []
-  baseValue: 12
-  attributeCof: 1
+  baseValue: 44
+  attributeMag: 1
   attribute: 0
-  isInstanceMovement: 0
-  isMovementFirst: 0
+  cost:
+    mana:
+      fire: 0
+      water: 0
+      earth: 0
+      air: 0
+      light: 0
+      dark: 0
