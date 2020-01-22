@@ -157,6 +157,7 @@ namespace Wing.RPGSystem
 
         private IEnumerator CastGivenLabelSkill(Label label)
         {
+            var newCastableSkills = new List<CastableSkill>();
             foreach (var skill in castableSkills) {
                 CreatureController bot = Creatures[skill.creatureID];
                 if (bot.NextSkill.labels.Contains(label)) {
@@ -168,10 +169,13 @@ namespace Wing.RPGSystem
                     SetNextSkillTarget(skill.creatureID);
                     if (player.IsDeath) break;
                     AnimationManager.Instance.AddAnimClip(new OutlineEntityAnimClip(bot.Hash, Color.black));
-                    castableSkills.Remove(skill);
                     yield return null;
                 }
+                else {
+                    newCastableSkills.Add(skill);
+                }
             }
+            castableSkills = newCastableSkills;
         }
 
         private void SetNextSkillTarget(int creatureID)
