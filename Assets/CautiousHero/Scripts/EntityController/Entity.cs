@@ -242,13 +242,16 @@ namespace Wing.RPGSystem
         public virtual void OnTurnStarted()
         {
             OnTurnStartedEvent?.Invoke();
-            EntityBuffManager.UpdateBuffs();
+            //EntityBuffManager.UpdateBuffs();
             CancelArmour();
-            ImpactActionPoints(ActionPointsPerTurn,false);
+            if (EntityBuffManager.APRecoverable) {
+                ImpactActionPoints(ActionPointsPerTurn, false);
+            }               
         }
 
         public virtual void OnTurnEnded()
         {
+            EntityBuffManager.UpdateBuffs();
             OnTurnEndedEvent?.Invoke();
         }
 
@@ -320,6 +323,7 @@ namespace Wing.RPGSystem
 
         public virtual bool CastSkill(int skillID, Location castLoc)
         {
+            if (!EntityBuffManager.Castable) return false;
             BaseSkill tSkill = SkillHashes[skillID].GetBaseSkill();
             if (ActionPoints < tSkill.actionPointsCost)
                 return false;
