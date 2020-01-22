@@ -31,7 +31,7 @@ namespace Wing.RPGSystem
             unlockedRaces = new List<int>() { defaultRace.Hash };
             unlockedClasses = new List<int>() { defaultClass.Hash };
             unlockedSkills = new List<int>() { defaultClass.skillSet[0].Hash,
-                    defaultClass.skillSet[1].Hash , defaultClass.skillSet[2].Hash };
+                    defaultClass.skillSet[1].Hash , defaultRace.skill.Hash };
             unlockedBuffs = new List<int>() { defaultRace.relic.Hash, defaultRace.relic.Hash };
             unlockedCreatures = new List<int>();
             unlockedEquipments = new List<int>();

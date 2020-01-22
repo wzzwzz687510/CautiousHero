@@ -103,6 +103,13 @@ namespace Wing.RPGSystem
             Database.Instance.SetNewGame();
             AudioManager.Instance.PlayTitleClip();
             titleUIController.ResetUI();
+            titleUIController.gameObject.SetActive(true);
+        }
+
+        public void BackToTitle()
+        {
+            titleUIController.ResetUI();
+            titleUIController.gameObject.SetActive(true);
         }
 
         public void ContinueGame()

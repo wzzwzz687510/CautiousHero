@@ -35,8 +35,7 @@ namespace Wing.RPGSystem
         public InfoBoard infoBoard;        
         public IconSlot[] skillElements;
 
-        [Header("Pages")]
-        public GameObject titlePage;
+        [Header("Pages")]        
         public GameObject loadingPage;
         public GameObject infoPage;
         public GameObject endPage;
@@ -137,7 +136,6 @@ namespace Wing.RPGSystem
         public void Button_CompleteAWorld()
         {
             endPage.SetActive(false);
-            titlePage.SetActive(true);
             WorldMapManager.Instance.CompleteWorld();
         }
 
@@ -176,7 +174,7 @@ namespace Wing.RPGSystem
                 infoPage.SetActive(false);
                 
                 AudioManager.Instance.PlayTitleClip();
-                titlePage.SetActive(true);
+                WorldMapManager.Instance.BackToTitle();
             });
             infoText.text = "Progress is automatically saved.";
             infoPage.SetActive(true);

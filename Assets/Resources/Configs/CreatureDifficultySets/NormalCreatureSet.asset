@@ -9,9 +9,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 0}
-  m_Name: EasyBattle
-  m_EditorClassIdentifier: Assembly-CSharp:Wing.RPGSystem:CreatureDifficultySet
+  m_Script: {fileID: 11500000, guid: 7b71e93676b2bd84e97f8291729c1d32, type: 3}
+  m_Name: NormalCreatureSet
+  m_EditorClassIdentifier: 
   standardSets:
   - {fileID: 11400000, guid: 3b4fc481a31096f458a05006fd6b3df5, type: 2}
   - {fileID: 11400000, guid: 6facda352bb839a4192a3d8885cfa40b, type: 2}

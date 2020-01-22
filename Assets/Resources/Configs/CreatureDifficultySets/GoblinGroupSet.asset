@@ -9,9 +9,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 0}
-  m_Name: BossBattle
-  m_EditorClassIdentifier: Assembly-CSharp:Wing.RPGSystem:CreatureDifficultySet
+  m_Script: {fileID: 11500000, guid: 7b71e93676b2bd84e97f8291729c1d32, type: 3}
+  m_Name: GoblinGroupSet
+  m_EditorClassIdentifier: 
   standardSets:
   - {fileID: 11400000, guid: 59314958f6fc4dd45923fb0306c04e80, type: 2}
   - {fileID: 11400000, guid: 4e16270d77a4bc24d967941f6df604b0, type: 2}
