@@ -26,6 +26,7 @@ namespace Wing.RPGSystem
                 extraValue = caster.Intelligence;
             else if (attribute == AdditiveAttribute.Strength)
                 extraValue = caster.Strength;
+            extraValue = Mathf.Max(0, extraValue);
 
             return (baseValue + attributeMag * extraValue) * caster.EntityBuffManager.GetDamageAdjustment();
         }
