@@ -13,8 +13,8 @@ MonoBehaviour:
   m_Name: EasyBattle
   m_EditorClassIdentifier: Assembly-CSharp:Wing.RPGSystem:CreatureDifficultySet
   standardSets:
+  - {fileID: 11400000, guid: 3b4fc481a31096f458a05006fd6b3df5, type: 2}
   - {fileID: 11400000, guid: 6facda352bb839a4192a3d8885cfa40b, type: 2}
   - {fileID: 11400000, guid: 2d7585f0e7ff70e4b91af0960e9903fa, type: 2}
   - {fileID: 11400000, guid: f8221e3ccf00cc64ea78a93ce74f4295, type: 2}
-  - {fileID: 11400000, guid: 3b4fc481a31096f458a05006fd6b3df5, type: 2}
   hardSets: []

@@ -15,9 +15,9 @@ MonoBehaviour:
   configName: Goblin Camp
   description: 
   type: 4
-  sprite: {fileID: 21300000, guid: 4a40a5d6062d3994eb89546484780c26, type: 3}
+  sprite: {fileID: 21300000, guid: ef14886e0a930b54ab5a29ec3d7b60b9, type: 3}
   subAreaSets: {fileID: 11400000, guid: cfb9e97098179094a86b9361ffda8ae7, type: 2}
   tileSet: {fileID: 11400000, guid: f6afb31ccaf00d54babc8f09f37c5e97, type: 2}
-  creatureSets: {fileID: 11400000, guid: a23611fda1999d14f940ea155fb4069e, type: 2}
+  creatureSets: {fileID: 11400000, guid: 56f8373c4c0d6b348a18a317fd20ba35, type: 2}
   abioticSets: []
   bgm: {fileID: 8300000, guid: f0d35aece0694d44ab69d380244c4c8c, type: 3}

@@ -19,8 +19,8 @@ MonoBehaviour:
     stageLength: 3
     creatureNumber: 0
     treatureNumber: 0
-    mainConfig: {fileID: 11400000, guid: 0929893825cee84468c6ff250e1dcba5, type: 2}
-    bossConfig: {fileID: 11400000, guid: 54adc8f72ff71cf448ff347f3dcf9a30, type: 2}
+    mainConfig: {fileID: 11400000, guid: 637aa3023f231ed49a846dd8202c7a16, type: 2}
+    bossConfig: {fileID: 11400000, guid: 043f5b144ccd9df449fee21ae46e8aaf, type: 2}
     mainAreaNumber: 3
     specialConfigs: []
   randomPool: {fileID: 11400000, guid: 12859766857ad1247bd5147b7d99b154, type: 2}

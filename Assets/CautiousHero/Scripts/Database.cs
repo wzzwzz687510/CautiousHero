@@ -131,7 +131,7 @@ namespace Wing.RPGSystem
 
         private IEnumerator LoadScene()
         {
-            AsyncOperation ao = SceneManager.LoadSceneAsync("Main");
+            AsyncOperation ao = SceneManager.LoadSceneAsync("Game");
             while (!ao.isDone) {
                 yield return null;
             }
