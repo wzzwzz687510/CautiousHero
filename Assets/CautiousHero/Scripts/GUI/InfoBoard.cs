@@ -20,8 +20,16 @@ namespace Wing.RPGSystem
         public Image header;
         public Toggle[] apcostImgs;
 
+        [Header("Entity Elements")]
+        public GameObject entityInfo;
+        public Text entityHP;
+        public Text entityPAP;
+        public Text entityMAP;
+
         public void UpdateToSkillBoard(int skillHash)
         {
+            entityInfo.SetActive(false);
+
             BaseSkill skill = skillHash.GetBaseSkill();
             title.text = skill.skillName;
             Color c = colors[(int)skill.skillElement];
@@ -55,6 +63,7 @@ namespace Wing.RPGSystem
 
         public void UpdateToBuffBoard(int buffHash)
         {
+            entityInfo.SetActive(false);
             for (int i = 0; i < apcostImgs.Length; i++) {
                 apcostImgs[i].gameObject.SetActive(false);
             }
@@ -69,6 +78,7 @@ namespace Wing.RPGSystem
 
         public void UpdateToRelicBoard(int relicHash)
         {
+            entityInfo.SetActive(false);
             for (int i = 0; i < apcostImgs.Length; i++) {
                 apcostImgs[i].gameObject.SetActive(false);
             }
@@ -79,6 +89,25 @@ namespace Wing.RPGSystem
             header.color = Color.yellow;
 
             m_rectT.sizeDelta = baseRect + new Vector2(0, (description.text.Length / charLengthPerRow + 1) * hightPerRow);
+        }
+
+        public void UpdateToEntityBoard(int entityHash)
+        {
+            entityInfo.SetActive(true);
+
+            Entity entity = entityHash.GetEntity();
+            title.text = entity.EntityName;
+            description.text = "";
+            header.color = Color.red;
+
+            for (int i = 0; i < apcostImgs.Length; i++) {
+                apcostImgs[i].gameObject.SetActive(i < entity.ActionPointsPerTurn);
+            }
+
+            entityHP.text = entity.HealthPoints + "/" + entity.MaxHealthPoints;
+            entityPAP.text = entity.PhysicalArmourPoints.ToString();
+            entityMAP.text = entity.MagicalArmourPoints.ToString();
+            m_rectT.sizeDelta = new Vector2(500, 170);
         }
     }
 }

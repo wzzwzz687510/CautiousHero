@@ -67,15 +67,7 @@ public class AreaUIController : MonoBehaviour
     public IconSlot[] skillLearningSlots; 
 
     [Header("Creature Board")]
-    public Transform creatureBoard;
-    public Image creatureSprite;
-    public Text creatureName;
-    public Text creatureLv;
-    public Text creatureHP;
-    public Text creatureAP;
-    public Text creatureResistance;
-    public Text creatureElement;
-    private int selectCreatureID = -1;
+    private int selectCreatureHash = 0;
     private bool isCreatureBoardDisplayed;
 
     public bool IsDisplayInfoAnim { get; private set; }
@@ -92,8 +84,8 @@ public class AreaUIController : MonoBehaviour
                     else DisplayBuffBoard();
                     isInfoBoardDisplayed = true;
                 }
-                else if (selectCreatureID != -1) {
-                    ShowCreatureBoard();
+                else if (selectCreatureHash != 0) {
+                    DisplayCreatureBoard();
                     isCreatureBoardDisplayed = true;
                 }
             }
@@ -194,6 +186,30 @@ public class AreaUIController : MonoBehaviour
         isInfoBoardDisplayed = false;
         selectSlot = -1;
         infoBoard.transform.position = new Vector3(Screen.width + 260, 0, 0);
+    }
+
+    public void OnCreatureBoardEvent(int hash, bool isExit)
+    {
+        if (selectCreatureHash == hash && !isExit)
+            return;
+        selectCreatureHash = hash;
+        startTimer = !isExit;
+        if (!isExit && timer > waitDuration) {
+            DisplayCreatureBoard();
+        }
+        else if (isExit) {
+            isCreatureBoardDisplayed = false;
+            infoBoard.transform.position = new Vector3(Screen.width + 260, 0, 0);
+        }
+    }
+
+    private void DisplayCreatureBoard()
+    {
+        if (!skillLearningPage.activeSelf) {
+            float xOffset = Input.mousePosition.x > Screen.width - 330 ? -320 : 320;
+            infoBoard.transform.position = Input.mousePosition + new Vector3(xOffset, 0, 0);
+            infoBoard.UpdateToEntityBoard(selectCreatureHash);
+        }
     }
 
     private void DisplayBuffBoard()
@@ -449,72 +465,6 @@ public class AreaUIController : MonoBehaviour
         image_blackBG.DOFade(0.7f, 0.5f);
         image_die.DOFade(1, 2);
         image_blackBG.raycastTarget = true;
-    }
-
-    public void OnCreatureBoardEvent(int hash, bool isExit)
-    {
-        if (selectCreatureID == hash && !isExit)
-            return;
-        selectCreatureID = hash;
-        startTimer = !isExit;
-        if (!isExit && timer > waitDuration) {
-            ShowCreatureBoard();
-        }
-        else if (isExit) {            
-            isCreatureBoardDisplayed = false;
-            creatureBoard.position = new Vector3(-300, 0, 0);
-        }
-    }
-
-    public void ShowCreatureBoard()
-    {
-        if (EntityManager.Instance.TryGetEntity(selectCreatureID, out Entity entity)) {
-            var cc = (entity as CreatureController).Template;
-            creatureSprite.sprite = cc.sprite;
-            creatureName.text = cc.creatureName;
-            if (entity.Intelligence <= character.Intelligence) {
-                creatureHP.text = cc.attribute.maxHealth.ToString();
-                creatureAP.text = cc.attribute.actionPerTurn.ToString();
-                if(cc.skills.Length==0)
-                    creatureResistance.text = "None";
-                else
-                switch (cc.skills[0].skillElement) {
-                    case ElementType.None:
-                        creatureResistance.text = "None";
-                        break;
-                    case ElementType.Fire:
-                        creatureResistance.text = "Fire";
-                        break;
-                    case ElementType.Water:
-                        creatureResistance.text = "Water";
-                        break;
-                    case ElementType.Earth:
-                        creatureResistance.text = "Earth";
-                        break;
-                    case ElementType.Air:
-                        creatureResistance.text = "Air";
-                        break;
-                    case ElementType.Light:
-                        creatureResistance.text = "Light";
-                        break;
-                    case ElementType.Dark:
-                        creatureResistance.text = "Dark";
-                        break;
-                    default:
-                        break;
-                }
-                creatureElement.text = creatureResistance.text;
-            }
-            else {
-                creatureLv.text = "?";
-                creatureHP.text = "?";
-                creatureAP.text = "?";
-                creatureResistance.text = "?";
-                creatureElement.text = "?";
-            }
-
-            creatureBoard.position = new Vector3(Screen.width - 310, Screen.height - 130, 0);
-        }
     }
 
     public void ShowSkillLearningPage(bool isActive)
