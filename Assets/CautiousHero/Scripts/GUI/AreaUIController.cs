@@ -326,7 +326,7 @@ public class AreaUIController : MonoBehaviour
         arrowAnim.SetActive(steps != 0);
         for (int i = 0; i < character.ActionPoints; i++) {
             aps[i].Play("apStatic");
-            if (i >= character.ActionPoints - steps) aps[i].Play("apBlink");
+            if (i >= character.ActionPoints - steps * character.MoveCost) aps[i].Play("apBlink");
         }
 
         for (int i = 0; i < steps; i++) {
