@@ -8,6 +8,7 @@ namespace Wing.RPGSystem
     public class AdditionTriggerBuff : BaseBuff
     {
         public BaseBuff[] additionBuffs;
+        public BaseSkill[] impactSkills;
 
         public override void ApplyEffect(BuffHandler bh)
         {
@@ -16,6 +17,10 @@ namespace Wing.RPGSystem
 
             foreach (var buff in additionBuffs) {
                 entity.EntityBuffManager.AddBuff(new BuffHandler(bh.CasterHash, bh.TargetHash, buff.Hash));
+            }
+
+            foreach (var skill in impactSkills) {
+                skill.ApplyEffect(bh.CasterHash, entity.Loc, entity.Loc, false);
             }
         }
     }

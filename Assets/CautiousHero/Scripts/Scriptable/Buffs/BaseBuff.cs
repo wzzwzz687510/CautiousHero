@@ -9,6 +9,7 @@ namespace Wing.RPGSystem
     {
         Default,
         Attribute,
+        Control,
         DamageAdjustment,
         Defense,
         ArrowReturn,
@@ -47,19 +48,21 @@ namespace Wing.RPGSystem
         public string description;
         public Sprite sprite;
         public BuffType type;
+        public int lastingTurn = 1;
+        public bool infinity;
         public VisualEffect buffEffect;
 
         [Header("Trigger Parameters")]
         public BuffTrigger trigger;
         public int triggerTimes;
         public bool triggerInfinityTimes;
-        public int lastTurn;
-        public bool infinity;
 
         [Header("Stack Parameters")]        
         public bool stackable;
         public int stackTriggerNumber;
         public bool isTriggeredOnStacked;
+        public bool isAddLastingTurn;
+        public bool isAttributeCof;
 
         public EntityAttribute adjustValue;
         public int Hash => buffName.GetStableHashCode();
@@ -80,6 +83,7 @@ namespace Wing.RPGSystem
 
         public virtual void OnStacked(BuffHandler bh)
         {
+            if (isAddLastingTurn) bh.ImpactLastingTurn(1);
             if (bh.StackCount >= stackTriggerNumber || isTriggeredOnStacked) ApplyEffect(bh);
         }
 

@@ -7,10 +7,10 @@ namespace Wing.RPGSystem
     [CreateAssetMenu(fileName = "Buff", menuName = "Wing/Scriptable Buffs/ImpactBuff", order = 23)]
     public class ImpactBuff : BaseBuff
     {
-        public int hp;
-        public int pap;
-        public int map;
-        public int ap;
+        public int hP;
+        public int pAP;
+        public int mAP;
+        public int aP;
         public float damageCof;
         public float coinCof;
         public float expCof;
@@ -18,10 +18,10 @@ namespace Wing.RPGSystem
         public override void ApplyEffect(BuffHandler bh)
         {
             Entity target = bh.TargetHash.GetEntity();
-            target.ImpactHP(hp, hp<0);
-            target.ImpactArmour(pap, true, pap < 0);
-            target.ImpactArmour(map, false, map < 0);
-            target.ImpactActionPoints(ap, ap < 0);
+            target.ImpactHP(hP, hP<0);
+            target.ImpactArmour(pAP, true, pAP < 0);
+            target.ImpactArmour(mAP, false, mAP < 0);
+            target.ImpactActionPoints(aP, aP < 0);
 
         }
     }

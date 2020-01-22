@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System.Linq;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
@@ -16,7 +17,7 @@ namespace Wing.RPGSystem
         public bool Infinity => Template.infinity; 
         public bool Stackable => Template.stackable; 
 
-        public int LastTurn { get; private set; }
+        public int LastingTurn { get; private set; }
         public int TriggerTime { get; private set; }
         public int StackCount { get; private set; }
 
@@ -35,10 +36,15 @@ namespace Wing.RPGSystem
         //    ConnectEvent(false);
         //}
 
+        public void ImpactLastingTurn(int number)
+        {
+            LastingTurn += number;
+        }
+
         public void ResetBuff(int casterHash)
         {
             CasterHash = casterHash;
-            LastTurn = Template.lastTurn;
+            LastingTurn = Template.lastingTurn;
             TriggerTime = Template.triggerTimes;
             StackCount = 1;
         }
@@ -54,7 +60,7 @@ namespace Wing.RPGSystem
         /// <returns>True for last to next turn</returns>
         public bool UpdateBuff()
         {
-            if (Infinity || (TriggerTime > 0 && --LastTurn > 0))
+            if (Infinity || (TriggerTime > 0 && --LastingTurn > 0))
                 return true;
 
             // Clear event registration.
@@ -191,6 +197,10 @@ namespace Wing.RPGSystem
 
         public List<int> RemoveBuffHashes { get; private set; }
 
+        public bool Movable => CheckMovable();
+        public bool Castable => CheckCastable();
+        public bool APRecoverable => CheckAPRecoverable();
+
         public delegate void OnBuffChanged(int buffID, bool isAdd);
         public OnBuffChanged OnBuffChangedEvent;
 
@@ -255,7 +265,6 @@ namespace Wing.RPGSystem
                     }
                 }
                 foreach (var hash in removeHashes) {
-                    Debug.Log(1);
                     RemoveBuff(hash);
                 }
                 removeHashes.Clear();
@@ -276,7 +285,8 @@ namespace Wing.RPGSystem
             EntityAttribute tmp = new EntityAttribute();
             if (buffTypeDic.ContainsKey(BuffType.Attribute))
                 foreach (var buffHandler in buffTypeDic[BuffType.Attribute].Values) {
-                    tmp += buffHandler.Template.adjustValue * buffHandler.StackCount;
+                    tmp += buffHandler.Template.adjustValue * 
+                        (buffHandler.Template.isAttributeCof ? buffHandler.StackCount : 1);
                 }
 
             return tmp;
@@ -287,7 +297,7 @@ namespace Wing.RPGSystem
             float cof = 1.0f;
             if (buffTypeDic.ContainsKey(BuffType.DamageAdjustment))
                 foreach (var bh in buffTypeDic[BuffType.DamageAdjustment].Values) {
-                    cof += (bh.Template as ValueBasedBuff).cof;
+                    cof += (bh.Template as ValueBasedBuff).cofAdjustment;
                 }
             return cof;
         }
@@ -308,5 +318,34 @@ namespace Wing.RPGSystem
         }
 
         public BuffHandler GetBuffHandler(int buffhash) => buffTypeDic[buffhash.GetBaseBuff().type][buffhash];
+
+        private bool CheckMovable() {
+            if (!buffTypeDic.ContainsKey(BuffType.Control)) return true;
+
+            foreach (var bh in buffTypeDic[BuffType.Control].Values) {
+                if ((bh.Template as ControlBuff).movement) return false;
+            }
+            return true;
+        }
+
+        private bool CheckCastable()
+        {
+            if (!buffTypeDic.ContainsKey(BuffType.Control)) return true;
+
+            foreach (var bh in buffTypeDic[BuffType.Control].Values) {
+                if ((bh.Template as ControlBuff).castment) return false;
+            }
+            return true;
+        }
+
+        private bool CheckAPRecoverable()
+        {
+            if (!buffTypeDic.ContainsKey(BuffType.Control)) return true;
+
+            foreach (var bh in buffTypeDic[BuffType.Control].Values) {
+                if ((bh.Template as ControlBuff).recoverAP) return false;
+            }
+            return true;
+        }
     }
 }

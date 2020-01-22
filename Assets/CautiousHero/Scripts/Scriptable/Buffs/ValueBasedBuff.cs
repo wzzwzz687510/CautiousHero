@@ -8,7 +8,7 @@ namespace Wing.RPGSystem
     public class ValueBasedBuff : BaseBuff
     {
         public int baseValue;
-        public float cof;
+        public float cofAdjustment;
 
         public ValueBasedBuff() : base(BuffType.DamageAdjustment, false, false) { }
     }

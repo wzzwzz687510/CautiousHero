@@ -213,6 +213,7 @@ namespace Wing.RPGSystem
                     break;
             }
         }
+
         /// <summary>
         /// Return effect location
         /// </summary>
