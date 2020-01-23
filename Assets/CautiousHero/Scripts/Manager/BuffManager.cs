@@ -243,7 +243,7 @@ namespace Wing.RPGSystem
                 else {
                     buffTypeDic[buffType].Add(buffhash, bh);
                     BuffHashes.Add(buffhash);
-                    OnBuffChangedEvent?.Invoke(BuffHashes.Count-1,true);
+                    OnBuffChangedEvent?.Invoke(BuffHashes.Count - 1, true);
                 }
             }
             else {

@@ -215,6 +215,7 @@ public class AreaUIController : MonoBehaviour
     private void DisplayBuffBoard()
     {
         if (!skillLearningPage.activeSelf) {
+            //Debug.Log("select: " + selectSlot+", size: "+buffSlots.Count);
             infoBoard.transform.position = buffSlots[selectSlot].transform.position + new Vector3(272, 0, 0);
             infoBoard.UpdateToBuffBoard(character.EntityBuffManager.BuffHashes[selectSlot]);
         }
@@ -286,6 +287,7 @@ public class AreaUIController : MonoBehaviour
                 buffSlots[i].UpdateSlotID(buffID);
             }
             Destroy(buffSlotHolder.GetChild(buffID).gameObject);
+            buffSlots.RemoveAt(buffID);
         }
     }
 

@@ -101,12 +101,22 @@ namespace Wing.RPGSystem
 
         [Header("Addon")]
         public BaseSkill[] additionSkills;
+        public BaseSkill[] additionSelfSkills;
         public BaseBuff[] additionBuffs;
+        public BaseSkill[] additionSelfBuffs;
 
         public virtual void ApplyEffect(int casterHash,Location casterLoc, Location selecLoc, bool anim)
         {
+            foreach (var skill in additionSelfSkills) {
+                skill.ApplyEffect(casterHash, casterLoc, casterLoc, anim);
+            }
+
+            foreach (var buff in additionSelfBuffs) {
+                casterHash.GetEntity().EntityBuffManager.AddBuff(new BuffHandler(casterHash, casterHash, buff.Hash));
+            }
+
             foreach (var skill in additionSkills) {
-                skill.ApplyEffect(casterHash,casterLoc, selecLoc,anim);
+                skill.ApplyEffect(casterHash, casterLoc, selecLoc, anim);
             }
 
             TileController tc = selecLoc.GetTileController();

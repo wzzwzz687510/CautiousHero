@@ -110,6 +110,7 @@ namespace Wing.RPGSystem
             SelectSlot = -1;
             m_playerData = new PlayerData[3];
             if (!reset) LoadAll();
+            else PlayerPrefs.DeleteAll();
         }
 
         private void Update()
@@ -196,16 +197,17 @@ namespace Wing.RPGSystem
                     LoadData(filePath, ref m_playerData[i]);
                 if (SelectSlot == -1 && m_playerData[i].name != null) SelectSlot = i;
             }
-            if(m_playerData[SelectSlot].name == null) {
+            if (SelectSlot == -1) {
+                PlayerPrefs.SetInt(selectSlotKey, -1);
+                return;
+            }
+            if (m_playerData[SelectSlot].name == null) {
                 SelectSlot = -1;
                 for (int i = 0; i < 3; i++) {
                     if(m_playerData[i].name != null) SelectSlot = i;
                 }
             }
-            if (SelectSlot == -1) {
-                PlayerPrefs.SetInt(selectSlotKey, -1);
-                return;
-            }
+
             if (ActivePlayerData.isNewGame) {
                 Debug.Log("Game Loaded");
                 return;

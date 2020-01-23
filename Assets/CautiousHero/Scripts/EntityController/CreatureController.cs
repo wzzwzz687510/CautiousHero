@@ -63,7 +63,8 @@ namespace Wing.RPGSystem {
         public override bool CastSkill(int skillID, Location castLoc)
         {
             bool res = base.CastSkill(skillID, castLoc);
-            NextCastSkillID = NextCastSkillID == SkillHashes.Count - 1 ? 0 : NextCastSkillID++;
+            NextCastSkillID = NextCastSkillID == SkillHashes.Count - 1 ? 0 : NextCastSkillID + 1;
+            //Debug.Log("id: " + NextCastSkillID + ", name: " + NextSkill.skillName);
             return res;
         }
 
