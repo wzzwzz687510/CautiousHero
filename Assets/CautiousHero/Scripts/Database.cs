@@ -206,6 +206,10 @@ namespace Wing.RPGSystem
                 for (int i = 0; i < 3; i++) {
                     if(m_playerData[i].name != null) SelectSlot = i;
                 }
+                if (SelectSlot == -1) {
+                    PlayerPrefs.SetInt(selectSlotKey, -1);
+                    return;
+                }
             }
 
             if (ActivePlayerData.isNewGame) {
