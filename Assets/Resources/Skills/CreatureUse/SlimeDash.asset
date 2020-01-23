@@ -20,7 +20,7 @@ MonoBehaviour:
   damageType: 0
   skillElement: 0
   castType: 0
-  labels: 
+  labels: 06000000
   castEffect:
     effectName: hit
     animDuration: 1
@@ -31,8 +31,10 @@ MonoBehaviour:
     emptySize: 1
   tEffectPatterns: {fileID: 11400000, guid: 6ea384fd33e47c44baaf0ab2bc8eb637, type: 2}
   additionSkills: []
+  additionSelfSkills: []
   additionBuffs:
   - {fileID: 11400000, guid: 1b05d44847a0522418e5048444c6292d, type: 2}
+  additionSelfBuffs: []
   baseValue: 20
   attributeMag: 1
   attribute: 0
