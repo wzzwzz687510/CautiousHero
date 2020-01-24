@@ -29,6 +29,7 @@ namespace Wing.RPGSystem
         private Location currentLoc;
         private Location highlightArea;
         private bool hasHighlighted;
+        private float timer;
 
         private Dictionary<Location, PreAreaInfo> preDic;
         private List<Location> stageAreaLocs;
@@ -102,18 +103,19 @@ namespace Wing.RPGSystem
         {
             Database.Instance.SetNewGame();
             AudioManager.Instance.PlayTitleClip();
-            titleUIController.ResetUI();
-            titleUIController.gameObject.SetActive(true);
+            BackToTitle();
         }
 
         public void BackToTitle()
         {
+            Database.Instance.SetPlaytime(Time.time - timer);
             titleUIController.ResetUI();
             titleUIController.gameObject.SetActive(true);
         }
 
         public void ContinueGame()
         {
+            timer = Time.time;
             AudioManager.Instance.PlayPeacefulClip();
             m_worldUIController.UpdateUI();
             m_worldUIController.SwitchToWorldView();

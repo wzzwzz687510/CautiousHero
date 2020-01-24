@@ -375,6 +375,11 @@ namespace Wing.RPGSystem
             SavePlayerData();
         }
 
+        public void SetPlaytime(float time)
+        {
+            m_playerData[SelectSlot].totalPlayTime += time;
+        }
+
         public void SetCharacterData(int hp,EntityAttribute attribute)
         {
             m_activeWorldData.HealthPoints = hp;
