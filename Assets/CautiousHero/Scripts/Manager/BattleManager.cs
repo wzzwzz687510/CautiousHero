@@ -25,7 +25,6 @@ public class BattleManager : MonoBehaviour
     [Header("Test")]
     //public BaseSkill[] skills;
     //public BattleConfig config;
-    public GameObject win;
     public float clickCDDuration = 0.1f;
 
     [Header("Component References")]
