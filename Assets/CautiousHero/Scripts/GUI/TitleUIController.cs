@@ -124,11 +124,11 @@ namespace Wing.RPGSystem
 
         public void Button_NewSave()
         {
-            if (nameInputField.text != null) {
+            if (nameInputField.text != null && nameInputField.text != "") {
                 Database.Instance.CreateNewPlayer(nameInputField.text);
-                saveName.text = nameInputField.text;                
+                saveName.text = nameInputField.text;
                 ResetUI();
-            }          
+            }      
         }
 
         public void Button_DisplaySaveSlot()
