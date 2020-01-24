@@ -152,18 +152,19 @@ public class BattleManager : MonoBehaviour
 
     private void ApplyCast()
     {
+        Location loc = currentSelected[0];
         bool effectiveCast = false;
-        foreach (var tile in currentSelected) {
-            if (tile.TryGetStayEntity(out Entity entity) && entity != null) {
+        BaseSkill skill = character.SkillHashes[selectedSkillID].GetBaseSkill();        
+        foreach (var ep in skill.GetFixedEffectPatterns(loc-character.Loc)) {
+            if ((loc + ep).TryGetStayEntity(out Entity entity) && entity != null) {
                 effectiveCast = true;
                 break;
-            }              
+            }
         }
         if (!effectiveCast) return;
-        Location loc = currentSelected[0];
-        int skillID = selectedSkillID;
+
         ChangeState(BattleState.PlayerAnim);
-        character.CastSkill(skillID, loc);
+        character.CastSkill(selectedSkillID, loc);
         StartCoroutine(StartClickCD());
     }
 
