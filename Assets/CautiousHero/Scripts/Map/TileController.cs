@@ -50,7 +50,7 @@ namespace Wing.RPGSystem
             mana = template.mana;
             isObstacle = template.type == TileType.Obstacle;
             isExplored = false;
-            isEmpty = !isObstacle;
+            isEmpty = true;
             stayEntityHash = 0;
         }
 
@@ -94,6 +94,8 @@ namespace Wing.RPGSystem
         public int StayEntityHash { get { return Info.stayEntityHash; } }
         public Entity StayEntity { get { return StayEntityHash.GetEntity(); } }
         public bool IsEmpty { get { return Info.isEmpty; } }
+        public bool IsObstacle { get { return Info.isObstacle; } }
+        public bool IsBlocked { get { return Info.IsBlocked; } }
         public bool IsBind { get; private set; }
         public bool HasImpacts => Info.tTileHash.GetTTile().HasImpacts;
 

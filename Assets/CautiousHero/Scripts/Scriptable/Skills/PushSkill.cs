@@ -16,7 +16,7 @@ namespace Wing.RPGSystem
             foreach (var el in GetSubEffectZone(casterLoc, cp)) {
                 for (int i = 0; i < backSteps; i++) {
                     Location targetLoc = el + cp * (backSteps - i);
-                    if (targetLoc.IsEmpty()) {
+                    if (targetLoc.IsUnblocked()) {
                         Entity target = el.GetTileController().StayEntity;
                         target.MoveToTile(targetLoc,0);
                         if (i != 0) {

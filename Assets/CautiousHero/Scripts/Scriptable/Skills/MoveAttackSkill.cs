@@ -14,7 +14,7 @@ namespace Wing.RPGSystem
         {
             if(!isMovementFirst) base.ApplyEffect(casterHash,casterLoc, selecLoc, true);
             Entity caster = casterHash.GetEntity();
-            if (selecLoc.IsEmpty()) {
+            if (selecLoc.IsUnblocked()) {
                 caster.MoveToTile(selecLoc, 0, isInstanceMovement);
                 if (BattleManager.Instance.IsPlayerTurn)
                     AnimationManager.Instance.PlayOnce();

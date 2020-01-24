@@ -125,9 +125,9 @@ public class GridManager : MonoBehaviour
         changedTies.Clear();
     }
 
-    public bool IsEmptyLocation(Location id)
+    public bool IsUnblockedLocation(Location id)
     {
-        return TileDic.ContainsKey(id) && TileDic[id].IsEmpty;
+        return TileDic.ContainsKey(id) && !TileDic[id].IsBlocked;
     }
 
     public bool ChangeTileState(Location id, TileState state)
@@ -308,7 +308,7 @@ public class GridManager : MonoBehaviour
     public bool TryGetTileOutsideZone(Entity self,HashSet<Location> zone,out TileController safeTile)
     {
         foreach (var reachableLoc in Nav.GetGivenDistancePoints(self.Loc, self.ActionPoints/self.MoveCost)) {
-            if (!zone.Contains(reachableLoc) && IsEmptyLocation(reachableLoc)) {
+            if (!zone.Contains(reachableLoc) && IsUnblockedLocation(reachableLoc)) {
                 safeTile = TileDic[reachableLoc];
                 return true;
             }
@@ -321,7 +321,7 @@ public class GridManager : MonoBehaviour
     public IEnumerable<Location> TryGetLocationOutsideZone(Entity self, Entity caster, HashSet<Location> zone)
     {
         foreach (var reachableLoc in Nav.GetGivenDistancePoints(self.Loc, self.ActionPoints / self.MoveCost)) {
-            if (!zone.Contains(reachableLoc) && IsEmptyLocation(reachableLoc)) {
+            if (!zone.Contains(reachableLoc) && IsUnblockedLocation(reachableLoc)) {
                 yield return reachableLoc;
             }
         }

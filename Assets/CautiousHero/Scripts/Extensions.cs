@@ -61,7 +61,7 @@ namespace Wing.RPGSystem
 
         public static bool IsValid(this Location location) => GridManager.Instance.TileDic.ContainsKey(location);
 
-        public static bool IsEmpty(this Location location) => GridManager.Instance.IsEmptyLocation(location);
+        public static bool IsUnblocked(this Location location) => GridManager.Instance.IsUnblockedLocation(location);
 
         public static bool TryGetTileController(this Location location, out TileController tc) 
             => GridManager.Instance.TileDic.TryGetValue(location, out tc);

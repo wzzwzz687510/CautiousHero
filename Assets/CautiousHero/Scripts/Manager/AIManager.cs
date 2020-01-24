@@ -138,7 +138,7 @@ namespace Wing.RPGSystem
                         foreach (var cp in bot.NextSkill.CastPattern) {
                             foreach (var ep in bot.NextSkill.EffectPattern) {
                                 Location destination = bot.NextSkillTarget.Loc - cp - ep.loc;
-                                if (destination.IsEmpty()) {
+                                if (destination.IsUnblocked()) {
                                     destination = bot.Loc.GetLocationWithGivenStep(destination, sparePoints);
                                     //Debug.Log("creature id: " + Creatures.IndexOf(bot) + "destination loc: " + destination.ToString() + ", spare points: " + sparePoints);
                                     AnimationManager.Instance.AddAnimClip(new OutlineEntityAnimClip(bot.Hash, Color.red));
@@ -220,7 +220,7 @@ namespace Wing.RPGSystem
                     foreach (var cp in bot.NextSkill.CastPattern) {
                         foreach (var ep in bot.NextSkill.EffectPattern) {
                             Location destination = bot.NextSkillTarget.Loc - ep.loc - cp;
-                            if (destination.IsEmpty() && !destinations.Contains(destination)) {
+                            if (destination.IsUnblocked() && !destinations.Contains(destination)) {
                                 Location tmp = bot.Loc.GetLocationWithGivenStep(destination, moveSteps);
                                 if (tmp == destination) {
                                     castableSkills.Add(new CastableSkill(creatureID, new CastSkillAction(destination, destination + cp)));
