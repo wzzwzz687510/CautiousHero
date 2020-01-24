@@ -50,7 +50,7 @@ namespace Wing.RPGSystem
             mana = template.mana;
             isObstacle = template.type == TileType.Obstacle;
             isExplored = false;
-            isEmpty = true;
+            isEmpty = !isObstacle;
             stayEntityHash = 0;
         }
 
