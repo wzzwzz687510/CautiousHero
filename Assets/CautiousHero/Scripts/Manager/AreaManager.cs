@@ -4,6 +4,8 @@ using UnityEngine;
 using Cinemachine;
 using UnityEngine.EventSystems;
 using DG.Tweening;
+using Priority_Queue;
+using System.Linq;
 
 namespace Wing.RPGSystem
 {
@@ -16,7 +18,7 @@ namespace Wing.RPGSystem
 
         [Header("Test")]
         public BaseSkill[] skills;
-        public int enemyViewDistance = 3;
+        public int enemyViewDistance = 5;
         public int playerViewDistance = 5;
 
         [Header("Components")]
@@ -39,6 +41,7 @@ namespace Wing.RPGSystem
         public AreaInfo TempData { get; private set; }
         public bool MoveCheck { get; private set; }
         public Dictionary<Location, List<int>> RemainedCreatures { get; private set; } // key - spawn point, value - creature set
+        public Dictionary<Location, HashSet<Location>> AlertZone { get; private set; }
         public List<Location> InBatlleCreatureSets { get; private set; }
         public int[] RandomedSkillHashes { get; private set; }
 
@@ -152,22 +155,25 @@ namespace Wing.RPGSystem
         private Location BattleCheck(Location loc)
         {
             foreach (var spawnLoc in RemainedCreatures.Keys) {
+                var orderedHashes = new SimplePriorityQueue<int>();
                 foreach (var creatureHash in RemainedCreatures[spawnLoc]) {
                     Entity creature = creatureHash.GetEntity();
-                    int distance = loc.Distance(creature.Loc);
+                    int distance = character.Loc.Distance(creature.Loc);
                     creature.SetVisual(distance <= playerViewDistance);
-                    int delta = enemyViewDistance - distance;
-                    // TODO: improve trigger condition
-                    if (delta < 0 || loc == creature.Loc) continue;
-                    Location stopLoc = delta > 0 ?
-                        character.Loc.GetLocationWithGivenStep(loc, character.Loc.Distance(loc) - delta) : loc;
-                    character.MoveToLocation(stopLoc, false, false);
-                    foreach (var hash in RemainedCreatures[spawnLoc]) hash.GetEntity().SetVisual(true);
-                    BattleManager.Instance.NewBattle(RemainedCreatures[spawnLoc]);
-                    RemainedCreatures.Remove(spawnLoc);
-                    InBatlleCreatureSets.Add(spawnLoc);
-                    MoveCheck = false;
-                    return stopLoc;
+                    orderedHashes.Enqueue(creatureHash, distance);                 
+                }
+
+                Location des = character.Loc.HasPath(loc) ? loc : loc.GetNearestUnblockedLocation(character.Loc);
+                foreach (var step in character.Loc.GetPath(des)) {
+                    if (AlertZone[spawnLoc].Contains(step)) {                        
+                        character.MoveToLocation(step, false, false);
+                        foreach (var hash in RemainedCreatures[spawnLoc]) hash.GetEntity().SetVisual(true);
+                        BattleManager.Instance.NewBattle(RemainedCreatures[spawnLoc]);
+                        RemainedCreatures.Remove(spawnLoc);
+                        InBatlleCreatureSets.Add(spawnLoc);
+                        MoveCheck = false;
+                        return step;
+                    }
                 }
             }
             character.MoveToLocation(loc, false, false);
@@ -190,6 +196,12 @@ namespace Wing.RPGSystem
                     creatureHashes.Add(cc.Hash);
                 }
                 RemainedCreatures.Add(spawnLoc, creatureHashes);
+
+                var alertZone = new HashSet<Location>();
+                foreach (var loc in spawnLoc.GetGivenDistancePoints(enemyViewDistance)) {
+                    alertZone.Add(loc);
+                }
+                AlertZone.Add(spawnLoc, alertZone);
             }
 
             if(RemainedCreatures.Count == 0 && TempData.GetAreaInfoType() == AreaType.Boss) {
@@ -250,6 +262,7 @@ namespace Wing.RPGSystem
 
             // Reset lists and dictionaries
             RemainedCreatures = new Dictionary<Location, List<int>>();
+            AlertZone = new Dictionary<Location, HashSet<Location>>();
             InBatlleCreatureSets = new List<Location>();
             EntityManager.Instance.ResetEntityDicionary();
 

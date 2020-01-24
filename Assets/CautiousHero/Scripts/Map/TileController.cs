@@ -105,7 +105,9 @@ namespace Wing.RPGSystem
         public void Init(Location location)
         {
             Loc = location;
-            m_bSpriteRenderer.sortingOrder = Loc.x + Loc.y * 32 - 32 * 32;            
+            m_bSpriteRenderer.sortingOrder = Loc.x + Loc.y * 32 - 32 * 32;
+            //m_bSpriteRenderer.color = new Color(1, 1, 1, 0);
+            //m_fSpriteRenderer.color = new Color(1, 1, 1, 0);
         }
 
         public void UpdateSprite()
@@ -156,7 +158,12 @@ namespace Wing.RPGSystem
             if (!IsEmpty) {
                 StayEntity.ChangeOutlineColor(c);
             }
+        }
 
+        public void SetVisiable()
+        {
+            m_bSpriteRenderer.color = Color.white;
+            m_fSpriteRenderer.color = Color.white;
         }
 
         public void EntityPassBy(Entity entity)

@@ -103,7 +103,7 @@ public class GridManager : MonoBehaviour
                 heuristic = Mathf.Abs(x) + Mathf.Abs(y);
                 if (heuristic <= viewDistance) {
                     Location tmp = new Location(loc.x + x, loc.y + y);
-                    if(TileDic.ContainsKey(tmp)) AddExploredTile(tmp);                    
+                    if(TileDic.ContainsKey(tmp)) AddExploredTile(tmp);                
                 }
             }
         }

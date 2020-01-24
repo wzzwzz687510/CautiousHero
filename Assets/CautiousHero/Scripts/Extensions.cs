@@ -63,6 +63,19 @@ namespace Wing.RPGSystem
 
         public static bool IsUnblocked(this Location location) => GridManager.Instance.IsUnblockedLocation(location);
 
+        public static Location GetNearestUnblockedLocation(this Location to,Location from)
+        {
+            Location loc = to;
+            if (from.x != to.x) {
+                loc = to.x - from.x > 0 ? loc + Location.Left : loc + Location.Right;
+            }
+            if (from.y != to.y) {
+                loc = to.y - from.y > 0 ? loc + Location.Down : loc + Location.Up;
+            }
+
+            return loc.IsUnblocked() ? loc : loc.GetNearestUnblockedLocation(from);
+        }
+
         public static bool TryGetTileController(this Location location, out TileController tc) 
             => GridManager.Instance.TileDic.TryGetValue(location, out tc);
 
@@ -83,6 +96,8 @@ namespace Wing.RPGSystem
             => Math.Abs(location.x - loc.x) + Math.Abs(location.y - loc.y);
 
         public static bool HasPath(this Location from, Location to) => GridManager.Instance.Nav.HasPath(from, to);
+
+        public static Location[] GetPath(this Location from, Location to) => GridManager.Instance.Nav.GetPath(from, to).ToArray();
 
         public static IEnumerable<Location> GetGivenDistancePoints(this Location target, int step, bool includeInside = true)
             => GridManager.Instance.Nav.GetGivenDistancePoints(target, step, includeInside);
