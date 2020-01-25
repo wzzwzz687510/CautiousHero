@@ -105,6 +105,13 @@ namespace Wing.RPGSystem
             SaveStatus();
         }
 
+        public override void ImpactAttribute(EntityAttribute value)
+        {
+            base.ImpactAttribute(value);
+            Database.Instance.SetCharacterData(m_attribute);
+            Database.Instance.SetCharacterData(HealthPoints + value.maxHealth);
+        }
+
         public override bool CastSkill(int skillID, Location castLoc)
         {
             bool res = base.CastSkill(skillID, castLoc);

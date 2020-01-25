@@ -28,6 +28,8 @@ namespace Wing.RPGSystem
         public Text raceText;
         public Text raceDesText;
         public Text classText;
+        public Image raceFace;
+        public Animator actorAnim;
         public InfoBoard infoBoard;
         public GameObject talentCover;
         public GameObject classCover;
@@ -215,17 +217,22 @@ namespace Wing.RPGSystem
 
             if (selectRaceID < Database.Instance.ActivePlayerData.unlockedRaces.Count) {
                 TRace tRace = Database.Instance.ActivePlayerData.unlockedRaces[selectRaceID].GetTRace();
-                TClass tClass = Database.Instance.ActivePlayerData.unlockedClasses[selectClassID].GetTClass();
                 raceText.text = tRace.name;
                 raceDesText.text = tRace.description;
+                raceFace.sprite = tRace.face;
+                actorAnim.Play(tRace.name);
+                raceFace.color = Color.white;
+                actorAnim.gameObject.SetActive(true);
                 talentSlots[0].icon.sprite = tRace.relic.sprite;
-                talentSlots[1].icon.sprite = tClass.relic.sprite;
+                skillSlots[2].icon.sprite = tRace.skill.sprite;
                 talentCover.SetActive(false);
             }
             else {
                 raceText.text = "LOCKED";
                 raceDesText.text = "...";
                 talentCover.SetActive(true);
+                raceFace.color = Color.black;
+                actorAnim.gameObject.SetActive(false);
             }
         }
 
@@ -236,13 +243,11 @@ namespace Wing.RPGSystem
             else if (selectClassID >= TClass.Dict.Count) selectClassID = 0;
 
             if (selectClassID < Database.Instance.ActivePlayerData.unlockedClasses.Count) {
-                TRace tRace = Database.Instance.ActivePlayerData.unlockedRaces[selectRaceID].GetTRace();
                 TClass tClass = Database.Instance.ActivePlayerData.unlockedClasses[selectClassID].GetTClass();
-                classText.text = tClass.name;              
+                classText.text = tClass.name;
+                talentSlots[1].icon.sprite = tClass.relic.sprite;
                 skillSlots[0].icon.sprite = tClass.skillSet[0].sprite;
                 skillSlots[1].icon.sprite = tClass.skillSet[1].sprite;
-                skillSlots[2].icon.sprite = tRace.skill.sprite;
-
                 classCover.SetActive(false);
             }
             else {

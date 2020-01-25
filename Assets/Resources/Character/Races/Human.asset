@@ -17,7 +17,8 @@ MonoBehaviour:
     and terrorize, then to settle. Yet there was an energy,  a love of adventure,
     that sang from every page. Long into the  night Liriel read, lighting candle after
     precious candle.
-  relic: {fileID: 11400000, guid: d7d79f33724698e4f9c7b819269366de, type: 2}
+  face: {fileID: 993848701852529411, guid: c7165e6290f2f564a9d8d7f024925d95, type: 3}
+  relic: {fileID: 11400000, guid: 7e41ddb1a8a7410459bf9726d355a1b0, type: 2}
   skill: {fileID: 11400000, guid: 50128fe247e5bd24abb6ceeb6045caee, type: 2}
   attribute:
     maxHealth: 90
@@ -27,3 +28,12 @@ MonoBehaviour:
     intelligence: 0
     agility: 0
     moveCost: 1
+    resistance:
+      physcialResistance: 0
+      elementResistance:
+        fire: 0
+        water: 0
+        earth: 0
+        air: 0
+        light: 0
+        dark: 0

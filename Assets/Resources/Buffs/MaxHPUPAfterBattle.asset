@@ -1,0 +1,52 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b1fbc9ff1ccca434fac2cc4022e7cf42, type: 3}
+  m_Name: MaxHPUPAfterBattle
+  m_EditorClassIdentifier: 
+  buffName: Motivation
+  description: Increase 1 Max HP after battle
+  sprite: {fileID: 1156149144172314982, guid: 95182df2e629f5c4c90c733881fc6d9c, type: 3}
+  type: 0
+  lastingTurn: 1
+  infinity: 1
+  buffEffect:
+    effectName: 
+    animDuration: 0
+    sound: {fileID: 0}
+  trigger: 13
+  triggerTimes: 1
+  triggerInfinityTimes: 0
+  stackable: 0
+  stackTriggerNumber: 0
+  isTriggeredOnStacked: 0
+  isAddLastingTurn: 0
+  isAttributeCof: 0
+  adjustValue:
+    maxHealth: 0
+    maxAction: 0
+    actionPerTurn: 0
+    strength: 0
+    intelligence: 0
+    agility: 0
+    moveCost: 0
+    resistance:
+      physcialResistance: 0
+      elementResistance:
+        fire: 0
+        water: 0
+        earth: 0
+        air: 0
+        light: 0
+        dark: 0
+  additionBuffs: []
+  impactSkills:
+  - {fileID: 11400000, guid: 1382424b7a8c7e14891b6998fb275ae2, type: 2}

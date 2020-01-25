@@ -23,5 +23,15 @@ MonoBehaviour:
     intelligence: 0
     agility: 0
     moveCost: 0
-  buffs: []
+    resistance:
+      physcialResistance: 0
+      elementResistance:
+        fire: 0
+        water: 0
+        earth: 0
+        air: 0
+        light: 0
+        dark: 0
+  buffs:
+  - {fileID: 11400000, guid: 1829abafe691a984b9b9817b17b18ff0, type: 2}
   rarity: 0

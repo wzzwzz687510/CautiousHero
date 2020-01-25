@@ -388,6 +388,11 @@ namespace Wing.RPGSystem
             }          
         }
 
+        public virtual void ImpactAttribute(EntityAttribute value)
+        {
+            m_attribute += value;
+        }
+
         public virtual void ImpactActionPoints(int value, bool reduce)
         {
             if(!IsCostAP) {

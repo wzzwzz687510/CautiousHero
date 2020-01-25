@@ -116,7 +116,6 @@ public class BattleManager : MonoBehaviour
         else if (State == BattleState.BotTurn) {
             CompleteBotTurn();
         }
-
     }
 
     private void ChangeState(BattleState state)
@@ -463,11 +462,12 @@ public class BattleManager : MonoBehaviour
 
     private void BattleVictory()
     {
+        ChangeState(BattleState.FreeMove);
+        BattleEndEvent?.Invoke();
         AnimationManager.Instance.Clear();
         m_battleUIController.DisplayInfo("Victory");
         AudioManager.Instance.PlayVictoryClip();     
-        
-        ChangeState(BattleState.FreeMove);
+                
         AreaManager.Instance.CompleteBattle();
         Debug.Log("You win");
 

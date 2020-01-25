@@ -222,7 +222,7 @@ namespace Wing.RPGSystem
         private void SaveData()
         {
             ClearEntity(character.Loc);
-            Database.Instance.SetCharacterData(character.HealthPoints, character.Attribute);
+            Database.Instance.SetCharacterData(character.HealthPoints);
             AreaInfo.SaveToDatabase(ChunkIndex, TempData);
             Database.Instance.SaveWorldData();
         }

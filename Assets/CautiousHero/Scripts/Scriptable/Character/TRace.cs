@@ -10,6 +10,7 @@ namespace Wing.RPGSystem
     {
         public string raceName;
         public string description;
+        public Sprite face;
         public BaseRelic relic;
         public BaseSkill skill;
         public EntityAttribute attribute;
