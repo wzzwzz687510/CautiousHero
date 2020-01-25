@@ -101,6 +101,8 @@ namespace Wing.RPGSystem
 
         public void CompleteWorld()
         {
+            Database.Instance.UnlockClass(Database.Instance.completeClass.Hash);
+            Database.Instance.UnlockRace(Database.Instance.completeRace.Hash);
             Database.Instance.SetNewGame();
             AudioManager.Instance.PlayTitleClip();
             BackToTitle();
@@ -222,6 +224,7 @@ namespace Wing.RPGSystem
         {
             // TODO: Add score statistics to unlock content and for player review
             Database.Instance.SetNewGame();
+
             m_worldUIController.DisplayEndPage();
         }
 

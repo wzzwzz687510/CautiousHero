@@ -12,6 +12,8 @@ namespace Wing.RPGSystem
         public float ssAnimDuration = 0.2f;
         public int defaultSkillCount = 5;
 
+        public Animator m_animator;
+
         public List<int> SkillDeck { get; private set; }
         public List<int> SkillDiscardPile { get; private set; }
 

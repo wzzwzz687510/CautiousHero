@@ -76,6 +76,7 @@ MonoBehaviour:
       m_Calls: []
   ssAnimDuration: 0.2
   defaultSkillCount: 5
+  m_animator: {fileID: 1841661921016734695}
 --- !u!1 &3097053191406357699
 GameObject:
   m_ObjectHideFlags: 0
@@ -145,7 +146,7 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 442063065
-  m_SortingLayer: 3
+  m_SortingLayer: 4
   m_SortingOrder: 1
   m_Sprite: {fileID: -5558489723163504840, guid: da1c89952dd75ed43a6573eee451d1d2,
     type: 3}

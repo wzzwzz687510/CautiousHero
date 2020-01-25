@@ -16,8 +16,8 @@ namespace Wing.RPGSystem
         [Header("View")]
         public Image worldViewBG;
         public RawImage worldView;
-        public PlayerController worldPlayer;
-        public PlayerController areaPlayer;
+        public PlayerController worldCharacter;
+        public PlayerController areaCharacter;
         public float switchTime = 0.3f;
 
         [Header("UI Elements")]
@@ -27,6 +27,7 @@ namespace Wing.RPGSystem
         public Text hpText;
         public Text coinText;
         public Text expText;
+        public Image characterFace;
 
         [Header("Skill Book Elements")]
         //public GameObject infoPrefab;
@@ -78,6 +79,10 @@ namespace Wing.RPGSystem
                     skillElements[i].gameObject.SetActive(false);
                 }
             }
+            TRace race = ActiveWorldData.selectRaceID.GetTRaceFromID();
+            worldCharacter.m_animator.Play(race.raceName);
+            areaCharacter.m_animator.Play(race.raceName);
+            characterFace.sprite = race.face;
         }
 
         public void UpdateHP(int hp, int maxHP, float duration)

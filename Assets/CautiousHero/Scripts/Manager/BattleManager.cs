@@ -128,7 +128,7 @@ public class BattleManager : MonoBehaviour
         character.SetActiveCollider(true);
         character.EntitySprite.color = Color.white;
         if (tmpVisualPlayer)
-            tmpVisualPlayer.gameObject.SetActive(false);
+            tmpVisualPlayer.color = new Color(1, 1, 1, 0);
     }
 
     private void CompletePlacement()
@@ -344,13 +344,14 @@ public class BattleManager : MonoBehaviour
         if (!tmpVisualPlayer) {
             tmpVisualPlayer = Instantiate(character.EntitySprite.gameObject, character.transform.position,
                 Quaternion.identity).GetComponent<SpriteRenderer>();
+            tmpVisualPlayer.GetComponent<Animator>().Play(Database.Instance.ActiveWorldData.selectRaceID.GetTRaceFromID().raceName);
 
             tmpVisualPlayer.GetComponent<SpriteRenderer>().sortingOrder = character.Loc.x + character.Loc.y * 8 + 1;
         }
         else {
             tmpVisualPlayer.transform.position = des;
             tmpVisualPlayer.sortingOrder = sortingOrder;
-            tmpVisualPlayer.gameObject.SetActive(true);
+            tmpVisualPlayer.color = Color.white;
         }
         
     }

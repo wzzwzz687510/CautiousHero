@@ -18,7 +18,7 @@ namespace Wing.RPGSystem
         public bool Stackable => Template.stackable; 
 
         public int LastingTurn { get; private set; }
-        public int TriggerTime { get; private set; }
+        public int TriggerTimes { get; private set; }
         public int StackCount { get; private set; }
 
         public BuffHandler(int casterHash, int targetHash, int buffhash)
@@ -45,7 +45,7 @@ namespace Wing.RPGSystem
         {
             CasterHash = casterHash;
             LastingTurn = Template.lastingTurn;
-            TriggerTime = Template.triggerTimes;
+            TriggerTimes = Template.triggerTimes;
             StackCount = 1;
         }
 
@@ -60,7 +60,7 @@ namespace Wing.RPGSystem
         /// <returns>True for last to next turn</returns>
         public bool UpdateBuff()
         {
-            if (Infinity || (TriggerTime > 0 && --LastingTurn > 0))
+            if (Infinity || (TriggerTimes > 0 && --LastingTurn > 0))
                 return true;
 
             // Clear event registration.
@@ -181,8 +181,8 @@ namespace Wing.RPGSystem
         {
             Template.ApplyEffect(this);
             if (!Template.triggerInfinityTimes) {
-                TriggerTime--;
-                if (TriggerTime <= 0) AnimationManager.Instance.AddAnimClip(new BuffRemovementAnimClip(TargetHash, BuffHash));
+                TriggerTimes--;
+                if (TriggerTimes <= 0) AnimationManager.Instance.AddAnimClip(new BuffRemovementAnimClip(TargetHash, BuffHash));
                 return;
             }            
         }

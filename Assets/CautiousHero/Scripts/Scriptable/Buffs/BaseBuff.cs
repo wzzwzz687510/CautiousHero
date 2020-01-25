@@ -54,7 +54,7 @@ namespace Wing.RPGSystem
 
         [Header("Trigger Parameters")]
         public BuffTrigger trigger;
-        public int triggerTimes;
+        public int triggerTimes = 1;
         public bool triggerInfinityTimes;
 
         [Header("Stack Parameters")]        
@@ -83,7 +83,10 @@ namespace Wing.RPGSystem
 
         public virtual void OnStacked(BuffHandler bh)
         {
-            if (isAddLastingTurn) bh.ImpactLastingTurn(1);
+            if (isAddLastingTurn) {
+                Entity entity = bh.TargetHash.GetEntity();
+                entity.EntityBuffManager.buffTypeDic[bh.Template.type][bh.BuffHash].ImpactLastingTurn(1);
+            }
             if (bh.StackCount >= stackTriggerNumber || isTriggeredOnStacked) ApplyEffect(bh);
         }
 

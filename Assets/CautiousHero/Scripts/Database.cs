@@ -84,6 +84,8 @@ namespace Wing.RPGSystem
         public bool reset;
         public TRace defaultRace;
         public TClass defaultClass;
+        public TRace completeRace;
+        public TClass completeClass;
         public WorldConfig defaultWorldConfig;
         public EntityAttribute attribute;
 
@@ -378,6 +380,18 @@ namespace Wing.RPGSystem
         public void SetPlaytime(float time)
         {
             m_playerData[SelectSlot].totalPlayTime += time;
+        }
+
+        public void UnlockClass(int hash)
+        {
+            if (!m_playerData[SelectSlot].unlockedClasses.Contains(hash))
+                m_playerData[SelectSlot].unlockedClasses.Add(hash);
+        }
+
+        public void UnlockRace(int hash)
+        {
+            if (!m_playerData[SelectSlot].unlockedRaces.Contains(hash))
+                m_playerData[SelectSlot].unlockedRaces.Add(hash);
         }
 
         public void SetCharacterData(int hp)

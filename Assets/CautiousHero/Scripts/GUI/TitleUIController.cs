@@ -154,6 +154,8 @@ namespace Wing.RPGSystem
 
         public void Button_StartNewGame()
         {
+            if (selectClassID >= Database.Instance.ActivePlayerData.unlockedClasses.Count ||
+                selectRaceID >= Database.Instance.ActivePlayerData.unlockedRaces.Count) return;
             startPage.SetActive(true);
             createPage.SetActive(false);
             gameObject.SetActive(false);

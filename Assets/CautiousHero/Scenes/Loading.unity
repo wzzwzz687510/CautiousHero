@@ -412,6 +412,8 @@ MonoBehaviour:
   reset: 0
   defaultRace: {fileID: 11400000, guid: a14db9ec504cb634f9e22a8c3dc60b36, type: 2}
   defaultClass: {fileID: 11400000, guid: acfbdc84818a1624992c3f527e0bfa54, type: 2}
+  completeRace: {fileID: 11400000, guid: 1f79486e663c88544ae21bdb06d2c2a2, type: 2}
+  completeClass: {fileID: 11400000, guid: 37ca5669c73b163408a1a6a3642effd1, type: 2}
   defaultWorldConfig: {fileID: 11400000, guid: 7f0317c635b0e8a46acd9748a2b0bdf5, type: 2}
   attribute:
     maxHealth: 100
