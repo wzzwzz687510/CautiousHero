@@ -23,7 +23,7 @@ MonoBehaviour:
     animDuration: 0
     sound: {fileID: 0}
   trigger: 1
-  triggerTimes: 0
+  triggerTimes: 1
   triggerInfinityTimes: 1
   stackable: 0
   stackTriggerNumber: 0

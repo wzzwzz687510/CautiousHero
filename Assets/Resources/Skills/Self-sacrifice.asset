@@ -34,6 +34,7 @@ MonoBehaviour:
   additionSelfSkills: []
   additionBuffs:
   - {fileID: 11400000, guid: 4328078e8ab43574ab4127b90dad5788, type: 2}
+  - {fileID: 11400000, guid: 4328078e8ab43574ab4127b90dad5788, type: 2}
   additionSelfBuffs: []
   healthPoints: 0
   physicalArmourPoints: 0

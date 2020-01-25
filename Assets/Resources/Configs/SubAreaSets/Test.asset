@@ -14,9 +14,17 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   cornerAreas:
   - {fileID: 11400000, guid: 26c6628cdcfc6d449b501d9556481509, type: 2}
+  - {fileID: 11400000, guid: 38f160912787d934e93bf6a572aec0cf, type: 2}
+  - {fileID: 11400000, guid: 3d762518319f57645bde35ee856cb1c3, type: 2}
   vEdgeAreas:
   - {fileID: 11400000, guid: 58b26c765eded0848a57370551fe6534, type: 2}
+  - {fileID: 11400000, guid: 5e83c6181ae3d0e459d37cbe67334e4b, type: 2}
+  - {fileID: 11400000, guid: f4cd25a7d1960594d812399491aa5548, type: 2}
   hEdgeAreas:
   - {fileID: 11400000, guid: 8c55c959b8ede704c8ca0f3aaf3a622c, type: 2}
+  - {fileID: 11400000, guid: 86720c254c08a5b40aa603f101e7691b, type: 2}
+  - {fileID: 11400000, guid: 4df3f59bfe12eaf41845ccd03b97df2b, type: 2}
   centreAreas:
   - {fileID: 11400000, guid: 587e7dfb30027b84b9def27019567f51, type: 2}
+  - {fileID: 11400000, guid: e6d47af78e6577b4781986252cf3f6ed, type: 2}
+  - {fileID: 11400000, guid: c2825f35a3477844fa8c67c3754d5fc2, type: 2}

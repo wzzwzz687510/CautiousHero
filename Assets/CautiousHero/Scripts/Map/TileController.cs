@@ -78,7 +78,6 @@ namespace Wing.RPGSystem
         public SpriteRenderer m_bSpriteRenderer;
         public SpriteRenderer m_fSpriteRenderer;
         public SpriteRenderer m_cover;
-        public Animator m_animator;
         public Transform m_archor;
 
         [Header("Colours")]
@@ -114,12 +113,6 @@ namespace Wing.RPGSystem
         {
             m_bSpriteRenderer.sprite = Info.tTileHash.GetTTile().bSprite;
             m_fSpriteRenderer.sprite = Info.tTileHash.GetTTile().fSprite;
-        }
-
-        IEnumerator PlayAnimation(float delayTime)
-        {
-            yield return new WaitForSeconds(delayTime);
-            m_animator.Play("tile_fall");
         }
 
         public void ChangeTileState(TileState state)

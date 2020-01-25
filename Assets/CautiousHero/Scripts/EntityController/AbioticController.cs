@@ -33,16 +33,8 @@ namespace Wing.RPGSystem
         {
             transform.GetChild(0).localPosition = new Vector3(0, 0.15f, 0);
             EntitySprite.DOFade(0, 0);
-            StartCoroutine(WaitDisplay());
         }
 
-        IEnumerator WaitDisplay()
-        {            
-            while (!Loc.GetTileController().m_animator.GetCurrentAnimatorStateInfo(0).IsName("tile_fall")) {
-                yield return null;
-            }
-            EntitySprite.DOFade(1, 0);
-        }
     }
 }
 
