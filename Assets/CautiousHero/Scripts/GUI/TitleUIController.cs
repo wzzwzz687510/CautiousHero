@@ -76,17 +76,28 @@ namespace Wing.RPGSystem
 
         private void DisplaySkillInfoBoard(int slotID)
         {
-            TRace tRace = Database.Instance.ActivePlayerData.unlockedRaces[selectRaceID].GetTRace();
-            TClass tClass = Database.Instance.ActivePlayerData.unlockedClasses[selectClassID].GetTClass();
-            infoBoard.UpdateToSkillBoard(slotID == 2 ? tRace.skill.Hash : tClass.skillSet[slotID].Hash);
+            if (slotID == 2) {
+                TRace tRace = Database.Instance.ActivePlayerData.unlockedRaces[selectRaceID].GetTRace();
+                infoBoard.UpdateToSkillBoard(tRace.skill.Hash);
+            }
+            else if(selectClassID < Database.Instance.ActivePlayerData.unlockedClasses.Count) {
+                TClass tClass = Database.Instance.ActivePlayerData.unlockedClasses[selectClassID].GetTClass();
+                infoBoard.UpdateToSkillBoard(tClass.skillSet[slotID].Hash);
+            }
+
             infoBoard.transform.position = skillSlots[slotID].transform.position + new Vector3(0, infoBoardOffsetY, 0);
         }
 
         private void DisplayTalentInfoBoard(int slotID)
         {
-            TRace tRace = Database.Instance.ActivePlayerData.unlockedRaces[selectRaceID].GetTRace();
-            TClass tClass = Database.Instance.ActivePlayerData.unlockedClasses[selectClassID].GetTClass();
-            infoBoard.UpdateToRelicBoard(slotID == 0 ? tRace.relic.Hash : tClass.relic.Hash);
+            if (slotID == 0) {
+                TRace tRace = Database.Instance.ActivePlayerData.unlockedRaces[selectRaceID].GetTRace();
+                infoBoard.UpdateToRelicBoard(tRace.relic.Hash);
+            }else if(selectClassID < Database.Instance.ActivePlayerData.unlockedClasses.Count) {
+                TClass tClass = Database.Instance.ActivePlayerData.unlockedClasses[selectClassID].GetTClass();
+                infoBoard.UpdateToRelicBoard(tClass.relic.Hash);
+            }
+          
             infoBoard.transform.position = talentSlots[slotID].transform.position + new Vector3(0, infoBoardOffsetY, 0);
         }
 
