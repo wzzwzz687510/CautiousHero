@@ -16,6 +16,8 @@ namespace Wing.RPGSystem
         public InputField nameInputField;
         public Button infoConfirmButton;
         public Text infoText;
+        public Slider bgmSlider;
+        public Slider seSlider;
 
         [Header("Pages")]
         public GameObject startPage;
@@ -23,6 +25,7 @@ namespace Wing.RPGSystem
         public GameObject savePage;
         public GameObject nameInputPage;
         public GameObject infoPage;
+        public GameObject settingPage;
 
         [Header("CreatePage")]
         public Text raceText;
@@ -42,6 +45,9 @@ namespace Wing.RPGSystem
         private int selectClassID;
         private int selectRaceID;
         private float infoBoardOffsetY => infoBoard.m_rectT.sizeDelta.y / 2 + 40;
+
+        private float lastBGMValue;
+        private float lastSEValue;
 
         private void Start()
         {
@@ -216,7 +222,18 @@ namespace Wing.RPGSystem
 
         public void Button_Setting()
         {
+            lastBGMValue = AudioManager.Instance.musicSource.volume;
+            lastSEValue = AudioManager.Instance.seSource.volume;
+            bgmSlider.value = lastBGMValue;
+            seSlider.value = lastSEValue;
+            settingPage.SetActive(true);
+        }
 
+        public void Button_Setting_Cancel()
+        {
+            bgmSlider.value = lastBGMValue;
+            seSlider.value = lastSEValue;
+            settingPage.SetActive(false);
         }
 
         public void Button_Quit()
@@ -271,5 +288,14 @@ namespace Wing.RPGSystem
             }
         }
 
+        public void Slider_BGM()
+        {
+            AudioManager.Instance.musicSource.volume = bgmSlider.value;
+        }
+
+        public void Slider_SE()
+        {
+            AudioManager.Instance.seSource.volume = seSlider.value;
+        }
     }
 }
