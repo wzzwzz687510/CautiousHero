@@ -65,6 +65,8 @@ namespace Wing.RPGSystem
         private void Update()
         {
             if (Input.GetMouseButtonDown(1)) {
+                selectClassID = 0;
+                selectRaceID = 0;
                 savePage.SetActive(false);
                 createPage.SetActive(false);
                 startPage.SetActive(true);
@@ -101,6 +103,26 @@ namespace Wing.RPGSystem
             }
           
             infoBoard.transform.position = talentSlots[slotID].transform.position + new Vector3(0, infoBoardOffsetY, 0);
+        }
+
+        private void UpdateSummonPage()
+        {
+            TRace tRace = Database.Instance.ActivePlayerData.unlockedRaces[selectRaceID].GetTRace();
+            TClass tClass = Database.Instance.ActivePlayerData.unlockedClasses[selectClassID].GetTClass();
+            raceFace.sprite = tRace.face;
+            raceText.text = tRace.name;
+            classText.text = tClass.name;
+            raceDesText.text = tRace.description;
+
+            talentSlots[0].icon.sprite = tRace.relic.sprite;
+            talentSlots[1].icon.sprite = tClass.relic.sprite;
+            skillSlots[0].icon.sprite = tClass.skillSet[0].sprite;
+            skillSlots[1].icon.sprite = tClass.skillSet[1].sprite;
+            skillSlots[2].icon.sprite = tRace.skill.sprite;
+            raceFace.color = Color.white;
+
+            talentCover.SetActive(false);
+            classCover.SetActive(false);
         }
 
         public void ResetUI()
@@ -175,6 +197,7 @@ namespace Wing.RPGSystem
                 infoConfirmButton.onClick.AddListener(() => {
                     Button_ConfirmNewGame();
                     infoConfirmButton.onClick.RemoveAllListeners();
+                    UpdateSummonPage();
                     infoPage.SetActive(false);
                 });
                 infoText.text = "Summon will create a new world and delete saved data.";
@@ -185,18 +208,7 @@ namespace Wing.RPGSystem
 
         public void Button_ConfirmNewGame()
         {
-            TRace tRace = Database.Instance.ActivePlayerData.unlockedRaces[selectRaceID].GetTRace();
-            TClass tClass = Database.Instance.ActivePlayerData.unlockedClasses[selectClassID].GetTClass();
-            raceFace.sprite = tRace.face;
-            raceText.text = tRace.name;
-            classText.text = tClass.name;
-            raceDesText.text = tRace.description;
-
-            talentSlots[0].icon.sprite = tRace.relic.sprite;
-            talentSlots[1].icon.sprite = tClass.relic.sprite;           
-            skillSlots[0].icon.sprite = tClass.skillSet[0].sprite;
-            skillSlots[1].icon.sprite = tClass.skillSet[1].sprite;
-            skillSlots[2].icon.sprite = tRace.skill.sprite;
+            UpdateSummonPage();
 
             startPage.SetActive(false);
             createPage.SetActive(true);
@@ -223,9 +235,9 @@ namespace Wing.RPGSystem
                 raceText.text = tRace.name;
                 raceDesText.text = tRace.description;
                 raceFace.sprite = tRace.face;
-                actorAnim.Play(tRace.name);
-                raceFace.color = Color.white;
                 actorAnim.gameObject.SetActive(true);
+                actorAnim.Play(tRace.name);
+                raceFace.color = Color.white;                
                 talentSlots[0].icon.sprite = tRace.relic.sprite;
                 skillSlots[2].icon.sprite = tRace.skill.sprite;
                 talentCover.SetActive(false);

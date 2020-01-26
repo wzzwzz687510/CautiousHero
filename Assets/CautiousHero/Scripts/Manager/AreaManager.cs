@@ -168,7 +168,7 @@ namespace Wing.RPGSystem
                 foreach (var step in character.Loc.GetPath(des)) {
                     if (AlertZone[spawnLoc].Contains(step)) {                        
                         character.MoveToLocation(step, false, false);
-                        foreach (var hash in RemainedCreatures[spawnLoc]) hash.GetEntity().SetVisual(true);
+                        //foreach (var hash in RemainedCreatures[spawnLoc]) hash.GetEntity().SetVisual(true);
                         BattleManager.Instance.NewBattle(RemainedCreatures[spawnLoc]);
                         RemainedCreatures.Remove(spawnLoc);
                         InBatlleCreatureSets.Add(spawnLoc);
@@ -195,6 +195,8 @@ namespace Wing.RPGSystem
                     patternY = -ce.pattern.x * sine + ce.pattern.y * cosine;
                     cc.InitCreature(ce.tCreature, new Location(patternX, patternY) + spawnLoc);
                     creatureHashes.Add(cc.Hash);
+                    int distance = character.Loc.Distance(cc.Loc);
+                    cc.SetVisual(distance < playerViewDistance);
                 }
                 RemainedCreatures.Add(spawnLoc, creatureHashes);
 

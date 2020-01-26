@@ -118,7 +118,6 @@ namespace Wing.RPGSystem
         {
             timer = Time.time;
             AudioManager.Instance.PlayPeacefulClip();
-            m_worldUIController.UpdateUI();
             m_worldUIController.SwitchToWorldView();
 
             // Init map visual
@@ -131,6 +130,8 @@ namespace Wing.RPGSystem
             character.InitCharacter("WorldCharacter", WorldData.ActiveData.attribute);
             character.MoveToLocation(currentLoc, true, true);
             StartCoroutine(DelayShowCharacter(1));
+
+            m_worldUIController.UpdateUI();
         }
 
         public void EnterNextStage()
