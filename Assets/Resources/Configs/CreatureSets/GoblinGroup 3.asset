@@ -27,7 +27,7 @@ MonoBehaviour:
     pattern:
       x: 0
       y: -1
-  difficulty: 3
+  difficulty: 4
   coin: 10
   exp: 20
   chest: {fileID: 0}

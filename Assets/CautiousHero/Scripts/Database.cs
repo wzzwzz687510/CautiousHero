@@ -87,6 +87,7 @@ namespace Wing.RPGSystem
         public TRace completeRace;
         public TClass completeClass;
         public WorldConfig defaultWorldConfig;
+        public WorldConfig hardConfig;
         public EntityAttribute attribute;
 
         public WorldData ActiveWorldData { get { return m_activeWorldData; } }
@@ -392,6 +393,12 @@ namespace Wing.RPGSystem
         {
             if (!m_playerData[SelectSlot].unlockedRaces.Contains(hash))
                 m_playerData[SelectSlot].unlockedRaces.Add(hash);
+        }
+
+        public void CompleteTutorial()
+        {
+            UnlockClass(completeClass.Hash);
+            UnlockRace(completeRace.Hash);
         }
 
         public void SetCharacterData(int hp)

@@ -123,6 +123,7 @@ namespace Wing.RPGSystem
 
         public void DisplayEndPage()
         {
+            AudioManager.Instance.PlayEndClip();
             endPage.SetActive(true);
         }
 

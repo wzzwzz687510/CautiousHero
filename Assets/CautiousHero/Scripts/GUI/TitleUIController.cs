@@ -187,6 +187,7 @@ namespace Wing.RPGSystem
         {
             TRace tRace = Database.Instance.ActivePlayerData.unlockedRaces[selectRaceID].GetTRace();
             TClass tClass = Database.Instance.ActivePlayerData.unlockedClasses[selectClassID].GetTClass();
+            raceFace.sprite = tRace.face;
             raceText.text = tRace.name;
             classText.text = tClass.name;
             raceDesText.text = tRace.description;

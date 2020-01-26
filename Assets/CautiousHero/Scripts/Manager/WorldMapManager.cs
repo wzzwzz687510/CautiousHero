@@ -101,8 +101,7 @@ namespace Wing.RPGSystem
 
         public void CompleteWorld()
         {
-            Database.Instance.UnlockClass(Database.Instance.completeClass.Hash);
-            Database.Instance.UnlockRace(Database.Instance.completeRace.Hash);
+            Database.Instance.CompleteTutorial();
             Database.Instance.SetNewGame();
             AudioManager.Instance.PlayTitleClip();
             BackToTitle();
@@ -214,7 +213,7 @@ namespace Wing.RPGSystem
                 Location loc = WorldData.ActiveData.worldMap[i];
                 Nav.SetTileWeight(loc, 1);
                 AreaController ac = areaHolder.GetChild(i).GetComponent<AreaController>();
-                ac.transform.position = new Vector3(0.524f * (loc.y-loc.x), 0.262f * (loc.x + loc.y), 0);
+                ac.transform.position = loc.ToPosition();//new Vector3(0.524f * (loc.y-loc.x), 0.262f * (loc.x + loc.y), 0);
                 ac.ResetArea();
                 AreaDic.Add(loc, ac);
             }
@@ -241,7 +240,9 @@ namespace Wing.RPGSystem
         private IEnumerator GenerateNewWorld()
         {
             WorldMapUIController.Instance.SetLoadingPage(true);
-            var worldConfig = Database.Instance.defaultWorldConfig;
+            //-------------------------- Test------------------------------------------------
+            var worldConfig = Database.Instance.ActivePlayerData.unlockedClasses.Count == 1 ? 
+                Database.Instance.defaultWorldConfig : Database.Instance.hardConfig;
             int areaNumber = 0;
             for (int i = 0; i < worldConfig.stages.Length; i++) {
                 areaNumber += worldConfig.stages[i].stageLength;

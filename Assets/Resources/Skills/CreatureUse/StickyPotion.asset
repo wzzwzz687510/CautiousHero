@@ -15,7 +15,7 @@ MonoBehaviour:
   skillName: Sticky Potion
   description: 
   sprite: {fileID: 915005301508503490, guid: 95182df2e629f5c4c90c733881fc6d9c, type: 3}
-  actionPointsCost: 2
+  actionPointsCost: 1
   rarity: 0
   damageType: 1
   skillElement: 3
@@ -31,10 +31,12 @@ MonoBehaviour:
     emptySize: 3
   tEffectPatterns: {fileID: 11400000, guid: 6ea384fd33e47c44baaf0ab2bc8eb637, type: 2}
   additionSkills: []
+  additionSelfSkills: []
   additionBuffs:
   - {fileID: 11400000, guid: 1b05d44847a0522418e5048444c6292d, type: 2}
   - {fileID: 11400000, guid: 1b05d44847a0522418e5048444c6292d, type: 2}
   - {fileID: 11400000, guid: 1b05d44847a0522418e5048444c6292d, type: 2}
+  additionSelfBuffs: []
   baseValue: 10
   attributeMag: 1
   attribute: 1

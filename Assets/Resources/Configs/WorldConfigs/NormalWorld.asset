@@ -12,7 +12,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4c6256741b9944049b46cc3724687dcf, type: 3}
   m_Name: NormalWorld
   m_EditorClassIdentifier: 
-  configName: 
+  configName: NormalWorld
   description: 
-  stages: []
-  randomPool: {fileID: 0}
+  stages:
+  - complexity: 20
+    stageLength: 5
+    creatureNumber: 0
+    treatureNumber: 0
+    mainConfig: {fileID: 11400000, guid: 637aa3023f231ed49a846dd8202c7a16, type: 2}
+    bossConfig: {fileID: 11400000, guid: 6897ec562f92823468f6a1cd03e75948, type: 2}
+    mainAreaNumber: 6
+    specialConfigs: []
+  randomPool: {fileID: 11400000, guid: 12859766857ad1247bd5147b7d99b154, type: 2}

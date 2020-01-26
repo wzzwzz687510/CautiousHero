@@ -12,9 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ec70590e5fc5eea4f9776aa96baa83a4, type: 3}
   m_Name: LightStep
   m_EditorClassIdentifier: 
-  skillName: 
-  description: 
-  sprite: {fileID: 0}
+  skillName: Light Step
+  description: Fast move to nearby
+  sprite: {fileID: -6565013819230968915, guid: 95182df2e629f5c4c90c733881fc6d9c, type: 3}
   actionPointsCost: 0
   rarity: 0
   damageType: 0
@@ -27,9 +27,9 @@ MonoBehaviour:
     sound: {fileID: 0}
   tCastPatterns:
     type: 0
-    size: 0
+    size: 2
     emptySize: 0
-  tEffectPatterns: {fileID: 0}
+  tEffectPatterns: {fileID: 11400000, guid: 6ea384fd33e47c44baaf0ab2bc8eb637, type: 2}
   additionSkills: []
   additionSelfSkills: []
   additionBuffs: []

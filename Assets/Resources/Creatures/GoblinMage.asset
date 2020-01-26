@@ -18,7 +18,7 @@ MonoBehaviour:
   attribute:
     maxHealth: 24
     maxAction: 6
-    actionPerTurn: 4
+    actionPerTurn: 3
     strength: 0
     intelligence: 2
     agility: 0

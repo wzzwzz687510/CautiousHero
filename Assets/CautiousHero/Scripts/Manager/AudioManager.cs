@@ -15,6 +15,7 @@ namespace Wing.RPGSystem
         public AudioClip peacefulClip;
         public AudioClip battleClip;
         public AudioClip bossClip;
+        public AudioClip endClip;
 
         [Header("SE")]
         public AudioClip turnChangeClip;
@@ -69,6 +70,11 @@ namespace Wing.RPGSystem
         public void PlayTitleClip()
         {
             StartCoroutine(FadeToClip(titleClip));
+        }
+
+        public void PlayEndClip()
+        {
+            StartCoroutine(FadeToClip(endClip));
         }
 
         public void PlayPeacefulClip()

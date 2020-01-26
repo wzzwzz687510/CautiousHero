@@ -415,6 +415,7 @@ MonoBehaviour:
   completeRace: {fileID: 11400000, guid: 1f79486e663c88544ae21bdb06d2c2a2, type: 2}
   completeClass: {fileID: 11400000, guid: 37ca5669c73b163408a1a6a3642effd1, type: 2}
   defaultWorldConfig: {fileID: 11400000, guid: 7f0317c635b0e8a46acd9748a2b0bdf5, type: 2}
+  hardConfig: {fileID: 11400000, guid: a9bea3684f8ac8943862de98a345b4b0, type: 2}
   attribute:
     maxHealth: 100
     maxAction: 6

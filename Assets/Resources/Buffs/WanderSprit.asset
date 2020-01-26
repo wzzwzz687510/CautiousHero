@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: WanderSprit
   m_EditorClassIdentifier: 
   buffName: Wander Sprit
-  description: 
+  description: Each 4 steps gives a protection.
   sprite: {fileID: 8671817140711672497, guid: 95182df2e629f5c4c90c733881fc6d9c, type: 3}
   type: 0
   lastingTurn: 1

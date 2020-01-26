@@ -31,8 +31,10 @@ MonoBehaviour:
     emptySize: 1
   tEffectPatterns: {fileID: 11400000, guid: fb8a15e96e3b9964793967d6999e77cc, type: 2}
   additionSkills: []
+  additionSelfSkills: []
   additionBuffs: []
-  baseValue: 16
+  additionSelfBuffs: []
+  baseValue: 12
   attributeMag: 1
   attribute: 0
   cost:

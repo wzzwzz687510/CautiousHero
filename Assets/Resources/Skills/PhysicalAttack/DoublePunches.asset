@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: DoublePunches
   m_EditorClassIdentifier: 
   skillName: Double Punch
-  description: 
+  description: 'Make target Vulnerable. '
   sprite: {fileID: -36115053092343016, guid: 95182df2e629f5c4c90c733881fc6d9c, type: 3}
   actionPointsCost: 2
   rarity: 0
@@ -31,8 +31,12 @@ MonoBehaviour:
     emptySize: 1
   tEffectPatterns: {fileID: 11400000, guid: 6ea384fd33e47c44baaf0ab2bc8eb637, type: 2}
   additionSkills: []
-  additionBuffs: []
-  baseValue: 20
+  additionSelfSkills: []
+  additionBuffs:
+  - {fileID: 11400000, guid: 4328078e8ab43574ab4127b90dad5788, type: 2}
+  - {fileID: 11400000, guid: 4328078e8ab43574ab4127b90dad5788, type: 2}
+  additionSelfBuffs: []
+  baseValue: 14
   attributeMag: 1
   attribute: 0
   cost:
