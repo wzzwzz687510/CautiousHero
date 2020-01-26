@@ -127,7 +127,6 @@ namespace Wing.RPGSystem
 
             // Init player
             character.EntitySprite.DOFade(0, 0);
-            Debug.Log(WorldData.ActiveData.HealthPoints);
             character.InitCharacter("WorldCharacter", WorldData.ActiveData.attribute, WorldData.ActiveData.HealthPoints);
             character.MoveToLocation(currentLoc, true, true);
             StartCoroutine(DelayShowCharacter(1));
