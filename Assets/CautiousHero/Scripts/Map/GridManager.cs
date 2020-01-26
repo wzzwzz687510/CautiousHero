@@ -72,12 +72,16 @@ public class GridManager : MonoBehaviour
 
     public void LoadMap()
     {
+        DG.Tweening.DOTween.SetTweensCapacity(1024, 50);
         exploredTiles.Clear();
         for (int x = 0; x < 32; x++) {
             for (int y = 0; y < 32; y++) {
                 Location loc = new Location(x, y);
                 TileDic[loc].UpdateSprite();
-                if (TileDic[loc].Info.isExplored) exploredTiles.Add(loc);
+                if (TileDic[loc].Info.isExplored) {
+                    AddExploredTile(loc);
+                    TileDic[loc].SetVisiable();
+                }
                 Nav.SetTileWeight(loc, TileDic[loc].Info.IsBlocked ? 0 : 1);
             }
         }
@@ -103,10 +107,41 @@ public class GridManager : MonoBehaviour
                 heuristic = Mathf.Abs(x) + Mathf.Abs(y);
                 if (heuristic <= viewDistance) {
                     Location tmp = new Location(loc.x + x, loc.y + y);
-                    if(TileDic.ContainsKey(tmp)) AddExploredTile(tmp);                
+                    if (TileDic.ContainsKey(tmp)) {
+                        AddExploredTile(tmp);
+                        TileDic[tmp].SetVisiable();
+                    }
                 }
             }
         }
+    }
+
+    public void DiscoverTiles(Location from, Location to)
+    {
+        //Debug.Log("from: " + from.ToString() + ", to: " + to.ToString());
+        int heuristic = 0;
+        int viewDistance = AreaManager.Instance.playerViewDistance;
+        var handledTiles = new HashSet<Location>();
+        // Can improve animation here. Use for loop to control delay time.
+        int weight = Nav.GetTileWeight(to);
+        Nav.SetTileWeight(to, 1);
+        foreach (var step in Nav.GetPath(from, to)) {
+            for (int x = -viewDistance; x < viewDistance + 1; x++) {
+                for (int y = -viewDistance; y < viewDistance + 1; y++) {
+                    Location tmp = new Location(step.x + x, step.y + y);
+                    if (handledTiles.Contains(tmp)) continue;
+                    heuristic = Mathf.Abs(x) + Mathf.Abs(y);
+                    if (heuristic <= viewDistance) {
+                        if (TileDic.ContainsKey(tmp)) {
+                            AddExploredTile(tmp);
+                            TileDic[tmp].SetVisiable();
+                            handledTiles.Add(tmp);
+                        }
+                    }
+                }
+            }
+        }
+        Nav.SetTileWeight(to, weight);
     }
 
     public void SaveExplorationState()

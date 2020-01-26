@@ -147,7 +147,8 @@ namespace Wing.RPGSystem
         {
             if (!tileLoc.IsValid() || AnimationManager.Instance.IsPlaying) return;
             viewPin.localPosition = Vector3.zero;
-            GridManager.Instance.DiscoverTiles(BattleCheck(tileLoc));
+            Location from = character.Loc;
+            GridManager.Instance.DiscoverTiles(from, BattleCheck(tileLoc));
             if (TempData.map[tileLoc.x, tileLoc.y].GetTileType() == TileType.Entrance)
                 StartCoroutine(CompleteExplorationAfterAnim());
         }
@@ -272,8 +273,10 @@ namespace Wing.RPGSystem
             character.transform.position = spawnLoc.ToPosition();
             m_areaUIController.BindBuffManager();
 
-            // Init battle system
+            // Init others
             BattleManager.Instance.Init();
+            GridManager.Instance.LoadMap();
+            GridManager.Instance.DiscoverTiles(spawnLoc);
             InstantiateCreatures();
             InstantiateAbotics();
             //SaveAreaInfo();

@@ -86,7 +86,6 @@ public class BattleManager : MonoBehaviour
     {
         ChangeState(BattleState.FreeMove);
         m_battleUIController.EnterAreaAnim();
-        GridManager.Instance.LoadMap();
     }
 
     public void NewBattle(List<int> battleSet)
@@ -219,6 +218,7 @@ public class BattleManager : MonoBehaviour
                 case BattleState.ExtraMove:
                     SelectVisual(tile.Loc, TileState.MoveZone);
                     if (Input.GetMouseButtonDown(0) && tile.Loc != character.Loc && tileZone.Contains(currentSelected[0])) {
+                        GridManager.Instance.DiscoverTiles(character.Loc, tile.Loc);
                         character.MoveToTile(tile.Loc, 0);
                         ChangeState(BattleState.PlayerAnim);
                         AnimationManager.Instance.PlayOnce();
@@ -228,9 +228,11 @@ public class BattleManager : MonoBehaviour
                     SelectVisual(tile.Loc, TileState.MoveZone);
 
                     if (Input.GetMouseButtonDown(0) && tile.Loc != character.Loc && tileZone.Contains(currentSelected[0])) {
+                        GridManager.Instance.DiscoverTiles(character.Loc, tile.Loc);
                         character.MoveToTile(tile.Loc,character.MoveCost);
                         ChangeState(BattleState.PlayerAnim);
                         AnimationManager.Instance.PlayOnce();
+                        
                     }
                     break;
                 case BattleState.PlayerCast:

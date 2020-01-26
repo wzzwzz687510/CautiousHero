@@ -78,6 +78,7 @@ namespace Wing.RPGSystem
         public SpriteRenderer m_bSpriteRenderer;
         public SpriteRenderer m_fSpriteRenderer;
         public SpriteRenderer m_cover;
+        public SpriteRenderer m_fog;
         public Transform m_archor;
 
         [Header("Colours")]
@@ -113,6 +114,7 @@ namespace Wing.RPGSystem
         {
             m_bSpriteRenderer.sprite = Info.tTileHash.GetTTile().bSprite;
             m_fSpriteRenderer.sprite = Info.tTileHash.GetTTile().fSprite;
+            m_fog.color = Color.black;
         }
 
         public void ChangeTileState(TileState state)
@@ -155,8 +157,7 @@ namespace Wing.RPGSystem
 
         public void SetVisiable()
         {
-            m_bSpriteRenderer.color = Color.white;
-            m_fSpriteRenderer.color = Color.white;
+            m_fog.DOFade(0, 0.5f);
         }
 
         public void EntityPassBy(Entity entity)

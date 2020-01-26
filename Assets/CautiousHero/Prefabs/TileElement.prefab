@@ -400,7 +400,7 @@ MonoBehaviour:
   m_bSpriteRenderer: {fileID: 4489795072179101738}
   m_fSpriteRenderer: {fileID: 3012695064823484868}
   m_cover: {fileID: 3151835176940546217}
-  m_animator: {fileID: 0}
+  m_fog: {fileID: 2383210024053800961}
   m_archor: {fileID: 131450598389702551}
   moveColor: {r: 0.36, g: 1, b: 0.36, a: 1}
   unreachableColor: {r: 1, g: 0.2, b: 0, a: 1}

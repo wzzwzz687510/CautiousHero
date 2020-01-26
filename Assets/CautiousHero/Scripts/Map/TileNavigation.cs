@@ -77,10 +77,8 @@ namespace Wing.RPGSystem
             }
         }
 
-        public void SetTileWeight(Location id, int cost)
-        {
-            grid.SetWeight(id, cost);
-        }
+        public void SetTileWeight(Location id, int cost) => grid.SetWeight(id, cost);
+        public int GetTileWeight(Location id) => grid.GetWeight(id);
     }
 
     public interface WeightedGraph<L>
@@ -111,10 +109,8 @@ namespace Wing.RPGSystem
             }
         }
 
-        public void SetWeight(Location id, int weight)
-        {
-            weights[id] = weight;
-        }
+        public int GetWeight(Location id) => weights[id];
+        public void SetWeight(Location id, int weight) => weights[id] = weight;
 
         public bool InBounds(Location id)
         {
@@ -123,15 +119,8 @@ namespace Wing.RPGSystem
         }
 
         // Negative number or zero seen as block
-        public bool Passable(Location id)
-        {
-            return weights[id] > 0;
-        }
-
-        public int Cost(Location from, Location to)
-        {
-            return weights[to];
-        }
+        public bool Passable(Location id) => weights[id] > 0;
+        public int Cost(Location from, Location to) => weights[to];
 
         public IEnumerable<Location> Neighbors(Location id)
         {
