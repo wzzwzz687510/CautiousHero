@@ -290,12 +290,12 @@ namespace Wing.RPGSystem
 
         public void Slider_BGM()
         {
-            AudioManager.Instance.musicSource.volume = bgmSlider.value;
+            AudioManager.Instance.SetBGMVolume(bgmSlider.value);
         }
 
         public void Slider_SE()
         {
-            AudioManager.Instance.seSource.volume = seSlider.value;
+            AudioManager.Instance.SetSEVolume(seSlider.value);
         }
     }
 }

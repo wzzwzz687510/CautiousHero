@@ -101,7 +101,6 @@ namespace Wing.RPGSystem
 
         public void CompleteWorld()
         {
-            Database.Instance.CompleteTutorial();
             Database.Instance.SetNewGame();
             AudioManager.Instance.PlayTitleClip();
             BackToTitle();

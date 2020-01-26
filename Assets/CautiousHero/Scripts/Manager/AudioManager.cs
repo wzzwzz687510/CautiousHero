@@ -29,6 +29,9 @@ namespace Wing.RPGSystem
         public AudioSource seSource;
         private bool sourceFlag;
 
+        private float bgmVolume;
+        private float seVolume;
+
         private void Awake()
         {
             if (!Instance)
@@ -39,6 +42,18 @@ namespace Wing.RPGSystem
         {
             //StartCoroutine(BlendIntroToLoop());
             PlayTitleClip();
+        }
+
+        public void SetBGMVolume(float value)
+        {
+            bgmVolume = value;
+            musicSource.volume = bgmVolume;
+        }
+
+        public void SetSEVolume(float value)
+        {
+            seVolume = value;
+            seSource.volume = seVolume;
         }
 
         public void PlaySEClip(AudioClip clip)
@@ -108,7 +123,7 @@ namespace Wing.RPGSystem
             yield return new WaitForSeconds(delay);
             yield return StartCoroutine(FadeAudio(musicSource, 0.2f, 0));
             musicSource.Stop();
-            musicSource.volume = 1;
+            musicSource.volume = bgmVolume;
             musicSource.clip = clip;
             musicSource.Play();
         }
