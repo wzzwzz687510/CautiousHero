@@ -416,23 +416,6 @@ MonoBehaviour:
   completeClass: {fileID: 11400000, guid: 37ca5669c73b163408a1a6a3642effd1, type: 2}
   defaultWorldConfig: {fileID: 11400000, guid: 7f0317c635b0e8a46acd9748a2b0bdf5, type: 2}
   hardConfig: {fileID: 11400000, guid: a9bea3684f8ac8943862de98a345b4b0, type: 2}
-  attribute:
-    maxHealth: 100
-    maxAction: 6
-    actionPerTurn: 4
-    strength: 10
-    intelligence: 10
-    agility: 10
-    moveCost: 1
-    resistance:
-      physcialResistance: 0
-      elementResistance:
-        fire: 0
-        water: 0
-        earth: 0
-        air: 0
-        light: 0
-        dark: 0
   WorldDataChangedEvent:
     m_PersistentCalls:
       m_Calls: []
