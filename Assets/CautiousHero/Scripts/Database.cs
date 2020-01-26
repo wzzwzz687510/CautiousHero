@@ -88,7 +88,6 @@ namespace Wing.RPGSystem
         public TClass completeClass;
         public WorldConfig defaultWorldConfig;
         public WorldConfig hardConfig;
-        public EntityAttribute attribute;
 
         public WorldData ActiveWorldData { get { return m_activeWorldData; } }
         private WorldData m_activeWorldData;
@@ -270,11 +269,12 @@ namespace Wing.RPGSystem
                 skillDeck.Add(tClass.skillSet[1].Hash);
             }
             skillDeck.Add(tRace.skill.Hash);
+            EntityAttribute attribute = (tRace.attribute + tClass.attribute) / 2;
             m_activeWorldData = new WorldData() {
                 seed = System.DateTime.Now.ToString(),
                 selectClassID = classID,
                 selectRaceID = raceID,
-                attribute = (tRace.attribute + tClass.attribute) / 2,
+                attribute = attribute,
                 HealthPoints = attribute.maxHealth,
                 gainedRelicHashes = new List<int>() { classID.GetTClassFromID().relic.Hash,
                     raceID.GetTRaceFromID().relic.Hash },
