@@ -168,7 +168,11 @@ namespace Wing.RPGSystem
                 foreach (var step in character.Loc.GetPath(des)) {
                     if (AlertZone[spawnLoc].Contains(step)) {                        
                         character.MoveToLocation(step, false, false);
-                        //foreach (var hash in RemainedCreatures[spawnLoc]) hash.GetEntity().SetVisual(true);
+                        foreach (var hash in RemainedCreatures[spawnLoc]) {
+                            Entity entity = hash.GetEntity();
+                            int distance = character.Loc.Distance(entity.Loc);
+                            entity.SetVisual(distance <= playerViewDistance);
+                        }
                         BattleManager.Instance.NewBattle(RemainedCreatures[spawnLoc]);
                         RemainedCreatures.Remove(spawnLoc);
                         InBatlleCreatureSets.Add(spawnLoc);
