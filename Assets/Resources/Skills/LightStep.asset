@@ -1,0 +1,49 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ec70590e5fc5eea4f9776aa96baa83a4, type: 3}
+  m_Name: LightStep
+  m_EditorClassIdentifier: 
+  skillName: 
+  description: 
+  sprite: {fileID: 0}
+  actionPointsCost: 0
+  rarity: 0
+  damageType: 0
+  skillElement: 0
+  castType: 0
+  labels: 
+  castEffect:
+    effectName: 
+    animDuration: 0
+    sound: {fileID: 0}
+  tCastPatterns:
+    type: 0
+    size: 0
+    emptySize: 0
+  tEffectPatterns: {fileID: 0}
+  additionSkills: []
+  additionSelfSkills: []
+  additionBuffs: []
+  additionSelfBuffs: []
+  baseValue: 0
+  attributeMag: 1
+  attribute: 0
+  cost:
+    mana:
+      fire: 0
+      water: 0
+      earth: 0
+      air: 0
+      light: 0
+      dark: 0
+  isInstanceMovement: 0
+  isMovementFirst: 0
