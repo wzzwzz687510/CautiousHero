@@ -29,8 +29,8 @@ namespace Wing.RPGSystem
         public AudioSource seSource;
         private bool sourceFlag;
 
-        private float bgmVolume;
-        private float seVolume;
+        private float bgmVolume = 1;
+        private float seVolume = 1;
 
         private void Awake()
         {
