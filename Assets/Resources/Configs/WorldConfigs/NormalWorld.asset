@@ -15,7 +15,7 @@ MonoBehaviour:
   configName: NormalWorld
   description: 
   stages:
-  - complexity: 20
+  - complexity: 60
     stageLength: 5
     creatureNumber: 0
     treatureNumber: 0

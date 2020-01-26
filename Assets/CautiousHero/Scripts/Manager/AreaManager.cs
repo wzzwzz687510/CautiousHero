@@ -145,7 +145,7 @@ namespace Wing.RPGSystem
 
         private void MoveToTile(Location tileLoc)
         {
-            if (!tileLoc.IsValid() || AnimationManager.Instance.IsPlaying) return;
+            if (!tileLoc.IsUnblocked() || AnimationManager.Instance.IsPlaying) return;
             viewPin.localPosition = Vector3.zero;
             Location from = character.Loc;
             GridManager.Instance.DiscoverTiles(from, BattleCheck(tileLoc));

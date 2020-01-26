@@ -17,4 +17,6 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 6facda352bb839a4192a3d8885cfa40b, type: 2}
   - {fileID: 11400000, guid: 2d7585f0e7ff70e4b91af0960e9903fa, type: 2}
   - {fileID: 11400000, guid: f8221e3ccf00cc64ea78a93ce74f4295, type: 2}
-  hardSets: []
+  hardSets:
+  - {fileID: 11400000, guid: 59314958f6fc4dd45923fb0306c04e80, type: 2}
+  - {fileID: 11400000, guid: 4e16270d77a4bc24d967941f6df604b0, type: 2}
